@@ -58,17 +58,18 @@
 
 #ifdef _DEBUG
 #   ifdef _UNICODE
-#       pragma comment(lib, "..\\Lib\\DuiLib_ud.lib")
+#       pragma comment(lib, "DuiLibUD")
 #   else
-#       pragma comment(lib, "..\\Lib\\DuiLib_d.lib")
+#       pragma comment(lib, "DuiLibD")
 #   endif
 #else
 #   ifdef _UNICODE
-#       pragma comment(lib, "..\\Lib\\DuiLib_u.lib")
+#       pragma comment(lib, "DuiLibU")
 #   else
-#       pragma comment(lib, "..\\Lib\\DuiLib.lib")
+#       pragma comment(lib, "DuiLib")
 #   endif
 #endif
+
 
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
