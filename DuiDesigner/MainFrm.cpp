@@ -5,7 +5,6 @@
 #include "DuiDesigner.h"
 #include "MainFrm.h"
 #include "DialogTemplateOpen.h"
-#include "DialogCheckUpdate.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -41,7 +40,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CMDIFrameWndEx)
 	ON_COMMAND(ID_MDITABS_MOVE_TO_PREV_GROUP, OnMdiMoveToPrevGroup)
 	ON_COMMAND(ID_MDITABS_NEW_HORZ_TAB_GROUP, OnMdiNewHorzTabGroup)
 	ON_COMMAND(ID_MDITABS_NEW_VERT_TAB_GROUP, OnMdiNewVertTabGroup)
-	ON_COMMAND(ID_APP_CHECK_UPDATE, &CMainFrame::OnAppCheckUpdate)
 	ON_COMMAND(ID_View_Controls, &CMainFrame::OnViewControls)
 	ON_COMMAND(ID_View_Project, &CMainFrame::OnViewProject)
 	ON_COMMAND(ID_View_Resources, &CMainFrame::OnViewResource)
@@ -640,13 +638,6 @@ void CMainFrame::OnMdiNewHorzTabGroup()
 void CMainFrame::OnMdiNewVertTabGroup()
 {
 	MDITabNewGroup();
-}
-
-void CMainFrame::OnAppCheckUpdate()
-{
-	// TODO: Add your command handler code here
-	CDialogCheckUpdate dlg;
-	dlg.DoModal();
 }
 
 void CMainFrame::OnViewProperty()

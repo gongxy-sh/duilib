@@ -310,7 +310,6 @@ BEGIN
     END
     POPUP "帮助(&H)"
     BEGIN
-        MENUITEM "检查更新(&U)...",                 ID_APP_CHECK_UPDATE
         MENUITEM "关于 Dui Designer(&A)...",      ID_APP_ABOUT
     END
 END
@@ -419,7 +418,6 @@ BEGIN
     END
     POPUP "帮助(&H)"
     BEGIN
-        MENUITEM "检查更新(&U)...",                 ID_APP_CHECK_UPDATE
         MENUITEM "关于 Dui Designer(&A)...",      ID_APP_ABOUT
     END
 END
@@ -1064,7 +1062,6 @@ BEGIN
     ID_MDITABS_NEW_VERT_TAB_GROUP "新建一个新的垂直选项卡组"
     ID_MDITABS_MOVE_TO_NEXT_GROUP "将当前视图移动到下一个选项卡组"
     ID_MDITABS_MOVE_TO_PREV_GROUP "将当前视图移动到上一个选项卡组"
-    ID_APP_CHECK_UPDATE     "检查是否有新版本\n检查更新"
 END
 
 STRINGTABLE 

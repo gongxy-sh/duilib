@@ -24,9 +24,6 @@
     <ClCompile Include="ClassView.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="DialogCheckUpdate.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="DialogCustomFonts.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -132,9 +129,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="ClassView.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DialogCheckUpdate.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="DialogCustomFonts.h">

@@ -102,10 +102,6 @@ SOURCE=.\ClassView.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\DialogCheckUpdate.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\DialogCustomFonts.cpp
 # End Source File
 # Begin Source File
@@ -131,6 +127,10 @@ SOURCE=.\DialogTemplateOpen.cpp
 # Begin Source File
 
 SOURCE=.\DialogUIAttribEdit.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\DuiDesigner.cpp
 # End Source File
 # Begin Source File
 
@@ -207,10 +207,6 @@ SOURCE=.\ToolBoxWnd.cpp
 # Begin Source File
 
 SOURCE=.\UICommandHistory.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\DuiDesigner.cpp
 # End Source File
 # Begin Source File
 

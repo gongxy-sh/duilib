@@ -226,7 +226,6 @@
 #define ID_MDITABS_MOVE_TO_PREV_GROUP   32857
 #define ID_32858                        32858
 #define ID_                             32859
-#define ID_APP_CHECK_UPDATE             32860
 #define ID_32861                        32861
 #define ID_32862                        32862
 #define ID_32863                        32863
