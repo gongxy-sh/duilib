@@ -178,7 +178,9 @@ CPaintManagerUI::~CPaintManagerUI()
 {
     // Delete the control-tree structures
     for( int i = 0; i < m_aDelayedCleanup.GetSize(); i++ ) static_cast<CControlUI*>(m_aDelayedCleanup[i])->Delete();
+    {
     for( int i = 0; i < m_aAsyncNotify.GetSize(); i++ ) delete static_cast<TNotifyUI*>(m_aAsyncNotify[i]);
+    }
     m_mNameHash.Resize(0);
     if( m_pRoot != NULL ) m_pRoot->Delete();
 
@@ -1616,7 +1618,9 @@ bool CPaintManagerUI::AttachDialog(CControlUI* pControl)
     if( m_pRoot != NULL ) {
         for( int i = 0; i < m_aDelayedCleanup.GetSize(); i++ ) static_cast<CControlUI*>(m_aDelayedCleanup[i])->Delete();
         m_aDelayedCleanup.Empty();
+        {
         for( int i = 0; i < m_aAsyncNotify.GetSize(); i++ ) delete static_cast<TNotifyUI*>(m_aAsyncNotify[i]);
+        }
         m_aAsyncNotify.Empty();
         m_mNameHash.Resize(0);
         m_aPostPaintControls.Empty();
@@ -2452,6 +2456,7 @@ HFONT CPaintManagerUI::GetFont(LPCTSTR pStrFontName, int nSize, bool bBold, bool
 				return pFontInfo->hFont;
 		}
 	}
+    {
 	for( int i = 0; i< m_SharedResInfo.m_CustomFonts.GetSize(); i++ ) {
 		if(LPCTSTR key = m_SharedResInfo.m_CustomFonts.GetAt(i)) {
 			pFontInfo = static_cast<TFontInfo*>(m_SharedResInfo.m_CustomFonts.Find(key));
@@ -2460,6 +2465,7 @@ HFONT CPaintManagerUI::GetFont(LPCTSTR pStrFontName, int nSize, bool bBold, bool
 				return pFontInfo->hFont;
 		}
 	}
+    }
 
 	return NULL;
 }
@@ -3264,6 +3270,7 @@ CDuiString CPaintManagerUI::GetWindowXML()
             sWindowXML.Append(_T("\" />"));
         }
     }
+    {
     for( int i = 0; i< m_ResInfo.m_AttrHash.GetSize(); i++ ) {
         if(LPCTSTR key = m_ResInfo.m_AttrHash.GetAt(i)) {
             sDefaultAttr = static_cast<CDuiString*>(m_ResInfo.m_AttrHash.Find(key))->GetData();
@@ -3274,6 +3281,7 @@ CDuiString CPaintManagerUI::GetWindowXML()
             sWindowXML.Append(sDefaultAttr.GetData());
             sWindowXML.Append(_T("\" />"));
         }
+    }
     }
 
     // Controls

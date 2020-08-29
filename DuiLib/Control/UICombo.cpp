@@ -171,7 +171,7 @@ void CComboWnd::Init(CComboUI* pOwner)
 
     ::MapWindowRect(pOwner->GetManager()->GetPaintWindow(), HWND_DESKTOP, &rc);
 
-    MONITORINFO oMonitor = {};
+    MONITORINFO oMonitor = {0};
     oMonitor.cbSize = sizeof(oMonitor);
     ::GetMonitorInfo(::MonitorFromWindow(*this, MONITOR_DEFAULTTOPRIMARY), &oMonitor);
     CDuiRect rcWork = oMonitor.rcWork;

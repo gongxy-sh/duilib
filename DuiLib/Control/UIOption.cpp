@@ -217,10 +217,12 @@ namespace DuiLib
 			}	
 		}
 
+        {
 		UINT uSavedState = m_uButtonState;
 		m_uButtonState &= ~UISTATE_PUSHED;
 		CButtonUI::PaintStatusImage(hDC);
 		m_uButtonState = uSavedState;
+        }
 
 Label_ForeImage:
 		DrawImage(hDC, m_diFore);

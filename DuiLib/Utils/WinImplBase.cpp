@@ -109,7 +109,7 @@ LRESULT WindowImplBase::OnNcCalcSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BO
 
 	if ( ::IsZoomed(m_hWnd))
 	{	// 最大化时，计算当前显示器最适合宽高度
-		MONITORINFO oMonitor = {};
+		MONITORINFO oMonitor = {0};
 		oMonitor.cbSize = sizeof(oMonitor);
 		::GetMonitorInfo(::MonitorFromWindow(*this, MONITOR_DEFAULTTONEAREST), &oMonitor);
 		CDuiRect rcWork = oMonitor.rcWork;
@@ -174,7 +174,7 @@ LRESULT WindowImplBase::OnGetMinMaxInfo(UINT uMsg, WPARAM wParam, LPARAM lParam,
 {
 	LPMINMAXINFO lpMMI = (LPMINMAXINFO) lParam;
 
-	MONITORINFO oMonitor = {};
+	MONITORINFO oMonitor = {0};
 	oMonitor.cbSize = sizeof(oMonitor);
 	::GetMonitorInfo(::MonitorFromWindow(*this, MONITOR_DEFAULTTONEAREST), &oMonitor);
 	CDuiRect rcWork = oMonitor.rcWork;
@@ -457,7 +457,7 @@ void WindowImplBase::OnClick(TNotifyUI& msg)
 
 void WindowImplBase::Notify(TNotifyUI& msg)
 {
-	return CNotifyPump::NotifyPump(msg);
+	CNotifyPump::NotifyPump(msg);
 }
 
 }

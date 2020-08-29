@@ -6,8 +6,10 @@
 #define _USE_GDIPLUS 1
 
 #ifdef _USE_GDIPLUS
+#define iterator iter
 #include <GdiPlus.h>
-#pragma comment( lib, "GdiPlus.lib" )
+#undef iterator
+#pragma comment( lib, "GdiPlus" )
 // UMU: DO NOT use "using namespace" in .h file
 //using namespace Gdiplus;
 class DUILIB_API Gdiplus::RectF;

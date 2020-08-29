@@ -392,13 +392,13 @@ namespace DuiLib
 			nGraphics.SetTextRenderingHint(TextRenderingHintAntiAlias);
 
 			StringFormat format;
-			StringAlignment sa = StringAlignment::StringAlignmentNear;
-			if ((m_uTextStyle & DT_VCENTER) != 0) sa = StringAlignment::StringAlignmentCenter;
-			else if( (m_uTextStyle & DT_BOTTOM) != 0) sa = StringAlignment::StringAlignmentFar;
+			StringAlignment sa = StringAlignmentNear;
+			if ((m_uTextStyle & DT_VCENTER) != 0) sa = StringAlignmentCenter;
+			else if( (m_uTextStyle & DT_BOTTOM) != 0) sa = StringAlignmentFar;
 			format.SetLineAlignment((StringAlignment)sa);
-			sa = StringAlignment::StringAlignmentNear;
-			if ((m_uTextStyle & DT_CENTER) != 0) sa = StringAlignment::StringAlignmentCenter;
-			else if( (m_uTextStyle & DT_RIGHT) != 0) sa = StringAlignment::StringAlignmentFar;
+			sa = StringAlignmentNear;
+			if ((m_uTextStyle & DT_CENTER) != 0) sa = StringAlignmentCenter;
+			else if( (m_uTextStyle & DT_RIGHT) != 0) sa = StringAlignmentFar;
 			format.SetAlignment((StringAlignment)sa);
 
 			RectF nRc((float)rc.left,(float)rc.top,(float)rc.right-rc.left,(float)rc.bottom-rc.top);

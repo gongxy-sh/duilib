@@ -2973,8 +2973,10 @@ LPVOID CListHBoxElementUI::GetInterface(LPCTSTR pstrName)
 
 void CListHBoxElementUI::SetPos(RECT rc, bool bNeedInvalidate)
 {
-    if( m_pOwner == NULL ) return CListContainerElementUI::SetPos(rc, bNeedInvalidate);
-
+    if( m_pOwner == NULL )
+    {
+      CListContainerElementUI::SetPos(rc, bNeedInvalidate);
+    }
     CControlUI::SetPos(rc, bNeedInvalidate);
     rc = m_rcItem;
 

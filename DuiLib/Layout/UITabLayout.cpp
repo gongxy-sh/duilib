@@ -131,7 +131,7 @@ namespace DuiLib
 	void CTabLayoutUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
 	{
 		if( _tcscmp(pstrName, _T("selectedid")) == 0 ) SelectItem(_ttoi(pstrValue));
-		return CContainerUI::SetAttribute(pstrName, pstrValue);
+		CContainerUI::SetAttribute(pstrName, pstrValue);
 	}
 
 	void CTabLayoutUI::SetPos(RECT rc, bool bNeedInvalidate)

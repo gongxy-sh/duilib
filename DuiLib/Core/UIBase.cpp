@@ -2,7 +2,7 @@
 
 #ifdef _DEBUG
 #include <shlwapi.h>
-#pragma comment(lib, "shlwapi.lib")
+#pragma comment(lib, "shlwapi")
 #endif
 
 namespace DuiLib {
@@ -330,7 +330,7 @@ void CWindowWnd::CenterWindow()
 		hWnd=hWndCenter;
 
 	// 处理多显示器模式下屏幕居中
-	MONITORINFO oMonitor = {};
+	MONITORINFO oMonitor = {0};
 	oMonitor.cbSize = sizeof(oMonitor);
 	::GetMonitorInfo(::MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST), &oMonitor);
 	rcArea = oMonitor.rcWork;

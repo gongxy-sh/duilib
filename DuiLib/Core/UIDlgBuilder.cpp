@@ -185,12 +185,12 @@ CMarkup* CDialogBuilder::GetMarkup()
 
 void CDialogBuilder::GetLastErrorMessage(LPTSTR pstrMessage, SIZE_T cchMax) const
 {
-    return m_xml.GetLastErrorMessage(pstrMessage, cchMax);
+    m_xml.GetLastErrorMessage(pstrMessage, cchMax);
 }
 
 void CDialogBuilder::GetLastErrorLocation(LPTSTR pstrSource, SIZE_T cchMax) const
 {
-    return m_xml.GetLastErrorLocation(pstrSource, cchMax);
+    m_xml.GetLastErrorLocation(pstrSource, cchMax);
 }
 
 CControlUI* CDialogBuilder::_Parse(CMarkupNode* pRoot, CControlUI* pParent, CPaintManagerUI* pManager)

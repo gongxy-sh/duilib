@@ -1,7 +1,8 @@
 #include "StdAfx.h"
 #include "UIWebBrowser.h"
+#include <atlbase.h>
 #include <atlconv.h>
-#include <atlcomcli.h>
+//#include <atlcomcli.h>
 #include "../Utils/downloadmgr.h"
 #include <mshtml.h>
 
@@ -630,7 +631,9 @@ IDispatch* CWebBrowserUI::GetHtmlWindow()
 	if (FAILED(hr))
 		return NULL;
 
-    CComQIPtr<IHTMLDocument2> pHtmlDoc2 = pDp;
+    CComQIPtr<IHTMLDocument2> pHtmlDoc2;
+    
+    pHtmlDoc2 = pDp;
 
 	if (pHtmlDoc2 == NULL)
 		return NULL;

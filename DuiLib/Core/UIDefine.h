@@ -220,7 +220,22 @@ protected:                                                                \
 // Mark method as deprecated.
 // example: DUI_DEPRECATED void func();
 #if defined(_MSC_VER)
+#if _MSC_VER > 1200
 #  define DUI_DEPRECATED __declspec(deprecated)
+#else
+#  define DUI_DEPRECATED
+#  define override
+#  define __RPC__in
+#  define __RPC__out
+#  define __RPC__in_opt
+#  define __RPC__deref_out_opt
+#  define __RPC__in_ecount_full(a)
+#  define __RPC__inout_ecount_full(a)
+#  define __RPC__out_ecount_full(a)
+#  define __RPC__inout_opt
+//#  define OLECMD UINT
+//#  define OLECMDTEXT BSTR
+#endif
 #elif defined(__GNUC__)
 #  define DUI_DEPRECATED __attribute__ ((deprecated))
 #else

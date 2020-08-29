@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "UIFlash.h"
-#include <atlcomcli.h>
+//#include <atlcomcli.h>
+#include <atlbase.h>
 
 #define DISPID_FLASHEVENT_FLASHCALL	 ( 0x00C5 )
 #define DISPID_FLASHEVENT_FSCOMMAND	 ( 0x0096 )
