@@ -318,7 +318,7 @@ public:
 
     bool OnHChanged(void* param) {
         TNotifyUI* pMsg = (TNotifyUI*)param;
-        if( pMsg->sType == _T("valuechanged") ) {
+        if( pMsg->nType == DUI_MSGTYPE_VALUECHANGED) {
             short H, S, L;
             CPaintManagerUI::GetHSL(&H, &S, &L);
             CPaintManagerUI::SetHSL(true, (static_cast<CSliderUI*>(pMsg->pSender))->GetValue(), S, L);
@@ -328,7 +328,7 @@ public:
 
     bool OnSChanged(void* param) {
         TNotifyUI* pMsg = (TNotifyUI*)param;
-        if( pMsg->sType == _T("valuechanged") ) {
+        if( pMsg->nType == DUI_MSGTYPE_VALUECHANGED) {
             short H, S, L;
             CPaintManagerUI::GetHSL(&H, &S, &L);
             CPaintManagerUI::SetHSL(true, H, (static_cast<CSliderUI*>(pMsg->pSender))->GetValue(), L);
@@ -338,7 +338,7 @@ public:
 
     bool OnLChanged(void* param) {
         TNotifyUI* pMsg = (TNotifyUI*)param;
-        if( pMsg->sType == _T("valuechanged") ) {
+        if( pMsg->nType == DUI_MSGTYPE_VALUECHANGED) {
             short H, S, L;
             CPaintManagerUI::GetHSL(&H, &S, &L);
             CPaintManagerUI::SetHSL(true, H, S, (static_cast<CSliderUI*>(pMsg->pSender))->GetValue());
@@ -348,7 +348,7 @@ public:
 
     bool OnAlphaChanged(void* param) {
         TNotifyUI* pMsg = (TNotifyUI*)param;
-        if( pMsg->sType == _T("valuechanged") ) {
+        if( pMsg->nType == DUI_MSGTYPE_VALUECHANGED) {
             m_pm.SetOpacity((static_cast<CSliderUI*>(pMsg->pSender))->GetValue());
         }
         return true;
@@ -368,8 +368,8 @@ public:
 
     void Notify(TNotifyUI& msg)
     {
-        if( msg.sType == _T("windowinit") ) OnPrepare();
-        else if( msg.sType == _T("click") ) {
+        if( msg.nType == DUI_MSGTYPE_WINDOWINIT) OnPrepare();
+        else if( msg.nType == DUI_MSGTYPE_CLICK) {
             if( msg.pSender->GetName() == _T("insertimagebtn") ) {
                 CRichEditUI* pRich = static_cast<CRichEditUI*>(m_pm.FindControl(_T("testrichedit")));
                 if( pRich ) {

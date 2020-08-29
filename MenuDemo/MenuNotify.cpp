@@ -14,7 +14,7 @@ CMenuNotify::~CMenuNotify(void)
 
 void CMenuNotify::Notify(TNotifyUI& msg)
 {
-	if( msg.sType == DUI_MSGTYPE_ITEMCLICK) 
+	if( msg.nType == DUI_MSGTYPE_ITEMCLICK) 
 	{
 		CMenuElementUI *pMenuElement  = (CMenuElementUI*)msg.pSender;
 		CPaintManagerUI *m_pm = pMenuElement->GetManager();

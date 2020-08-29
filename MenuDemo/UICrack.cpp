@@ -128,23 +128,4 @@ const TCHAR* const kListContainerElementUIInterfaceName = _T("ListContainerEleme
 const TCHAR* const kRichEditUIClassName = _T("RichEditUI");
 const TCHAR* const kRichEditUIInterfaceName = _T("RichEdit");
 
-/////////////////////////////////////////////////////////////////////////////////////
-//
-//
-// control related message
-const TCHAR* const kWindowInit = _T("windowinit");
-const TCHAR* const kClick = _T("click");
-const TCHAR* const kSelectChanged = _T("selectchanged");
-const TCHAR* const kItemSelect = _T("itemselect");
-const TCHAR* const kItemActivate = _T("itemactivate");
-const TCHAR* const kItemClick = _T("itemclick");
-const TCHAR* const kDropDown = _T("dropdown");
-const TCHAR* const kTimer = _T("timer");
-const TCHAR* const kMenu = _T("menu");
-const TCHAR* const kReturn = _T("return");
-const TCHAR* const kTextChanged = _T("textchanged");
-const TCHAR* const kKillFocus = _T("killfocus");
-const TCHAR* const kSetFocus = _T("setfocus");
-const TCHAR* const kValueChanged = _T("valuechanged");
-
 }; // namespace DuiLib

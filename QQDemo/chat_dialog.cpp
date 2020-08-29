@@ -302,14 +302,14 @@ void ChatDialog::SendMsg()
 
 void ChatDialog::Notify(TNotifyUI& msg)
 {
-	if (_tcsicmp(msg.sType, _T("windowinit")) == 0)
+	if (msg.nType == DUI_MSGTYPE_WINDOWINIT)
 	{
 		OnPrepare(msg);
 	}
-	else if (_tcsicmp(msg.sType, _T("killfocus")) == 0)
+	else if (msg.nType == DUI_MSGTYPE_KILLFOCUS)
 	{
 	}
-	else if (_tcsicmp(msg.sType, _T("click")) == 0)
+	else if (msg.nType == DUI_MSGTYPE_CLICK)
 	{
 		if (_tcsicmp(msg.pSender->GetName(), kCloseButtonControlName) == 0)
 		{
@@ -369,18 +369,18 @@ void ChatDialog::Notify(TNotifyUI& msg)
             SendMsg();
 		}
 	}
-    else if( _tcsicmp(msg.sType, _T("return")) == 0 ) 
+    else if( msg.nType == DUI_MSGTYPE_RETURN)
     {
         if (_tcsicmp(msg.pSender->GetName(), kInputRichEditControlName) == 0)
         {
             SendMsg();
         }
     }
-	else if (_tcsicmp(msg.sType, _T("timer")) == 0)
+	else if (msg.nType == DUI_MSGTYPE_TIMER)
 	{
 		return OnTimer(msg);
 	}
-	else if (_tcsicmp(msg.sType, _T("selectchanged")) == 0)
+	else if (msg.nType == DUI_MSGTYPE_SELECTCHANGED)
 	{
 		if (_tcsicmp(msg.pSender->GetName(), kColorButtonControlName) == 0)
 		{
@@ -426,7 +426,7 @@ void ChatDialog::Notify(TNotifyUI& msg)
 			}
 		}
 	}
-	else if (_tcsicmp(msg.sType, _T("itemselect")) == 0)
+	else if (msg.nType == DUI_MSGTYPE_ITEMSELECT)
 	{
 		if (_tcsicmp(msg.pSender->GetName(), kFontTypeControlName) == 0)
 		{

@@ -93,10 +93,10 @@ void CScrCaptureWnd::OnPrepare()
 
 void CScrCaptureWnd::Notify(TNotifyUI& msg)
 {
-	if( msg.sType == _T("windowinit") ) {
+	if( msg.nType == DUI_MSGTYPE_WINDOWINIT) {
 		OnPrepare();
 	}
-	else if( msg.sType == _T("click") ) {
+	else if( msg.nType == DUI_MSGTYPE_CLICK) {
 	}
 }
 

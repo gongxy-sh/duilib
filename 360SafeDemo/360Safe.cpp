@@ -23,8 +23,8 @@ public:
 
 	void Notify(TNotifyUI& msg)
 	{
-		if( msg.sType == _T("windowinit") ) OnPrepare();
-		else if( msg.sType == _T("click") ) {
+		if( msg.nType == DUI_MSGTYPE_WINDOWINIT) OnPrepare();
+		else if( msg.nType == DUI_MSGTYPE_CLICK) {
 			if( msg.pSender == m_pCloseBtn ) {
 				PostQuitMessage(0);
 				return; 
@@ -36,7 +36,7 @@ public:
 			else if( msg.pSender == m_pRestoreBtn ) { 
 				SendMessage(WM_SYSCOMMAND, SC_RESTORE, 0); return; }
 		}
-		else if(msg.sType==_T("selectchanged"))
+		else if(msg.nType==DUI_MSGTYPE_SELECTCHANGED)
 		{
 			CDuiString name = msg.pSender->GetName();
 			CTabLayoutUI* pControl = static_cast<CTabLayoutUI*>(m_pm.FindControl(_T("switch")));

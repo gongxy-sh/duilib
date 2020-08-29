@@ -181,9 +181,9 @@ public:
 
     void Notify(TNotifyUI& msg)
     {
-        if( msg.sType == _T("windowinit") ) 
+        if( msg.nType == DUI_MSGTYPE_WINDOWINIT) 
             OnPrepare(msg);
-        else if( msg.sType == _T("click") ) 
+        else if( msg.nType == DUI_MSGTYPE_CLICK) 
         {
             if( msg.pSender == m_pCloseBtn ) 
             {
@@ -208,13 +208,13 @@ public:
                 OnSearch();
             }
         }
-        else if(msg.sType==_T("setfocus"))
+        else if(msg.nType==DUI_MSGTYPE_SETFOCUS)
         {
         }
-        else if( msg.sType == _T("itemclick") ) 
+        else if( msg.nType == DUI_MSGTYPE_ITEMCLICK) 
         {
         }
-        else if( msg.sType == _T("itemactivate") ) 
+        else if( msg.nType == DUI_MSGTYPE_ITEMACTIVATE ) 
         {
             int iIndex = msg.pSender->GetTag();
             CDuiString sMessage = _T("Click: ");;
@@ -231,7 +231,7 @@ public:
 #endif
             ::MessageBox(NULL, sMessage.GetData(), _T("ÌבÊ¾(by tojen)"), MB_OK);
         }
-        else if(msg.sType == _T("menu")) 
+        else if(msg.nType == DUI_MSGTYPE_MENU) 
         {
             if( msg.pSender->GetName() != _T("domainlist") ) return;
             CMenuWnd* pMenu = new CMenuWnd();
@@ -240,7 +240,7 @@ public:
             ::ClientToScreen(*this, &pt);
             pMenu->Init(msg.pSender, pt);
         }
-        else if( msg.sType == _T("menu_Delete") ) {
+        else if( msg.nType == DUI_MSGTYPE_MENUDELETE) {
             CListUI* pList = static_cast<CListUI*>(msg.pSender);
             int nSel = pList->GetCurSel();
             if( nSel < 0 ) return;

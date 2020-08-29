@@ -97,12 +97,12 @@ DUI_END_MESSAGE_MAP()
 
 static const DUI_MSGMAP_ENTRY* DuiFindMessageEntry(const DUI_MSGMAP_ENTRY* lpEntry,TNotifyUI& msg )
 {
-	CDuiString sMsgType = msg.sType;
+	UINT nMsgType = msg.nType;
 	CDuiString sCtrlName = msg.pSender->GetName();
 	const DUI_MSGMAP_ENTRY* pMsgTypeEntry = NULL;
 	while (lpEntry->nSig != DuiSig_end)
 	{
-		if(lpEntry->sMsgType==sMsgType)
+		if(lpEntry->nMsgType==nMsgType)
 		{
 			if(!lpEntry->sCtrlName.IsEmpty())
 			{

@@ -34,9 +34,9 @@ void MainDialog::Init()
 }
 void MainDialog::Notify(TNotifyUI& msg)
 {
-	if( msg.sType == _T("windowinit") ) 
+	if( msg.nType == DUI_MSGTYPE_WINDOWINIT) 
 		OnPrepare(msg);
-	else if( msg.sType == _T("click") ) 
+	else if( msg.nType == DUI_MSGTYPE_CLICK) 
 	{
 		if( msg.pSender == m_pCloseBtn ) 
 		{
@@ -67,11 +67,11 @@ void MainDialog::Notify(TNotifyUI& msg)
 		}
 	}
 
-	else if(msg.sType==_T("setfocus"))
+	else if(msg.nType==_T("setfocus"))
 	{
 		
 	}
-	else if( msg.sType == _T("itemexpand") ) 
+	else if( msg.nType == _T("itemexpand") ) 
 	{
 		CTreeNodeUI* pNowNode = static_cast<CTreeNodeUI*>(msg.pSender);
 		pNowNode->Select(true);

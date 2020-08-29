@@ -46,15 +46,15 @@ void CAbout::OnPrepare(TNotifyUI& msg)
 }
 void CAbout::Notify(TNotifyUI& msg)
 {
-	if (_tcsicmp(msg.sType, _T("windowinit")) == 0)
+	if (_tcsicmp(msg.nType, DUI_MSGTYPE_WINDOWINIT) == 0)
 	{
 		OnPrepare(msg);
 	}
-	else if (_tcsicmp(msg.sType, _T("killfocus")) == 0)
+	else if (_tcsicmp(msg.nType, DUI_MSGTYPE_KILLFOCUS) == 0)
 	{
 
 	}
-	else if( msg.sType == _T("click") ) 
+	else if( msg.nType == DUI_MSGTYPE_CLICK) 
 	{
 
 		if (_tcsicmp(msg.pSender->GetName(), kCloseButtonControlName) == 0)

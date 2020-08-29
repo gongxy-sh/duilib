@@ -18,13 +18,13 @@ public:
 
     void Notify(TNotifyUI& msg)
     {
-        if( msg.sType == _T("click") ) {
+        if( msg.nType == DUI_MSGTYPE_CLICK) {
             if( msg.pSender->GetName() == _T("closebtn") || msg.pSender->GetName() == _T("closebtn2") ) {
                 PostQuitMessage(0); 
                 return; 
             }
         }
-        else if( msg.sType == _T("showactivex") ) {
+        else if( msg.nType == DUI_MSGTYPE_SHOWACTIVEX) {
             if( msg.pSender->GetName() != _T("flash") ) return;
             IShockwaveFlash* pFlash = NULL;
             CActiveXUI* pActiveX = static_cast<CActiveXUI*>(msg.pSender);

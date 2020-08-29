@@ -132,25 +132,6 @@ extern const TCHAR* const kListContainerElementUIInterfaceName;// = _T("ListCont
 extern const TCHAR* const kRichEditUIClassName;// = _T("RichEditUI");
 extern const TCHAR* const kRichEditUIInterfaceName;// = _T("RichEdit");
 
-/////////////////////////////////////////////////////////////////////////////////////
-//
-//
-// control related message
-extern const TCHAR* const kWindowInit;// = _T("windowinit");
-extern const TCHAR* const kClick;// = _T("click");
-extern const TCHAR* const kSelectChanged;// = _T("selectchanged");
-extern const TCHAR* const kItemSelect;// = _T("itemselect");
-extern const TCHAR* const kItemActivate;// = _T("itemactivate");
-extern const TCHAR* const kItemClick;// = _T("itemclick");
-extern const TCHAR* const kDropDown;// = _T("dropdown");
-extern const TCHAR* const kTimer;// = _T("timer");
-extern const TCHAR* const kMenu;// = _T("menu");
-extern const TCHAR* const kReturn;// = _T("return");
-extern const TCHAR* const kTextChanged;// = _T("textchanged");
-extern const TCHAR* const kKillFocus; // = _T("killfocus");
-extern const TCHAR* const kSetFocus; // = _T("setfocus");
-extern const TCHAR* const kValueChanged; // = _T("valuechanged");
-
 }; // namespace DuiLib
 
 #endif // _UICRACK_H_

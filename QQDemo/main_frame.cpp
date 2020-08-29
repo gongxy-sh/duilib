@@ -326,11 +326,11 @@ void MainFrame::OnPrepare(TNotifyUI& msg)
 
 void MainFrame::Notify(TNotifyUI& msg)
 {
-	if (_tcsicmp(msg.sType, _T("windowinit")) == 0)
+	if (msg.nType == DUI_MSGTYPE_WINDOWINIT)
 	{
 		OnPrepare(msg);
 	}
-	else if (_tcsicmp(msg.sType, _T("killfocus")) == 0)
+	else if (msg.nType == DUI_MSGTYPE_KILLFOCUS)
 	{
 		if (_tcsicmp(msg.pSender->GetName(), kSignatureControlName) == 0)
 		{
@@ -357,7 +357,7 @@ void MainFrame::Notify(TNotifyUI& msg)
 			}
 		}
 	}
-	else if (_tcsicmp(msg.sType, _T("click")) == 0)
+	else if (msg.nType == DUI_MSGTYPE_CLICK)
 	{
 		if (_tcsicmp(msg.pSender->GetName(), kCloseButtonControlName) == 0)
 		{
@@ -483,11 +483,11 @@ void MainFrame::Notify(TNotifyUI& msg)
 			new ColorSkinWindow(this, rcWindow);
 		}
 	}
-	else if (_tcsicmp(msg.sType, _T("timer")) == 0)
+	else if (msg.nType == DUI_MSGTYPE_TIMER)
 	{
 		return OnTimer(msg);
 	}
-	else if (_tcsicmp(msg.sType, _T("selectchanged")) == 0)
+	else if (msg.nType == DUI_MSGTYPE_SELECTCHANGED)
 	{
 		CTabLayoutUI* pTabControl = static_cast<CTabLayoutUI*>(m_PaintManager.FindControl(kTabControlName));
 		if (_tcsicmp(msg.pSender->GetName(), kFriendButtonControlName) == 0)
@@ -515,7 +515,7 @@ void MainFrame::Notify(TNotifyUI& msg)
 			}
 		}
 	}
-	else if (_tcsicmp(msg.sType, _T("itemactivate")) == 0)
+	else if (msg.nType == DUI_MSGTYPE_ITEMACTIVATE)
 	{
 		CTabLayoutUI* pTabControl = static_cast<CTabLayoutUI*>(m_PaintManager.FindControl(kTabControlName));
 		if (pTabControl != NULL)
@@ -570,7 +570,7 @@ void MainFrame::Notify(TNotifyUI& msg)
 			}
 		}
 	}
-	else if (_tcsicmp(msg.sType, _T("itemclick")) == 0)
+	else if (msg.nType == DUI_MSGTYPE_ITEMCLICK)
 	{
 		CTabLayoutUI* pTabControl = static_cast<CTabLayoutUI*>(m_PaintManager.FindControl(kTabControlName));
 		if (pTabControl != NULL)

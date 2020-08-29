@@ -86,6 +86,8 @@ public:
     }
 };
 
+#define DUI_MSGTYPE_MENUDELETE DUI_MSGTYPE_USER
+
 class CMenuWnd : public CWindowWnd, public INotifyUI
 {
 public:
@@ -144,12 +146,12 @@ public:
 
     void Notify(TNotifyUI& msg)
     {
-        if( msg.sType == _T("itemselect") ) {
+        if( msg.nType == DUI_MSGTYPE_ITEMSELECT) {
             Close();
         }
-        else if( msg.sType == _T("itemclick") ) {
+        else if( msg.nType == DUI_MSGTYPE_ITEMCLICK) {
             if( msg.pSender->GetName() == _T("menu_Delete") ) {
-                if( m_pOwner ) m_pOwner->GetManager()->SendNotify(m_pOwner, _T("menu_Delete"), 0, 0, true);
+                if( m_pOwner ) m_pOwner->GetManager()->SendNotify(m_pOwner,DUI_MSGTYPE_MENUDELETE  , 0, 0, true);
             }
         }
     }

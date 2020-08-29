@@ -137,11 +137,11 @@ void MainFrame::OnPrepare(TNotifyUI& msg)
 
 void MainFrame::Notify(TNotifyUI& msg)
 {
-	if (_tcsicmp(msg.sType, kWindowInit) == 0)
+	if (msg.nType == DUI_MSGTYPE_WINDOWINIT)
 	{
 		OnPrepare(msg);
 	}
-	else if (_tcsicmp(msg.sType, kClick) == 0)
+	else if (msg.nType == DUI_MSGTYPE_CLICK)
 	{
 		if (_tcsicmp(msg.pSender->GetName(), kCloseButtonControlName) == 0)
 		{
@@ -188,7 +188,7 @@ void MainFrame::Notify(TNotifyUI& msg)
 			pMenu->Init(NULL, xml, _T("xml"), point);
 		}
 	}
-	else if (_tcsicmp(msg.sType, kTimer) == 0)
+	else if (msg.nType == DUI_MSGTYPE_TIMER)
 	{
 		return OnTimer(msg);
 	}

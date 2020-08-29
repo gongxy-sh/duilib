@@ -31,11 +31,11 @@ public:
 
     void Notify(TNotifyUI& msg)
     {
-        if( msg.sType == _T("click") ) {
+        if( msg.nType == DUI_MSGTYPE_CLICK) {
             if( msg.pSender->GetName() == _T("closebtn") ) { PostQuitMessage(0); return; }
             else if( msg.pSender->GetName() == _T("loginBtn") ) { Close(); return; }
         }
-        else if( msg.sType == _T("itemselect") ) {
+        else if( msg.nType == DUI_MSGTYPE_ITEMSELECT) {
             if( msg.pSender->GetName() == _T("accountcombo") ) {
                 CEditUI* pAccountEdit = static_cast<CEditUI*>(m_pm.FindControl(_T("accountedit")));
                 if( pAccountEdit ) pAccountEdit->SetText(msg.pSender->GetText());
@@ -279,8 +279,8 @@ public:
 
     void Notify(TNotifyUI& msg)
     {
-        if( msg.sType == _T("windowinit") ) OnPrepare();
-        else if( msg.sType == _T("click") ) {
+        if( msg.nType == DUI_MSGTYPE_WINDOWINIT) OnPrepare();
+        else if( msg.nType == DUI_MSGTYPE_CLICK) {
             if( msg.pSender == m_pCloseBtn ) { 
                 COptionUI* pControl = static_cast<COptionUI*>(m_pm.FindControl(_T("hallswitch")));
                 if( pControl && pControl->IsSelected() == false ) {
@@ -334,7 +334,7 @@ public:
                 SendChatMessage();
             }
         }
-        else if( msg.sType == _T("selectchanged") ) {
+        else if( msg.nType == DUI_MSGTYPE_SELECTCHANGED) {
             CDuiString name = msg.pSender->GetName();
             if( name == _T("hallswitch") ) {
                 CTabLayoutUI* pControl = static_cast<CTabLayoutUI*>(m_pm.FindControl(_T("switch")));
@@ -363,7 +363,7 @@ public:
                 }
             }
         }
-        else if( msg.sType == _T("itemclick") ) {
+        else if( msg.nType == DUI_MSGTYPE_ITEMCLICK) {
             GameListUI* pGameList = static_cast<GameListUI*>(m_pm.FindControl(_T("gamelist")));
             if( pGameList->GetItemIndex(msg.pSender) != -1 )
             {
@@ -380,7 +380,7 @@ public:
                 }
             }
         }
-        else if( msg.sType == _T("itemactivate") ) {
+        else if( msg.nType == DUI_MSGTYPE_ITEMACTIVATE) {
             GameListUI* pGameList = static_cast<GameListUI*>(m_pm.FindControl(_T("gamelist")));
             if( pGameList->GetItemIndex(msg.pSender) != -1 )
             {
@@ -399,14 +399,14 @@ public:
                 }
             }
         }
-        else if( msg.sType == _T("itemselect") ) {
+        else if( msg.nType == DUI_MSGTYPE_ITEMSELECT) {
             if( msg.pSender->GetName() == _T("chatCombo") ) {
                 CEditUI* pChatEdit = static_cast<CEditUI*>(m_pm.FindControl(_T("chatEdit")));
                 if( pChatEdit ) pChatEdit->SetText(msg.pSender->GetText());
                 static_cast<CComboUI*>(msg.pSender)->SelectItem(-1);
             }
         }
-        else if( msg.sType == _T("return") ) {
+        else if( msg.nType == DUI_MSGTYPE_RETURN) {
             if( msg.pSender->GetName() == _T("chatEdit") ) {
                 SendChatMessage();
             }

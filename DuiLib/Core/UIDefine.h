@@ -23,7 +23,7 @@ class CControlUI;
 // Structure for notifications to the outside world
 typedef struct tagTNotifyUI 
 {
-	CDuiString sType;
+	UINT nType;
 	CDuiString sVirtualWnd;
 	CControlUI* pSender;
 	DWORD dwTimestamp;
@@ -45,41 +45,43 @@ union DuiMessageMapFunctions
 //定义所有消息类型
 //////////////////////////////////////////////////////////////////////////
 
-#define DUI_MSGTYPE_MENU                   (_T("menu"))
-#define DUI_MSGTYPE_LINK                   (_T("link"))
+#define DUI_MSGTYPE_MENU                   0x0000
+#define DUI_MSGTYPE_LINK                   0x0001
 
-#define DUI_MSGTYPE_TIMER                  (_T("timer"))
-#define DUI_MSGTYPE_CLICK                  (_T("click"))
+#define DUI_MSGTYPE_TIMER                  0x0002
+#define DUI_MSGTYPE_CLICK                  0x0003
 
-#define DUI_MSGTYPE_RETURN                 (_T("return"))
-#define DUI_MSGTYPE_SCROLL                 (_T("scroll"))
+#define DUI_MSGTYPE_RETURN                 0x0004
+#define DUI_MSGTYPE_SCROLL                 0x0005
 
-#define DUI_MSGTYPE_DROPDOWN               (_T("dropdown"))
-#define DUI_MSGTYPE_SETFOCUS               (_T("setfocus"))
+#define DUI_MSGTYPE_DROPDOWN               0x0006
 
-#define DUI_MSGTYPE_KILLFOCUS              (_T("killfocus"))
-#define DUI_MSGTYPE_ITEMCLICK 		   	   (_T("itemclick"))
-#define DUI_MSGTYPE_TABSELECT              (_T("tabselect"))
+#define DUI_MSGTYPE_SETFOCUS               0x0007
+#define DUI_MSGTYPE_KILLFOCUS              0x0008
 
-#define DUI_MSGTYPE_ITEMSELECT 		   	   (_T("itemselect"))
-#define DUI_MSGTYPE_ITEMEXPAND             (_T("itemexpand"))
+#define DUI_MSGTYPE_ITEMCLICK 		   	   0x0009
+#define DUI_MSGTYPE_ITEMSELECT 		   	   0x000A
+#define DUI_MSGTYPE_ITEMEXPAND             0x000B
+#define DUI_MSGTYPE_ITEMDBCLICK        	   0x000C      
+#define DUI_MSGTYPE_ITEMCOLLAPSE      	   0x000D       
+#define DUI_MSGTYPE_ITEMACTIVATE      	   0x000E       
 
-#define DUI_MSGTYPE_WINDOWINIT             (_T("windowinit"))
-#define DUI_MSGTYPE_BUTTONDOWN 		   	   (_T("buttondown"))
-#define DUI_MSGTYPE_MOUSEENTER			   (_T("mouseenter"))
-#define DUI_MSGTYPE_MOUSELEAVE			   (_T("mouseleave"))
+#define DUI_MSGTYPE_TABSELECT              0x000F
 
-#define DUI_MSGTYPE_TEXTCHANGED            (_T("textchanged"))
-#define DUI_MSGTYPE_HEADERCLICK            (_T("headerclick"))
-#define DUI_MSGTYPE_ITEMDBCLICK            (_T("itemdbclick"))
-#define DUI_MSGTYPE_SHOWACTIVEX            (_T("showactivex"))
+#define DUI_MSGTYPE_WINDOWINIT             0x0010    
 
-#define DUI_MSGTYPE_ITEMCOLLAPSE           (_T("itemcollapse"))
-#define DUI_MSGTYPE_ITEMACTIVATE           (_T("itemactivate"))
-#define DUI_MSGTYPE_VALUECHANGED           (_T("valuechanged"))
+#define DUI_MSGTYPE_BUTTONDOWN 		   	   0x0011   
+#define DUI_MSGTYPE_MOUSEENTER		   	   0x0012	   
+#define DUI_MSGTYPE_MOUSELEAVE		   	   0x0013	   
 
-#define DUI_MSGTYPE_SELECTCHANGED 		   (_T("selectchanged"))
+#define DUI_MSGTYPE_TEXTCHANGED        	   0x0014      
+#define DUI_MSGTYPE_HEADERCLICK        	   0x0015      
+#define DUI_MSGTYPE_SHOWACTIVEX       	   0x0016       
 
+#define DUI_MSGTYPE_VALUECHANGED      	   0x0017      
+#define DUI_MSGTYPE_SELECTCHANGED 	  	   0x0018	   
+
+#define DUI_MSGTYPE_USER                   0x1000
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -99,7 +101,7 @@ struct DUI_MSGMAP
 //结构定义
 struct DUI_MSGMAP_ENTRY //定义一个结构体，来存放消息信息
 {
-	CDuiString sMsgType;          // DUI消息类型
+	UINT nMsgType;          // DUI消息类型
 	CDuiString sCtrlName;         // 控件名称
 	UINT       nSig;              // 标记函数指针类型
 	DUI_PMSG   pfn;               // 指向函数的指针
@@ -176,7 +178,7 @@ protected:                                                                \
 
 //声明结束
 #define DUI_END_MESSAGE_MAP()                                             \
-	{ _T(""), _T(""), DuiSig_end, (DUI_PMSG)0 }                           \
+	{ 0, _T(""), DuiSig_end, (DUI_PMSG)0 }                           \
 };                                                                        \
 
 

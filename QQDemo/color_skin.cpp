@@ -40,7 +40,7 @@ void ColorSkinWindow::OnFinalMessage(HWND hWnd)
 
 void ColorSkinWindow::Notify(TNotifyUI& msg)
 {
-	if (_tcsicmp(msg.sType, _T("click")) == 0)
+	if (msg.nType == DUI_MSGTYPE_CLICK)
 	{
 		CTabLayoutUI* pTabControl = static_cast<CTabLayoutUI*>(m_PaintManager.FindControl(kTabControlName));
 		if (pTabControl != NULL)
@@ -67,7 +67,7 @@ void ColorSkinWindow::Notify(TNotifyUI& msg)
 			{}
 		}
 	}
-	else if (_tcsicmp(msg.sType, _T("valuechanged")) == 0)
+	else if (msg.nType == DUI_MSGTYPE_VALUECHANGED)
 	{
 		CTabLayoutUI* pTabControl = static_cast<CTabLayoutUI*>(m_PaintManager.FindControl(kTabControlName));
 		if (pTabControl != NULL)
@@ -103,7 +103,7 @@ void ColorSkinWindow::Notify(TNotifyUI& msg)
 			{}
 		}
 	}
-	else if (_tcsicmp(msg.sType, _T("selectchanged")) == 0)
+	else if (msg.nType == DUI_MSGTYPE_SELECTCHANGED)
 	{
 		CTabLayoutUI* pTabControl = static_cast<CTabLayoutUI*>(m_PaintManager.FindControl(kTabControlName));
 		if (_tcsicmp(msg.pSender->GetName(), kAdjustColorControlName) == 0)
