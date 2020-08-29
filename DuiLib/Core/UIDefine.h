@@ -87,7 +87,15 @@ union DuiMessageMapFunctions
 
 
 
-struct DUI_MSGMAP_ENTRY;
+//结构定义
+typedef struct tagDUI_MSGMAP_ENTRY  //定义一个结构体，来存放消息信息
+{
+	UINT nMsgType;          // DUI消息类型
+	LPCTSTR sCtrlName;         // 控件名称
+	UINT       nSig;              // 标记函数指针类型
+	DUI_PMSG   pfn;               // 指向函数的指针
+}DUI_MSGMAP_ENTRY;
+
 struct DUI_MSGMAP
 {
 #ifndef UILIB_STATIC
@@ -96,15 +104,6 @@ struct DUI_MSGMAP
 	const DUI_MSGMAP* pBaseMap;
 #endif
 	const DUI_MSGMAP_ENTRY* lpEntries;
-};
-
-//结构定义
-struct DUI_MSGMAP_ENTRY //定义一个结构体，来存放消息信息
-{
-	UINT nMsgType;          // DUI消息类型
-	CDuiString sCtrlName;         // 控件名称
-	UINT       nSig;              // 标记函数指针类型
-	DUI_PMSG   pfn;               // 指向函数的指针
 };
 
 //定义
@@ -237,6 +236,8 @@ protected:                                                                \
 #  define __RPC__inout_opt
 //#  define OLECMD UINT
 //#  define OLECMDTEXT BSTR
+#define _tstof atof
+#define __time32_t time_t
 #endif
 #elif defined(__GNUC__)
 #  define DUI_DEPRECATED __attribute__ ((deprecated))

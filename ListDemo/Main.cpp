@@ -13,6 +13,8 @@
 
 using namespace DuiLib;
 
+#define lengthof(x) (sizeof(x)/sizeof(*x))
+
 #define WM_ADDLISTITEM WM_USER + 50
 /*
 * 存放第二列数据
@@ -144,7 +146,7 @@ public:
         switch (iSubItem)
         {
         case 0:
-            _stprintf(szBuf, _T("%d"), iIndex);
+            _sntprintf(szBuf,lengthof(szBuf), _T("%d"), iIndex);
             break;
         case 1:
             {
@@ -156,7 +158,7 @@ public:
             _stprintf(szBuf, lpText);
             delete[] lpText;
 #else
-            _stprintf(szBuf, domain[iIndex].c_str());
+            _sntprintf(szBuf,lengthof(szBuf), domain[iIndex].c_str());
 #endif
             }
             break;
@@ -170,7 +172,7 @@ public:
             _stprintf(szBuf, lpText);
             delete[] lpText;
 #else
-            _stprintf(szBuf, desc[iIndex].c_str());
+            _sntprintf(szBuf,lengthof(szBuf), desc[iIndex].c_str());
 #endif
             }
             break;

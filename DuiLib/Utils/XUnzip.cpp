@@ -103,6 +103,10 @@
 #include <string.h>
 #include <tchar.h>
 
+#if _MSC_VER <= 1200
+#define __time32_t time_t
+#endif //_MSC_VER
+
 #pragma warning(disable : 4996)	// disable bogus deprecation warning
 
 // THIS FILE is almost entirely based upon code by Jean-loup Gailly

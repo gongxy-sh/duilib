@@ -106,6 +106,7 @@ STDMETHODIMP CWebBrowserUI::Invoke( DISPID dispIdMember, REFIID riid, LCID lcid,
 		break;
 		//  	case DISPID_NEWWINDOW2:
 		//  		break;
+#if _MSC_VER > 1200
 	case DISPID_NEWWINDOW3:
 		NewWindow3(
 			pDispParams->rgvarg[4].ppdispVal,
@@ -114,6 +115,7 @@ STDMETHODIMP CWebBrowserUI::Invoke( DISPID dispIdMember, REFIID riid, LCID lcid,
 			pDispParams->rgvarg[1].bstrVal,
 			pDispParams->rgvarg[0].bstrVal);
 		break;
+#endif //_MSC_VER
 // 	case DISPID_PROPERTYCHANGE:
 // 		if (pDispParams->cArgs>0 && pDispParams->rgvarg[0].vt == VT_BSTR) {
 // 			TRACE(_T("PropertyChange(%s)\n"), pDispParams->rgvarg[0].bstrVal);
