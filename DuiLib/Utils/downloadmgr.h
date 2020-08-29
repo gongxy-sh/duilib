@@ -70,7 +70,7 @@ void __RPC_USER MIDL_user_free( void __RPC_FAR * );
 // PARTICULAR PURPOSE.
 //=--------------------------------------------------------------------------=
 
-#pragma comment(lib,"uuid.lib")
+#pragma comment(lib,"uuid")
 
 //---------------------------------------------------------------------------=
 // Internet Explorer Download Manager Interfaces

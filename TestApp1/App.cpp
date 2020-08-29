@@ -318,7 +318,7 @@ public:
 
     bool OnHChanged(void* param) {
         TNotifyUI* pMsg = (TNotifyUI*)param;
-        if( pMsg->nType == DUI_MSGTYPE_VALUECHANGED) {
+        if( DUI_MSGTYPE_VALUECHANGED == pMsg->nType) {
             short H, S, L;
             CPaintManagerUI::GetHSL(&H, &S, &L);
             CPaintManagerUI::SetHSL(true, (static_cast<CSliderUI*>(pMsg->pSender))->GetValue(), S, L);
@@ -328,7 +328,7 @@ public:
 
     bool OnSChanged(void* param) {
         TNotifyUI* pMsg = (TNotifyUI*)param;
-        if( pMsg->nType == DUI_MSGTYPE_VALUECHANGED) {
+        if( DUI_MSGTYPE_VALUECHANGED == pMsg->nType) {
             short H, S, L;
             CPaintManagerUI::GetHSL(&H, &S, &L);
             CPaintManagerUI::SetHSL(true, H, (static_cast<CSliderUI*>(pMsg->pSender))->GetValue(), L);
@@ -338,7 +338,7 @@ public:
 
     bool OnLChanged(void* param) {
         TNotifyUI* pMsg = (TNotifyUI*)param;
-        if( pMsg->nType == DUI_MSGTYPE_VALUECHANGED) {
+        if( DUI_MSGTYPE_VALUECHANGED == pMsg->nType) {
             short H, S, L;
             CPaintManagerUI::GetHSL(&H, &S, &L);
             CPaintManagerUI::SetHSL(true, H, S, (static_cast<CSliderUI*>(pMsg->pSender))->GetValue());
@@ -348,7 +348,7 @@ public:
 
     bool OnAlphaChanged(void* param) {
         TNotifyUI* pMsg = (TNotifyUI*)param;
-        if( pMsg->nType == DUI_MSGTYPE_VALUECHANGED) {
+        if( DUI_MSGTYPE_VALUECHANGED == pMsg->nType) {
             m_pm.SetOpacity((static_cast<CSliderUI*>(pMsg->pSender))->GetValue());
         }
         return true;

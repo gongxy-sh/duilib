@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #ifdef _USEIMM
 #include <imm.h>
-#pragma comment(lib, "imm32.lib")
+#pragma comment(lib, "imm32")
 #endif
 // These constants are for backward compatibility. They are the 
 // sizes used for initialization and reset in RichEdit 1.0
