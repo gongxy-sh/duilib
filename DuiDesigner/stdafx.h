@@ -1,6 +1,4 @@
-// stdafx.h : 标准系统包含文件的包含文件，
-// 或是经常使用但不常更改的
-// 特定于项目的包含文件
+// stdafx.h
 
 #pragma once
 
@@ -9,30 +7,54 @@
 #endif
 
 #ifndef VC_EXTRALEAN
-#define VC_EXTRALEAN            // 从 Windows 头中排除极少使用的资料
+#define VC_EXTRALEAN
 #endif
 
 #include "targetver.h"
 
 #define _CRT_SECURE_NO_WARNINGS
-#define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS      // 某些 CString 构造函数将是显式的
+#define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS
 
-// 关闭 MFC 对某些常见但经常可放心忽略的警告消息的隐藏
 #define _AFX_ALL_WARNINGS
+#include <afxwin.h>
+#include <afxext.h>
+#include <afxdisp.h>
+#include <afxdtctl.h>
+#include <afxcmn.h>
 
-#include <afxwin.h>         // MFC 核心组件和标准组件
-#include <afxext.h>         // MFC 扩展
+#include <afxtempl.h>
+#include <BCGCBProInc.h>			// BCGControlBar Pro
 
-#include <afxdisp.h>        // MFC 自动化类
+#define AFX_DEFAULT_TOOLBAR_STYLE     (WS_CHILD | WS_VISIBLE | CBRS_TOP | CBRS_GRIPPER | CBRS_HIDE_INPLACE)
 
-#ifndef _AFX_NO_OLE_SUPPORT
-#include <afxdtctl.h>           // MFC 对 Internet Explorer 4 公共控件的支持
-#endif
-#ifndef _AFX_NO_AFXCMN_SUPPORT
-#include <afxcmn.h>             // MFC 对 Windows 公共控件的支持
-#endif // _AFX_NO_AFXCMN_SUPPORT
+#define MinOf(a,b) ((a)<(b)?(a):(b))
+#define MaxOf(a,b) ((a)>(b)?(a):(b))
+#define SIZE_T_NEG_1 (size_t)-1
 
-#include <afxcontrolbars.h>     // 功能区和控件条的 MFC 支持
+#ifdef _DEBUG
+#define DEBUG_BREAK()           { if (IsDebuggerPresent()) { __asm int 3 }}
+#define DEBUG_BREAK_ONCE()      { static char __b = 0; if (!__b) DEBUG_BREAK(); __b = 1; }
+#define DEBUG_BREAK_IF(expr)	  if ((expr)) DEBUG_BREAK()
+#else //!_DEBUG
+#define DEBUG_BREAK()
+#define DEBUG_BREAK_ONCE()
+#define DEBUG_BREAK_IF(expr)
+#endif //!_DEBUG
+
+#if _MSC_VER <= 1200
+#define _countof(a)                   (sizeof(a)/sizeof(*a))
+#define _stprintf_s                   _stprintf
+#define _stscanf_s                    _stscanf
+#define _tcscpy_s                     _tcscpy
+#define _tcscat_s                     _tcscat
+#define ENSURE(s)
+#define ENSURE_VALID(s)
+
+#define ON_WM_MOUSELEAVE() \
+	{ WM_MOUSELEAVE, 0, 0, 0, AfxSig_vv, \
+		(AFX_PMSG)(AFX_PMSGW)(void (AFX_MSG_CALL CWnd::*)(void))&OnMouseLeave },
+
+#endif //_MSC_VER
 
 //////////////////////////////////////////////////////////////////////////
 //Defines
@@ -55,9 +77,6 @@
 #define DIR_TEMPLATES _T("Templates\\")
 
 #define UI_COMMAND_HISTORY 10
-
-#define UIDESIGNER_VERSION _T("1.0.6.158")
-#define UIDESIGNER_VERSION_CHECK_URL _T("http://www.taxue.org/uidesigner-version.txt")
 
 //UI type
 enum UIType

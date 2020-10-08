@@ -9,7 +9,7 @@
 #define UPDATE_REDRAW_CONTROL 0x02
 #define UPDATE_REDRAW_PARENT 0x03
 
-class CPropertiesWnd : public CDockablePane
+class CPropertiesWnd : public CBCGPDockingControlBar
 {
 // ππ‘Ï
 public:
@@ -25,7 +25,7 @@ public:
 	void SetPropValue(CControlUI* pControl,int nTag);
 
 protected:
-	void SetUIValue(CMFCPropertyGridProperty* pProp,int nTag);
+	void SetUIValue(CBCGPProp* pProp,int nTag);
 
 protected:
 	CUIProperties m_wndUIProperties;

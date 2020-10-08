@@ -2,7 +2,6 @@
 //
 
 #include "stdafx.h"
-#include "afxwinappex.h"
 #include "DuiDesigner.h"
 #include "MainFrm.h"
 
@@ -11,6 +10,16 @@
 #include "UIDesignerView.h"
 #include "afxwin.h"
 
+#pragma comment(lib,"dbghelp")
+#ifdef _DEBUG
+#pragma comment(lib,"libcrypto1SD")
+#pragma comment(lib,"BCGCBPro2210SD")
+#else //!_DEBUG
+#pragma comment(lib,"libcrypto1S")
+#pragma comment(lib,"BCGCBPro2210S")
+#endif //!_DEBUG
+
+#if _MSC_VER > 1200
 #ifdef _UNICODE
 #if defined _M_IX86
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='x86' publicKeyToken='6595b64144ccf1df' language='*'\"")
@@ -22,26 +31,11 @@
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #endif
 #endif
+#endif //_MSC_VER
 
 
 //////////////////////////////////////////////////////////////////////////
 //Link
-
-#ifdef _DEBUG
-#   ifdef _UNICODE
-#       pragma comment(lib, "DuiLibUD")
-#   else
-#       pragma comment(lib, "DuiLibD")
-#   endif
-#else
-#   ifdef _UNICODE
-#       pragma comment(lib, "DuiLibU")
-#   else
-#       pragma comment(lib, "DuiLib")
-#   endif
-#endif
-
-#pragma comment(lib,"Dbghelp")
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -50,11 +44,11 @@
 
 // CUIDesignerApp
 
-BEGIN_MESSAGE_MAP(CUIDesignerApp, CWinAppEx)
-	ON_COMMAND(ID_APP_ABOUT, &CUIDesignerApp::OnAppAbout)
+BEGIN_MESSAGE_MAP(CUIDesignerApp, CBCGPWinApp)
+	ON_COMMAND(ID_APP_ABOUT, OnAppAbout)
 	// 基于文件的标准文档命令
-	ON_COMMAND(ID_FILE_NEW, &CUIDesignerApp::OnFileNew)
-	ON_COMMAND(ID_FILE_OPEN, &CWinAppEx::OnFileOpen)
+	ON_COMMAND(ID_FILE_NEW, OnFileNew)
+	ON_COMMAND(ID_FILE_OPEN, CBCGPWinApp::OnFileOpen)
 END_MESSAGE_MAP()
 
 
@@ -62,21 +56,16 @@ END_MESSAGE_MAP()
 
 CUIDesignerApp::CUIDesignerApp()
 {
-
 	m_bHiColorIcons = TRUE;
-
 	// TODO: 在此处添加构造代码，
 	// 将所有重要的初始化放置在 InitInstance 中
 	m_pUIDocTemplate = NULL;
 }
 
 // 唯一的一个 CUIDesignerApp 对象
-
 CUIDesignerApp theApp;
 
-
 // CUIDesignerApp 初始化
-
 BOOL CUIDesignerApp::InitInstance()
 {
 	// 如果一个运行在 Windows XP 上的应用程序清单指定要
@@ -89,7 +78,8 @@ BOOL CUIDesignerApp::InitInstance()
 	InitCtrls.dwICC = ICC_WIN95_CLASSES;
 	InitCommonControlsEx(&InitCtrls);
 
-	CWinAppEx::InitInstance();
+  BCGCBProSetResourceHandle(m_hInstance);
+	CBCGPWinApp::InitInstance();
 
 	// 初始化 OLE 库
 	if (!AfxOleInit())
@@ -110,19 +100,8 @@ BOOL CUIDesignerApp::InitInstance()
 	SetRegistryBase(_T("Settings"));
 	CPaintManagerUI::LoadPlugin(_T("mgyUI_Plugin.dll"));
 
-	InitContextMenuManager();
-
-	InitKeyboardManager();
-
-	InitTooltipManager();
-	CMFCToolTipInfo ttParams;
-	ttParams.m_bVislManagerTheme = TRUE;
-	theApp.GetTooltipManager()->SetTooltipParams(AFX_TOOLTIP_TYPE_ALL,
-		RUNTIME_CLASS(CMFCToolTipCtrl), &ttParams);
-
 	// 注册应用程序的文档模板。文档模板
 	// 将用作文档、框架窗口和视图之间的连接
-
 	m_pUIDocTemplate = new CMultiDocTemplate(IDR_UIDESIGNER,
 		RUNTIME_CLASS(CUIDesignerDoc),
 		RUNTIME_CLASS(CChildFrame), // 自定义 MDI 子框架
@@ -156,8 +135,6 @@ BOOL CUIDesignerApp::InitInstance()
 	return TRUE;
 }
 
-
-
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
 
 class CAboutDlg : public CDialog
@@ -177,8 +154,8 @@ protected:
 public:
 	virtual BOOL OnInitDialog();
 private:
-	CMFCLinkCtrl m_btnMyBlogURL;
-	CMFCLinkCtrl m_btnDuiLibURL;
+	CBCGPURLLinkButton m_btnMyBlogURL;
+	CBCGPURLLinkButton m_btnDuiLibURL;
 };
 
 CAboutDlg::CAboutDlg() : CDialog(CAboutDlg::IDD)
@@ -200,7 +177,6 @@ BOOL CAboutDlg::OnInitDialog()
 	CDialog::OnInitDialog();
 
 	// TODO:  在此添加额外的初始化
-	this->GetDlgItem(IDC_STATIC_CURRENT_VERSION)->SetWindowText(UIDESIGNER_VERSION);
 	m_btnMyBlogURL.SetURL(_T("http://www.taxue.org/"));
 	m_btnMyBlogURL.SetTooltip(_T("踏雪流云的博客"));
 	m_btnMyBlogURL.SizeToContent();
@@ -268,7 +244,7 @@ int CUIDesignerApp::ExitInstance()
 {
 	// TODO: 在此添加专用代码和/或调用基类
 
-	return CWinAppEx::ExitInstance();
+	return CBCGPWinApp::ExitInstance();
 }
 
 void CUIDesignerApp::RemoveLastFromMRU()

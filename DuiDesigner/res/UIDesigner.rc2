@@ -1,13 +1,19 @@
 //
-// UIDesigner.RC2 - Microsoft Visual C++ 不会直接编辑的资源
+// UIDesigner.RC2 - Microsoft Visual C++ 
 //
 
 #ifdef APSTUDIO_INVOKED
-#error 此文件不能用 Microsoft Visual C++ 编辑
 #endif //APSTUDIO_INVOKED
 
+//#ifdef _BCGCBPRO_STATIC_
+#include "../../BCGControlBarPro/BCGCBPro.rc"
+#include "../../BCGControlBarPro/Styles/BCGPStyle2007Luna.rc"
+#include "../../BCGControlBarPro/Styles/BCGPStyle2007Obsidian.rc"
+#include "../../BCGControlBarPro/Styles/BCGPStyle2007Silver.rc"
+#include "../../BCGControlBarPro/Styles/BCGPStyle2007Aqua.rc"
+#include "../../BCGControlBarPro/Styles/BCGPStyleCarbon.rc"
+//#endif //_BCGCBPRO_STATIC_
 
 /////////////////////////////////////////////////////////////////////////////
-// 在此处添加手动编辑的资源...
 
 /////////////////////////////////////////////////////////////////////////////

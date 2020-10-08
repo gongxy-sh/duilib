@@ -697,7 +697,7 @@ const char * const z_errmsg[10] = { // indexed by 2-zlib_error
 #else
 
 #ifndef __noop
-#if _MSC_VER < 1300
+#if _MSC_VER <= 1200
 #define __noop ((void)0)
 #endif
 #endif

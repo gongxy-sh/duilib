@@ -32,12 +32,12 @@ void CDialogDefaultAttribList::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(CDialogDefaultAttribList, CDialog)
-	ON_BN_CLICKED(IDC_BUTTON_ATTRIB_ADD, &CDialogDefaultAttribList::OnBnClickedButtonAttribAdd)
-	ON_BN_CLICKED(IDC_BUTTON_ATTRIB_DELETE, &CDialogDefaultAttribList::OnBnClickedButtonAttribDelete)
-	ON_BN_CLICKED(IDC_BUTTON_ATTRIB_MODIFY, &CDialogDefaultAttribList::OnBnClickedButtonAttribModify)
-	ON_LBN_SELCHANGE(IDC_LIST_DEFAULT_ATTRIB, &CDialogDefaultAttribList::OnLbnSelchangeListDefaultAttrib)
+	ON_BN_CLICKED(IDC_BUTTON_ATTRIB_ADD, OnBnClickedButtonAttribAdd)
+	ON_BN_CLICKED(IDC_BUTTON_ATTRIB_DELETE, OnBnClickedButtonAttribDelete)
+	ON_BN_CLICKED(IDC_BUTTON_ATTRIB_MODIFY, OnBnClickedButtonAttribModify)
+	ON_LBN_SELCHANGE(IDC_LIST_DEFAULT_ATTRIB, OnLbnSelchangeListDefaultAttrib)
 	ON_WM_DESTROY()
-	ON_BN_CLICKED(IDC_BUTTON_SAVE_AS_STYLE, &CDialogDefaultAttribList::OnBnClickedButtonSaveAsStyle)
+	ON_BN_CLICKED(IDC_BUTTON_SAVE_AS_STYLE, OnBnClickedButtonSaveAsStyle)
 END_MESSAGE_MAP()
 
 
@@ -287,21 +287,19 @@ BOOL CDialogDefaultAttribList::GetDefaultAttrib(CControlUI* pControl, CString& s
 		return FALSE;
 	}
 
-	CStringA strValueA;
-	CStringA strA;
+	CString strA;
 	pAttrib = pNode->ToElement()->FirstAttribute();
 	while(pAttrib)
 	{
 		const char* pstrName = pAttrib->Name();
-		if(strcmp(pstrName, "name") != 0 && strcmp(pstrName, "pos") != 0)
+		if (strcmp(pstrName, "name") != 0 && strcmp(pstrName, "pos") != 0)
 		{
-			strA.Format("%s=\"%s\" ", pstrName, pAttrib->Value());
-			strValueA += strA;
+			strA.Format(_T("%s=\"%s\" "), CDuiU2T(pstrName).c_str(), CDuiU2T(pAttrib->Value()).c_str());
+			strValue += strA;
 		}
 		pAttrib = pAttrib->Next();
 	}
 
-	strValue = StringConvertor::Utf8ToWide(strValueA);
 	return TRUE;
 }
 

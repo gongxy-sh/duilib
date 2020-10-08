@@ -28,9 +28,9 @@ void CDialogCustomFonts::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(CDialogCustomFonts, CDialog)
-	ON_BN_CLICKED(IDC_BUTTON_FONT_ADD, &CDialogCustomFonts::OnBnClickedButtonFontAdd)
-	ON_BN_CLICKED(IDC_BUTTON_FONT_DELETE, &CDialogCustomFonts::OnBnClickedButtonFontDelete)
-	ON_BN_CLICKED(IDC_BUTTON_FONT_MODIFY, &CDialogCustomFonts::OnBnClickedButtonFontModify)
+	ON_BN_CLICKED(IDC_BUTTON_FONT_ADD, OnBnClickedButtonFontAdd)
+	ON_BN_CLICKED(IDC_BUTTON_FONT_DELETE, OnBnClickedButtonFontDelete)
+	ON_BN_CLICKED(IDC_BUTTON_FONT_MODIFY, OnBnClickedButtonFontModify)
 END_MESSAGE_MAP()
 
 

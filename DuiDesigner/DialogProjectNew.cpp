@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "DuiDesigner.h"
 #include "DialogProjectNew.h"
-
+#include <shlwapi.h>
 
 // CDialogProjectNew ¶Ô»°¿ò
 
@@ -31,8 +31,8 @@ void CDialogProjectNew::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(CDialogProjectNew, CDialog)
-	ON_BN_CLICKED(IDC_BUTTON_BROWSE, &CDialogProjectNew::OnBnClickedButtonBrowse)
-	ON_BN_CLICKED(IDOK, &CDialogProjectNew::OnBnClickedOk)
+	ON_BN_CLICKED(IDC_BUTTON_BROWSE, OnBnClickedButtonBrowse)
+	ON_BN_CLICKED(IDOK, OnBnClickedOk)
 END_MESSAGE_MAP()
 
 

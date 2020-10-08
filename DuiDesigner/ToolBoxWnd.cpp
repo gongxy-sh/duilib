@@ -8,7 +8,7 @@
 //////////////////////////////////////////////////////////////////////////
 // CToolBoxWnd
 
-IMPLEMENT_DYNAMIC(CToolBoxWnd, CDockablePane)
+IMPLEMENT_DYNAMIC(CToolBoxWnd, CBCGPDockingControlBar)
 
 CToolBoxWnd::CToolBoxWnd()
 {
@@ -20,7 +20,7 @@ CToolBoxWnd::~CToolBoxWnd()
 }
 
 
-BEGIN_MESSAGE_MAP(CToolBoxWnd, CDockablePane)
+BEGIN_MESSAGE_MAP(CToolBoxWnd, CBCGPDockingControlBar)
 	ON_WM_CREATE()
 	ON_WM_SIZE()
 END_MESSAGE_MAP()
@@ -31,7 +31,7 @@ END_MESSAGE_MAP()
 
 int CToolBoxWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
-	if (CDockablePane::OnCreate(lpCreateStruct) == -1)
+	if (CBCGPDockingControlBar::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
 	// TODO:  Add your specialized creation code here
@@ -49,7 +49,7 @@ int CToolBoxWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 void CToolBoxWnd::OnSize(UINT nType, int cx, int cy)
 {
-	CDockablePane::OnSize(nType, cx, cy);
+	CBCGPDockingControlBar::OnSize(nType, cx, cy);
 
 	// TODO: Add your message handler code here
 	AdjustLayout();

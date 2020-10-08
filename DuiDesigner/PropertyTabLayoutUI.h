@@ -36,7 +36,7 @@ public:
 
 private:
 	CSingleCheckListBox m_lstTab;
-	CMFCMenuButton m_btnAdd;
+	CBCGPMenuButton m_btnAdd;
 	CMenu m_menuUI;
 
 	CTabLayoutUI* m_pTablayoutUI;

@@ -10,7 +10,7 @@
 #include "ToolBoxWnd.h"
 #include "UIDesignerView.h"
 
-class CMainFrame : public CMDIFrameWndEx
+class CMainFrame : public CBCGPMDIFrameWnd
 {
 	DECLARE_DYNAMIC(CMainFrame)
 public:
@@ -39,17 +39,17 @@ public:
 	CUIDesignerView* GetActiveUIView() const;
 
 protected:  // 控件条嵌入成员
-	CMFCMenuBar       m_wndMenuBar;
-	CMFCToolBar       m_wndToolBar;
-	CMFCStatusBar     m_wndStatusBar;
-	CMFCToolBarImages m_UserImages;
+	CBCGPMenuBar       m_wndMenuBar;
+	CBCGPToolBar       m_wndToolBar;
+	CBCGPStatusBar     m_wndStatusBar;
+	CBCGPToolBarImages m_UserImages;
 	CFileView         m_wndFileView;
 	CClassView        m_wndClassView;
 	CResourceViewBar m_wndResourceView;
 	CPropertiesWnd    m_wndProperties;
 	CToolBoxWnd       m_wndToolBox;
 
-	CMFCToolBar m_wndToolbarFormEdit;
+	CBCGPToolBar m_wndToolbarFormEdit;
 
 // 生成的消息映射函数
 protected:
@@ -88,11 +88,4 @@ public:
 	afx_msg void OnViewProject();
 	afx_msg void OnViewToolsBox();
 	afx_msg void OnViewProperty();
-/*
-	bool m_bViewControls;
-	bool m_bViewResources;
-	bool m_bViewProject;
-	bool m_bViewToolsBox;
-	bool m_bViewProperty;
-*/
 };

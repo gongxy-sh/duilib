@@ -9,7 +9,7 @@
 
 #pragma once
 
-class CResourceViewBar : public CDockablePane
+class CResourceViewBar : public CBCGPDockingControlBar
 {
 // Construction
 public:

@@ -20,7 +20,7 @@ CPropertiesWnd::~CPropertiesWnd()
 {
 }
 
-BEGIN_MESSAGE_MAP(CPropertiesWnd, CDockablePane)
+BEGIN_MESSAGE_MAP(CPropertiesWnd, CBCGPDockingControlBar)
 	ON_WM_CREATE()
 	ON_WM_SIZE()
 	ON_REGISTERED_MESSAGE(WM_UI_PROPERTY_CHANGED, OnUIPropChanged)
@@ -31,7 +31,7 @@ END_MESSAGE_MAP()
 
 int CPropertiesWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
-	if (CDockablePane::OnCreate(lpCreateStruct) == -1)
+	if (CBCGPDockingControlBar::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
 	CRect rectDummy;
@@ -57,7 +57,7 @@ void CPropertiesWnd::AdjustLayout()
 
 void CPropertiesWnd::OnSize(UINT nType, int cx, int cy)
 {
-	CDockablePane::OnSize(nType, cx, cy);
+	CBCGPDockingControlBar::OnSize(nType, cx, cy);
 
 	AdjustLayout();
 }
@@ -74,7 +74,7 @@ void CPropertiesWnd::ShowProperty(CControlUI* pControl)
 
 LRESULT CPropertiesWnd::OnUIPropChanged(WPARAM wp, LPARAM lp)
 {
-	CMFCPropertyGridProperty* pProp = (CMFCPropertyGridProperty *)lp;
+	CBCGPColorProp* pProp = (CBCGPColorProp *)lp;
 	SetUIValue(pProp, pProp->GetData());
 
 	return TRUE;
@@ -86,8 +86,8 @@ void CPropertiesWnd::SetPropValue(CControlUI* pControl,int nTag)
 	if(pCurControl != pControl)
 		return;
 
-	CMFCPropertyGridProperty* pPropUI=NULL;
-	CMFCPropertyGridProperty* pValueList=NULL;
+	CBCGPProp* pPropUI=NULL;
+	CBCGPProp* pValueList=NULL;
 	switch(nTag)
 	{
 	case tagWindowSize:
@@ -137,7 +137,7 @@ void CPropertiesWnd::SetPropValue(CControlUI* pControl,int nTag)
 	}
 }
 
-void CPropertiesWnd::SetUIValue(CMFCPropertyGridProperty* pProp,int nTag)
+void CPropertiesWnd::SetUIValue(CBCGPProp* pProp,int nTag)
 {
 	CControlUI* pControl = m_wndUIProperties.GetCurUI();
 	if(pControl == NULL)

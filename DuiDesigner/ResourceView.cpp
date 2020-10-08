@@ -41,7 +41,7 @@ CResourceViewBar::~CResourceViewBar()
 	m_mapImageArray.RemoveAll();
 }
 
-BEGIN_MESSAGE_MAP(CResourceViewBar, CDockablePane)
+BEGIN_MESSAGE_MAP(CResourceViewBar, CBCGPDockingControlBar)
 	ON_WM_CREATE()
 	ON_WM_SIZE()
 	ON_WM_CONTEXTMENU()
@@ -58,7 +58,7 @@ END_MESSAGE_MAP()
 
 int CResourceViewBar::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
-	if (CDockablePane::OnCreate(lpCreateStruct) == -1)
+	if (CBCGPDockingControlBar::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
 	CRect rectDummy;
@@ -86,7 +86,7 @@ int CResourceViewBar::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 void CResourceViewBar::OnSize(UINT nType, int cx, int cy)
 {
-	CDockablePane::OnSize(nType, cx, cy);
+	CBCGPDockingControlBar::OnSize(nType, cx, cy);
 
 	//if (CanAdjustLayout())
 	{
@@ -105,7 +105,7 @@ void CResourceViewBar::OnContextMenu(CWnd* pWnd, CPoint point)
 
 	if (pWnd != pWndTree)
 	{
-		CDockablePane::OnContextMenu(pWnd, point);
+		CBCGPDockingControlBar::OnContextMenu(pWnd, point);
 		return;
 	}
 
@@ -165,7 +165,7 @@ void CResourceViewBar::OnPaint()
 
 void CResourceViewBar::OnSetFocus(CWnd* pOldWnd)
 {
-	CDockablePane::OnSetFocus(pOldWnd);
+	CBCGPDockingControlBar::OnSetFocus(pOldWnd);
 	m_wndResourceView.SetFocus();
 }
 

@@ -8,14 +8,14 @@
 #include "DialogDefaultAttribList.h"
 
 //////////////////////////////////////////////////////////////////////////
-//CMFCPropertyGridColor32Property
+//CBCGPColor32Prop
 
-CMFCPropertyGridColor32Property::CMFCPropertyGridColor32Property(const CString& strName, const COLORREF& color,CPalette* pPalette/*=NULL*/,LPCTSTR lpszDescr/*=NULL*/,DWORD_PTR dwData/*=0*/)
-:CMFCPropertyGridColorProperty(strName,color,pPalette,lpszDescr,dwData)
+CBCGPColor32Prop::CBCGPColor32Prop(const CString& strName, const COLORREF& color,CPalette* pPalette/*=NULL*/,LPCTSTR lpszDescr/*=NULL*/,DWORD_PTR dwData/*=0*/)
+:CBCGPColorProp(strName,color,pPalette,lpszDescr,dwData)
 {
 }
 
-BOOL CMFCPropertyGridColor32Property::OnUpdateValue()
+BOOL CBCGPColor32Prop::OnUpdateValue()
 {
 	ASSERT_VALID(this);
 
@@ -45,12 +45,12 @@ BOOL CMFCPropertyGridColor32Property::OnUpdateValue()
 	return TRUE;
 }
 
-void CMFCPropertyGridColor32Property::OnDrawValue(CDC* pDC, CRect rect)
+void CBCGPColor32Prop::OnDrawValue(CDC* pDC, CRect rect)
 {
 	CRect rectColor = rect;
 
 	rect.left += rect.Height();
-	CMFCPropertyGridProperty::OnDrawValue(pDC, rect);
+	CBCGPProp::OnDrawValue(pDC, rect);
 
 	rectColor.right = rectColor.left + rectColor.Height();
 	rectColor.DeflateRect(1, 1);
@@ -62,7 +62,7 @@ void CMFCPropertyGridColor32Property::OnDrawValue(CDC* pDC, CRect rect)
 	pDC->Draw3dRect(rectColor, 0, 0);
 }
 
-CString CMFCPropertyGridColor32Property::FormatProperty()
+CString CBCGPColor32Prop::FormatProperty()
 {
 	ASSERT_VALID(this);
 
@@ -73,17 +73,17 @@ CString CMFCPropertyGridColor32Property::FormatProperty()
 }
 
 //////////////////////////////////////////////////////////////////////////
-//CMFCPropertyGridImageProperty
+//CBCGPImageProp
 
-IMPLEMENT_DYNAMIC(CMFCPropertyGridImageProperty, CMFCPropertyGridProperty)
+IMPLEMENT_DYNAMIC(CBCGPImageProp, CBCGPProp)
 
-CMFCPropertyGridImageProperty::CMFCPropertyGridImageProperty(const CString& strName, const CString& strImage, LPCTSTR lpszDescr/* = NULL*/, DWORD_PTR dwData/* = 0*/)
-: CMFCPropertyGridProperty(strName, COleVariant((LPCTSTR)strImage), lpszDescr, dwData)
+CBCGPImageProp::CBCGPImageProp(const CString& strName, const CString& strImage, LPCTSTR lpszDescr/* = NULL*/, DWORD_PTR dwData/* = 0*/)
+: CBCGPProp(strName, COleVariant((LPCTSTR)strImage), lpszDescr, dwData)
 {
 	m_dwFlags = AFX_PROP_HAS_BUTTON;
 }
 
-void CMFCPropertyGridImageProperty::OnClickButton(CPoint point)
+void CBCGPImageProp::OnClickButton(CPoint point)
 {
 	ASSERT_VALID(this);
 	ASSERT_VALID(m_pWndList);
@@ -122,10 +122,10 @@ void CMFCPropertyGridImageProperty::OnClickButton(CPoint point)
 //////////////////////////////////////////////////////////////////////////
 //CMFCPropertyGridCustomFontsProperty
 
-IMPLEMENT_DYNAMIC(CMFCPropertyGridCustomFontsProperty, CMFCPropertyGridProperty)
+IMPLEMENT_DYNAMIC(CMFCPropertyGridCustomFontsProperty, CBCGPProp)
 
 CMFCPropertyGridCustomFontsProperty::CMFCPropertyGridCustomFontsProperty(const CString& strName, const COleVariant& varValue, LPCTSTR lpszDescr/* = NULL*/, DWORD_PTR dwData/* = 0*/)
-: CMFCPropertyGridProperty(strName, varValue, lpszDescr, dwData)
+: CBCGPProp(strName, varValue, lpszDescr, dwData)
 {
 	m_dwFlags = AFX_PROP_HAS_BUTTON;
 }
@@ -159,10 +159,10 @@ void CMFCPropertyGridCustomFontsProperty::OnClickButton(CPoint point)
 //////////////////////////////////////////////////////////////////////////
 //CMFCPropertyGridDefaultAttribListProperty
 
-IMPLEMENT_DYNAMIC(CMFCPropertyGridDefaultAttribListProperty, CMFCPropertyGridProperty)
+IMPLEMENT_DYNAMIC(CMFCPropertyGridDefaultAttribListProperty, CBCGPProp)
 
 CMFCPropertyGridDefaultAttribListProperty::CMFCPropertyGridDefaultAttribListProperty(const CString& strName, const COleVariant& varValue, LPCTSTR lpszDescr/* = NULL*/, DWORD_PTR dwData/* = 0*/)
-: CMFCPropertyGridProperty(strName, varValue, lpszDescr, dwData)
+: CBCGPProp(strName, varValue, lpszDescr, dwData)
 {
 	m_dwFlags = AFX_PROP_HAS_BUTTON;
 }
@@ -212,7 +212,7 @@ BEGIN_MESSAGE_MAP(CUIProperties, CWnd)
 	ON_WM_CREATE()
 	ON_WM_SETFOCUS()
 	ON_WM_SIZE()
-	ON_REGISTERED_MESSAGE(AFX_WM_PROPERTY_CHANGED, OnPropertyChanged)
+	ON_REGISTERED_MESSAGE(BCGM_PROPERTY_CHANGED, OnPropertyChanged)
 	ON_COMMAND(ID_PROPERTIES_TOOLBAR_SORT, OnPropertiesSort)
 	ON_UPDATE_COMMAND_UI(ID_PROPERTIES_TOOLBAR_SORT, OnUpdatePropertiesSort)
 	ON_COMMAND(ID_PROPERTIES_TOOLBAR_ALPHABETIC, OnPropertiesAlphaBetic)
@@ -221,7 +221,7 @@ END_MESSAGE_MAP()
 
 BOOL CUIProperties::Create(DWORD dwStyle, const RECT& rect, CWnd* pParentWnd, UINT nID)
 {
-	return CWnd::Create(afxGlobalData.RegisterWindowClass(_T("UIPropWnd")), _T(""), dwStyle, rect, pParentWnd, nID, NULL);
+	return CWnd::Create(globalData.RegisterWindowClass(_T("UIPropWnd")), _T(""), dwStyle, rect, pParentWnd, nID, NULL);
 }
 
 int CUIProperties::OnCreate(LPCREATESTRUCT lpCreateStruct)
@@ -248,9 +248,10 @@ int CUIProperties::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_wndToolBar.LoadToolBar(IDR_PROPERTIES, 0, 0, TRUE /* 已锁定*/);
 	m_wndToolBar.CleanUpLockedImages();
 	m_wndToolBar.LoadBitmap(theApp.m_bHiColorIcons ? IDB_PROPERTIES_HC : IDR_PROPERTIES, 0, 0, TRUE /* 锁定*/);
-
+#if _MSC_VER > 1200
 	m_wndToolBar.SetPaneStyle(m_wndToolBar.GetPaneStyle() | CBRS_TOOLTIPS | CBRS_FLYBY);
 	m_wndToolBar.SetPaneStyle(m_wndToolBar.GetPaneStyle() & ~(CBRS_GRIPPER | CBRS_SIZE_DYNAMIC | CBRS_BORDER_TOP | CBRS_BORDER_BOTTOM | CBRS_BORDER_LEFT | CBRS_BORDER_RIGHT));
+#endif //_MSC_VER
 	m_wndToolBar.SetOwner(this);
 
 	// 所有命令将通过此控件路由，而不是通过主框架路由:
@@ -298,7 +299,7 @@ void CUIProperties::OnSize(UINT nType, int cx, int cy)
 
 LRESULT CUIProperties::OnPropertyChanged(WPARAM wp, LPARAM lp)
 {
-	CMFCPropertyGridProperty* pProp = (CMFCPropertyGridProperty *)lp;
+	CBCGPProp* pProp = (CBCGPProp *)lp;
 
 	int nLevel = pProp->GetHierarchyLevel();
 	for(; nLevel>1; nLevel--)
@@ -337,67 +338,69 @@ void CUIProperties::InitPropList()
 	m_wndPropList.EnableDescriptionArea();
 	m_wndPropList.SetVSDotNetLook();
 
-	CMFCPropertyGridProperty* pPropUI=NULL;
-	CMFCPropertyGridProperty* pValueList=NULL;
-	CMFCPropertyGridProperty* pProp=NULL;
-	CMFCPropertyGridColorProperty* pPropColor=NULL;
-	CMFCPropertyGridImageProperty* pPropImage=NULL;
+	CBCGPProp* pPropUI=NULL;
+	CBCGPProp* pValueList=NULL;
+	CBCGPProp* pProp=NULL;
+	CBCGPColorProp* pPropColor=NULL;
+	CBCGPImageProp* pPropImage=NULL;
 
 	//Window
+#if _MSC_VER > 1200
 #pragma region Window
-	pPropUI=new CMFCPropertyGridProperty(_T("Window"),classWindow);
+#endif //_MSC_VER
+	pPropUI=new CBCGPProp(_T("Window"),classWindow);
 
-	pValueList=new CMFCPropertyGridProperty(_T("Size"),tagWindowSize,TRUE);//size
-	pProp=new CMFCPropertyGridProperty(_T("Width"),(LONG)0,_T("窗体的宽度"));
+	pValueList=new CBCGPProp(_T("Size"),tagWindowSize,TRUE);//size
+	pProp=new CBCGPProp(_T("Width"),0,_T("窗体的宽度"));
 	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Height"),(LONG)0,_T("窗体的高度"));
+	pProp=new CBCGPProp(_T("Height"),0,_T("窗体的高度"));
 	pValueList->AddSubItem(pProp);
 	pPropUI->AddSubItem(pValueList);
 
-	pValueList=new CMFCPropertyGridProperty(_T("Caption"),tagCaption,TRUE);//caption
-	pProp=new CMFCPropertyGridProperty(_T("Left"),(LONG)0,_T("标题的Left位置"));
+	pValueList=new CBCGPProp(_T("Caption"),tagCaption,TRUE);//caption
+	pProp=new CBCGPProp(_T("Left"),0,_T("标题的Left位置"));
 	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Top"),(LONG)0,_T("标题的Top位置"));
+	pProp=new CBCGPProp(_T("Top"),0,_T("标题的Top位置"));
 	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Right"),(LONG)0,_T("标题的Right位置"));
+	pProp=new CBCGPProp(_T("Right"),0,_T("标题的Right位置"));
 	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Bottom"),(LONG)0,_T("标题的Bottom位置"));
-	pValueList->AddSubItem(pProp);
-	pPropUI->AddSubItem(pValueList);
-
-	pValueList=new CMFCPropertyGridProperty(_T("SizeBox"),tagSizeBox,TRUE);//sizebox
-	pProp=new CMFCPropertyGridProperty(_T("Left"),(LONG)0,_T("尺寸盒的Left位置"));
-	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Top"),(LONG)0,_T("尺寸盒的Top位置"));
-	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Right"),(LONG)0,_T("尺寸盒的Right位置"));
-	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Bottom"),(LONG)0,_T("尺寸盒的Bottom位置"));
+	pProp=new CBCGPProp(_T("Bottom"),0,_T("标题的Bottom位置"));
 	pValueList->AddSubItem(pProp);
 	pPropUI->AddSubItem(pValueList);
 
-	pValueList=new CMFCPropertyGridProperty(_T("RoundCorner"),tagRoundCorner,TRUE);//roundcorner
-	pProp=new CMFCPropertyGridProperty(_T("Width"),(LONG)0,_T("圆角的宽度"));
+	pValueList=new CBCGPProp(_T("SizeBox"),tagSizeBox,TRUE);//sizebox
+	pProp=new CBCGPProp(_T("Left"),0,_T("尺寸盒的Left位置"));
 	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Height"),(LONG)0,_T("圆角的高度"));
+	pProp=new CBCGPProp(_T("Top"),0,_T("尺寸盒的Top位置"));
 	pValueList->AddSubItem(pProp);
-	pPropUI->AddSubItem(pValueList);
-
-	pValueList=new CMFCPropertyGridProperty(_T("MinInfo"),tagMinInfo,TRUE);//mininfo
-	pProp=new CMFCPropertyGridProperty(_T("MinWidth"),(LONG)0,_T("窗口的最小跟踪宽度"));
+	pProp=new CBCGPProp(_T("Right"),0,_T("尺寸盒的Right位置"));
 	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("MinHeight"),(LONG)0,_T("窗口的最小跟踪高度"));
+	pProp=new CBCGPProp(_T("Bottom"),0,_T("尺寸盒的Bottom位置"));
 	pValueList->AddSubItem(pProp);
 	pPropUI->AddSubItem(pValueList);
 
-	pValueList=new CMFCPropertyGridProperty(_T("MaxInfo"),tagMinInfo,TRUE);//maxinfo
-	pProp=new CMFCPropertyGridProperty(_T("MaxWidth"),(LONG)0,_T("窗口的最大跟踪宽度"));
+	pValueList=new CBCGPProp(_T("RoundCorner"),tagRoundCorner,TRUE);//roundcorner
+	pProp=new CBCGPProp(_T("Width"),0,_T("圆角的宽度"));
 	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Maxeight"),(LONG)0,_T("窗口的最大跟踪高度"));
+	pProp=new CBCGPProp(_T("Height"),0,_T("圆角的高度"));
 	pValueList->AddSubItem(pProp);
 	pPropUI->AddSubItem(pValueList);
 
-	pProp=new CMFCPropertyGridProperty(_T("ShowDirty"),(_variant_t)false,_T("指示是否显示更新区域"),tagShowDirty);//showdirty
+	pValueList=new CBCGPProp(_T("MinInfo"),tagMinInfo,TRUE);//mininfo
+	pProp=new CBCGPProp(_T("MinWidth"),0,_T("窗口的最小跟踪宽度"));
+	pValueList->AddSubItem(pProp);
+	pProp=new CBCGPProp(_T("MinHeight"),0,_T("窗口的最小跟踪高度"));
+	pValueList->AddSubItem(pProp);
+	pPropUI->AddSubItem(pValueList);
+
+	pValueList=new CBCGPProp(_T("MaxInfo"),tagMinInfo,TRUE);//maxinfo
+	pProp=new CBCGPProp(_T("MaxWidth"),0,_T("窗口的最大跟踪宽度"));
+	pValueList->AddSubItem(pProp);
+	pProp=new CBCGPProp(_T("Maxeight"),0,_T("窗口的最大跟踪高度"));
+	pValueList->AddSubItem(pProp);
+	pPropUI->AddSubItem(pValueList);
+
+	pProp=new CBCGPProp(_T("ShowDirty"),false,_T("指示是否显示更新区域"),tagShowDirty);//showdirty
 	pPropUI->AddSubItem(pProp);
 
 	pProp=new CMFCPropertyGridCustomFontsProperty(_T("CustomFonts"),(_variant_t)_T("字体管理"),_T("管理自定义的字体"),tagCustomFonts);//customfonts
@@ -409,186 +412,194 @@ void CUIProperties::InitPropList()
 	pPropUI->AddSubItem(pProp);
 
 	// tagAlpha
-	pProp=new CMFCPropertyGridProperty(_T("Alpha"),(LONG)0,_T("窗口的alpha值(0-255)\n255"),tagAlpha);
+	pProp=new CBCGPProp(_T("Alpha"),(long)0,_T("窗口的alpha值(0-255)\n255"),tagAlpha);
 	pPropUI->AddSubItem(pProp);
 
 	// tagBkTrans
-	pProp=new CMFCPropertyGridProperty(_T("BkTrans"),(_variant_t)false,_T("窗口是否使用静态透明背景\nfalse"),tagBkTrans);
+	pProp=new CBCGPProp(_T("BkTrans"),false,_T("窗口是否使用静态透明背景\nfalse"),tagBkTrans);
 	pPropUI->AddSubItem(pProp);
 
 	// tagDefaultFontColor
-	pPropColor=new CMFCPropertyGridColor32Property(_T("DefaultFontColor"),(LONG)ARGB(0,0,0,0),NULL,_T("指定默认的字体颜色"),tagDefaultFontColor);
+	pPropColor=new CBCGPColor32Prop(_T("DefaultFontColor"),(long)ARGB(0,0,0,0),NULL,_T("指定默认的字体颜色"),tagDefaultFontColor);
 	pPropColor->EnableOtherButton(_T("其他..."));
 	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
 	pPropUI->AddSubItem(pPropColor);
 
 	// tagSelectedFontColor
-	pPropColor=new CMFCPropertyGridColor32Property(_T("SelectedColor"),(LONG)ARGB(0,0,0,0),NULL,_T("指定默认的selected字体颜色"),tagSelectedFontColor);
+	pPropColor=new CBCGPColor32Prop(_T("SelectedColor"),(long)ARGB(0,0,0,0),NULL,_T("指定默认的selected字体颜色"),tagSelectedFontColor);
 	pPropColor->EnableOtherButton(_T("其他..."));
 	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
 	pPropUI->AddSubItem(pPropColor);
 
 	//	DisabledFontColor
-	pPropColor=new CMFCPropertyGridColor32Property(_T("DisabledFontColor"),(LONG)ARGB(0,0,0,0),NULL,_T("指定默认的Disabled字体颜色"),tagDisabledFontColor);
+	pPropColor=new CBCGPColor32Prop(_T("DisabledFontColor"),(long)ARGB(0,0,0,0),NULL,_T("指定默认的Disabled字体颜色"),tagDisabledFontColor);
 	pPropColor->EnableOtherButton(_T("其他..."));
 	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
 	pPropUI->AddSubItem(pPropColor);
 
 	// tagLinkFontColor
-	pPropColor=new CMFCPropertyGridColor32Property(_T("LinkFontColor"),(LONG)ARGB(0,0,0,0),NULL,_T("指定默认的link字体颜色"),tagLinkFontColor);
+	pPropColor=new CBCGPColor32Prop(_T("LinkFontColor"),(long)ARGB(0,0,0,0),NULL,_T("指定默认的link字体颜色"),tagLinkFontColor);
 	pPropColor->EnableOtherButton(_T("其他..."));
 	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
 	pPropUI->AddSubItem(pPropColor);
 
 	// tagLinkHoverFontColor
-	pPropColor=new CMFCPropertyGridColor32Property(_T("LinkHoverFontColor"),(LONG)ARGB(0,0,0,0),NULL,_T("指定默认的linkhoverfont字体颜色"),tagLinkHoverFontColor);
+	pPropColor=new CBCGPColor32Prop(_T("LinkHoverFontColor"),(long)ARGB(0,0,0,0),NULL,_T("指定默认的linkhoverfont字体颜色"),tagLinkHoverFontColor);
 	pPropColor->EnableOtherButton(_T("其他..."));
 	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
 	pPropUI->AddSubItem(pPropColor);
 
 	m_wndPropList.AddProperty(pPropUI);
+#if _MSC_VER > 1200
 #pragma endregion Window
+#endif //_MSC_VER
 
 	//Control
+#if _MSC_VER > 1200
 #pragma region Control
-	pPropUI=new CMFCPropertyGridProperty(_T("Control"),classControl);
+#endif //_MSC_VER
+	pPropUI=new CBCGPProp(_T("Control"),classControl);
 
-	pProp=new CMFCPropertyGridProperty(_T("Name"),(_variant_t)_T(""),_T("控件的名称"),tagName);//name
+	pProp=new CBCGPProp(_T("Name"),_T(""),_T("控件的名称"),tagName);//name
 	pPropUI->AddSubItem(pProp);
 
-	pProp=new CMFCPropertyGridProperty(_T("Text"),(_variant_t)_T(""),_T("控件的显示文本"),tagText);//text
+	pProp=new CBCGPProp(_T("Text"),_T(""),_T("控件的显示文本"),tagText);//text
 	pPropUI->AddSubItem(pProp);
 
-	pValueList=new CMFCPropertyGridProperty(_T("Pos"),tagPos,TRUE);//pos
-	pProp=new CMFCPropertyGridProperty(_T("Left"),(LONG)0,_T("控件的Left位置"));
+	pValueList=new CBCGPProp(_T("Pos"),tagPos,TRUE);//pos
+	pProp=new CBCGPProp(_T("Left"),0,_T("控件的Left位置"));
 	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Top"),(LONG)0,_T("控件的Top位置"));
+	pProp=new CBCGPProp(_T("Top"),0,_T("控件的Top位置"));
 	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Right"),(LONG)0,_T("控件的Right位置"));
+	pProp=new CBCGPProp(_T("Right"),0,_T("控件的Right位置"));
 	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Bottom"),(LONG)0,_T("控件的Bottom位置"));
-	pValueList->AddSubItem(pProp);
-	pPropUI->AddSubItem(pValueList);
-
-	pValueList=new CMFCPropertyGridProperty(_T("RelativePos"),tagRelativePos,TRUE);//relativepos
-	pProp=new CMFCPropertyGridProperty(_T("MoveX"),(LONG)0,_T("控件的水平位移"));
-	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("MoveY"),(LONG)0,_T("控件的垂直位移"));
-	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("ZoomX"),(LONG)0,_T("控件的水平比例"));
-	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("ZoomY"),(LONG)0,_T("控件的垂直比例"));
+	pProp=new CBCGPProp(_T("Bottom"),0,_T("控件的Bottom位置"));
 	pValueList->AddSubItem(pProp);
 	pPropUI->AddSubItem(pValueList);
 
-	pValueList=new CMFCPropertyGridProperty(_T("Size"),tagSize,TRUE);//size
-	pProp=new CMFCPropertyGridProperty(_T("Width"),(LONG)0,_T("控件的宽度"));
+	pValueList=new CBCGPProp(_T("RelativePos"),tagRelativePos,TRUE);//relativepos
+	pProp=new CBCGPProp(_T("MoveX"),0,_T("控件的水平位移"));
 	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Height"),(LONG)0,_T("控件的高度"));
+	pProp=new CBCGPProp(_T("MoveY"),0,_T("控件的垂直位移"));
 	pValueList->AddSubItem(pProp);
-	pPropUI->AddSubItem(pValueList);
-
-	pValueList=new CMFCPropertyGridProperty(_T("MinSize"),tagMinSize,TRUE);//minsize
-	pProp=new CMFCPropertyGridProperty(_T("MinWidth"),(LONG)0,_T("指定控件的最小宽度"));
+	pProp=new CBCGPProp(_T("ZoomX"),0,_T("控件的水平比例"));
 	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("MinHeight"),(LONG)0,_T("指定控件的最小高度"));
+	pProp=new CBCGPProp(_T("ZoomY"),0,_T("控件的垂直比例"));
 	pValueList->AddSubItem(pProp);
 	pPropUI->AddSubItem(pValueList);
 
-	pValueList=new CMFCPropertyGridProperty(_T("MaxSize"),tagMaxSize,TRUE);
-	pProp=new CMFCPropertyGridProperty(_T("MaxWidth"),(LONG)0,_T("指定控件的最大宽度"));
+	pValueList=new CBCGPProp(_T("Size"),tagSize,TRUE);//size
+	pProp=new CBCGPProp(_T("Width"),0,_T("控件的宽度"));
 	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("MaxHeight"),(LONG)0,_T("指定控件的最大高度"));
-	pValueList->AddSubItem(pProp);
-	pPropUI->AddSubItem(pValueList);
-
-	pValueList=new CMFCPropertyGridProperty(_T("Padding"),tagPadding,TRUE);//padding
-	pProp=new CMFCPropertyGridProperty(_T("Left"),(LONG)0,_T("指定控件内部的左边距"));
-	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Top"),(LONG)0,_T("指定控件内部的上边距"));
-	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Right"),(LONG)0,_T("指定控件内部的右边距"));
-	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Bottom"),(LONG)0,_T("指定控件内部的下边距"));
+	pProp=new CBCGPProp(_T("Height"),0,_T("控件的高度"));
 	pValueList->AddSubItem(pProp);
 	pPropUI->AddSubItem(pValueList);
 
-	pPropImage=new CMFCPropertyGridImageProperty(_T("BkImage"),_T(""),_T("指定控件的背景图片"),tagBkImage);//bkimage
+	pValueList=new CBCGPProp(_T("MinSize"),tagMinSize,TRUE);//minsize
+	pProp=new CBCGPProp(_T("MinWidth"),0,_T("指定控件的最小宽度"));
+	pValueList->AddSubItem(pProp);
+	pProp=new CBCGPProp(_T("MinHeight"),0,_T("指定控件的最小高度"));
+	pValueList->AddSubItem(pProp);
+	pPropUI->AddSubItem(pValueList);
+
+	pValueList=new CBCGPProp(_T("MaxSize"),tagMaxSize,TRUE);
+	pProp=new CBCGPProp(_T("MaxWidth"),0,_T("指定控件的最大宽度"));
+	pValueList->AddSubItem(pProp);
+	pProp=new CBCGPProp(_T("MaxHeight"),0,_T("指定控件的最大高度"));
+	pValueList->AddSubItem(pProp);
+	pPropUI->AddSubItem(pValueList);
+
+	pValueList=new CBCGPProp(_T("Padding"),tagPadding,TRUE);//padding
+	pProp=new CBCGPProp(_T("Left"),0,_T("指定控件内部的左边距"));
+	pValueList->AddSubItem(pProp);
+	pProp=new CBCGPProp(_T("Top"),0,_T("指定控件内部的上边距"));
+	pValueList->AddSubItem(pProp);
+	pProp=new CBCGPProp(_T("Right"),0,_T("指定控件内部的右边距"));
+	pValueList->AddSubItem(pProp);
+	pProp=new CBCGPProp(_T("Bottom"),0,_T("指定控件内部的下边距"));
+	pValueList->AddSubItem(pProp);
+	pPropUI->AddSubItem(pValueList);
+
+	pPropImage=new CBCGPImageProp(_T("BkImage"),_T(""),_T("指定控件的背景图片"),tagBkImage);//bkimage
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
-	pPropColor=new CMFCPropertyGridColor32Property(_T("BkColor"),(LONG)ARGB(0,0,0,0),NULL,_T("指定控件的背景颜色"),tagBkColor);//bkcolor
+	pPropColor=new CBCGPColor32Prop(_T("BkColor"),(long)ARGB(0,0,0,0),NULL,_T("指定控件的背景颜色"),tagBkColor);//bkcolor
 	pPropColor->EnableOtherButton(_T("其他..."));
 	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
 	pPropUI->AddSubItem(pPropColor);
 
-	pPropColor=new CMFCPropertyGridColorProperty(_T("BkColor2"),(LONG)RGB(0,0,0),NULL,_T("指定控件的背景颜色2"),tagBkColor2);//bkcolor2
+	pPropColor=new CBCGPColorProp(_T("BkColor2"),(long)RGB(0,0,0),NULL,_T("指定控件的背景颜色2"),tagBkColor2);//bkcolor2
 	pPropColor->EnableOtherButton(_T("其他..."));
 	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
 	pPropUI->AddSubItem(pPropColor);
 
-	pPropColor=new CMFCPropertyGridColorProperty(_T("BorderColor"),(LONG)RGB(0,0,0),NULL,_T("指定控件的边框颜色"),tagBorderColor);//bordercolor
+	pPropColor=new CBCGPColorProp(_T("BorderColor"),(long)RGB(0,0,0),NULL,_T("指定控件的边框颜色"),tagBorderColor);//bordercolor
 	pPropColor->EnableOtherButton(_T("其他..."));
 	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
 	pPropUI->AddSubItem(pPropColor);
 
 	//focusbordercolor
-	pPropColor=new CMFCPropertyGridColorProperty(_T("focusbordercolor"),(LONG)RGB(0,0,0),NULL,_T("指定控件边框获得焦点时边框的颜色"),tagFocusBorderColor);
+	pPropColor=new CBCGPColorProp(_T("focusbordercolor"),(long)RGB(0,0,0),NULL,_T("指定控件边框获得焦点时边框的颜色"),tagFocusBorderColor);
 	pPropColor->EnableOtherButton(_T("其他..."));
 	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
 	pPropUI->AddSubItem(pPropColor);
 
-	pProp=new CMFCPropertyGridProperty(_T("BorderSize"),(LONG)0,_T("指定控件的边框线宽\n1"),tagBorderSize);//bordersize
+	pProp=new CBCGPProp(_T("BorderSize"),(long)0,_T("指定控件的边框线宽\n1"),tagBorderSize);//bordersize
 	pPropUI->AddSubItem(pProp);
 
 	//borderround
-	pValueList=new CMFCPropertyGridProperty(_T("borderround"),tagBorderRound,TRUE);
-	pProp=new CMFCPropertyGridProperty(_T("Width"),(LONG)0,_T("边框圆角的宽度"));
+	pValueList=new CBCGPProp(_T("borderround"),tagBorderRound,TRUE);
+	pProp=new CBCGPProp(_T("Width"),0,_T("边框圆角的宽度"));
 	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Height"),(LONG)0,_T("边框圆角的高度"));
+	pProp=new CBCGPProp(_T("Height"),0,_T("边框圆角的高度"));
 	pValueList->AddSubItem(pProp);
 	pPropUI->AddSubItem(pValueList);
 
-	pProp=new CMFCPropertyGridProperty(_T("Enabled"),(_variant_t)true,_T("指示是否已启用该控件\nTrue"),tagEnabled);//enabled
+	pProp=new CBCGPProp(_T("Enabled"),true,_T("指示是否已启用该控件\nTrue"),tagEnabled);//enabled
 	pPropUI->AddSubItem(pProp);
 
-	pProp=new CMFCPropertyGridProperty(_T("Float"),(_variant_t)false,_T("确定该控件是固定的，还是浮动的\nFalse"),tagFloat);//float
+	pProp=new CBCGPProp(_T("Float"),false,_T("确定该控件是固定的，还是浮动的\nFalse"),tagFloat);//float
 	pPropUI->AddSubItem(pProp);
 
-	pProp=new CMFCPropertyGridProperty(_T("Visible"),(_variant_t)true,_T("确定该控件是可见的，还是隐藏的\nTrue"),tagVisible);//visible
+	pProp=new CBCGPProp(_T("Visible"),true,_T("确定该控件是可见的，还是隐藏的\nTrue"),tagVisible);//visible
 	pPropUI->AddSubItem(pProp);
 
-	pProp=new CMFCPropertyGridProperty(_T("Mouse"),(_variant_t)true,_T("指示该控件是否响应鼠标操作\nTrue"),tagMouse);//mouse
+	pProp=new CBCGPProp(_T("Mouse"),true,_T("指示该控件是否响应鼠标操作\nTrue"),tagMouse);//mouse
 	pPropUI->AddSubItem(pProp);
 
-	pProp=new CMFCPropertyGridProperty(_T("Menu"),(_variant_t)false,_T("指示该控件是否需要右键菜单\nFalse"),tagMenu);//menu
+	pProp=new CBCGPProp(_T("Menu"),false,_T("指示该控件是否需要右键菜单\nFalse"),tagMenu);//menu
 	pPropUI->AddSubItem(pProp);
 
 	//colorhsl
-	pProp=new CMFCPropertyGridProperty(_T("ColorHSL"),(_variant_t)false,_T("指示该控件的颜色是否随窗口的hsl变化而变化\nFalse"),tagColorHSL);
+	pProp=new CBCGPProp(_T("ColorHSL"),false,_T("指示该控件的颜色是否随窗口的hsl变化而变化\nFalse"),tagColorHSL);
 	pPropUI->AddSubItem(pProp);
 
 	//tooltip
-	pProp=new CMFCPropertyGridProperty(_T("Tooltip"),(_variant_t)_T(""),_T("指示该控件鼠标悬浮提示"),tagTooltip);
+	pProp=new CBCGPProp(_T("Tooltip"),_T(""),_T("指示该控件鼠标悬浮提示"),tagTooltip);
 	pPropUI->AddSubItem(pProp);
 
 	//userdata
-	pProp=new CMFCPropertyGridProperty(_T("UserData"),(_variant_t)_T(""),_T("指示该控件自定义标识\nFalse"),tagUserData);
+	pProp=new CBCGPProp(_T("UserData"),_T(""),_T("指示该控件自定义标识\nFalse"),tagUserData);
 	pPropUI->AddSubItem(pProp);
 
 	//keyboard
-	pProp=new CMFCPropertyGridProperty(_T("KeyBoard"),(_variant_t)false,_T("指示CButton类控件是否接受TabStop和按键事件\nFalse"),tagKeyBoard);
+	pProp=new CBCGPProp(_T("KeyBoard"),false,_T("指示CButton类控件是否接受TabStop和按键事件\nFalse"),tagKeyBoard);
 	pPropUI->AddSubItem(pProp);
 
 	m_wndPropList.AddProperty(pPropUI);
+#if _MSC_VER > 1200
 #pragma endregion Control
+#endif //_MSC_VER
 
 	//Label
+#if _MSC_VER > 1200
 #pragma region Label
-	pPropUI=new CMFCPropertyGridProperty(_T("Label"),classLabel);
+#endif //_MSC_VER
+	pPropUI=new CBCGPProp(_T("Label"),classLabel);
 
 	//align
-	pProp=new CMFCPropertyGridProperty(_T("Align"),_T("Center"),_T("指示文本的对齐方式"),tagAlign);
+	pProp=new CBCGPProp(_T("Align"),_T("Center"),_T("指示文本的对齐方式"),tagAlign);
 	pProp->AddOption(_T("Center"));
 	pProp->AddOption(_T("Left"));
 	pProp->AddOption(_T("Right"));
@@ -598,273 +609,305 @@ void CUIProperties::InitPropList()
 	pPropUI->AddSubItem(pProp);
 
 	//textcolor
-	pPropColor=new CMFCPropertyGridColorProperty(_T("TextColor"),(LONG)RGB(0,0,0),NULL,_T("指定文本的颜色"),tagTextColor);
+	pPropColor=new CBCGPColorProp(_T("TextColor"),(long)RGB(0,0,0),NULL,_T("指定文本的颜色"),tagTextColor);
 	pPropColor->EnableOtherButton(_T("其他..."));
 	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
 	pPropUI->AddSubItem(pPropColor);
 
 	//disabledtextcolor
-	pPropColor=new CMFCPropertyGridColorProperty(_T("DisabledTextColor"),(LONG)RGB(0,0,0),NULL,_T("指定文本的颜色"),tagDisabledTextColor);
+	pPropColor=new CBCGPColorProp(_T("DisabledTextColor"),(long)RGB(0,0,0),NULL,_T("指定文本的颜色"),tagDisabledTextColor);
 	pPropColor->EnableOtherButton(_T("其他..."));
 	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
 	pPropUI->AddSubItem(pPropColor);
 
 	//font
-	pProp=new CMFCPropertyGridProperty(_T("Font"),(LONG)-1,_T("指定文本的字体"),tagFont);
+	pProp=new CBCGPProp(_T("Font"),(long)-1,_T("指定文本的字体"),tagFont);
 	pPropUI->AddSubItem(pProp);
 
 	//textpadding
-	pValueList=new CMFCPropertyGridProperty(_T("TextPadding"),tagTextPadding,TRUE);
-	pProp=new CMFCPropertyGridProperty(_T("Left"),(LONG)0,_T("指定文本区域的左边距"));
+	pValueList=new CBCGPProp(_T("TextPadding"),tagTextPadding,TRUE);
+	pProp=new CBCGPProp(_T("Left"),0,_T("指定文本区域的左边距"));
 	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Top"),(LONG)0,_T("指定文本区域的上边距"));
+	pProp=new CBCGPProp(_T("Top"),0,_T("指定文本区域的上边距"));
 	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Right"),(LONG)0,_T("指定文本区域的右边距"));
+	pProp=new CBCGPProp(_T("Right"),0,_T("指定文本区域的右边距"));
 	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Bottom"),(LONG)0,_T("指定文本区域的下边距"));
+	pProp=new CBCGPProp(_T("Bottom"),0,_T("指定文本区域的下边距"));
 	pValueList->AddSubItem(pProp);
 	pPropUI->AddSubItem(pValueList);
 
 	//showhtml
-	pProp=new CMFCPropertyGridProperty(_T("ShowHtml"),(_variant_t)false,_T("指示是否使用HTML格式的文本"),tagShowHtml);
+	pProp=new CBCGPProp(_T("ShowHtml"),false,_T("指示是否使用HTML格式的文本"),tagShowHtml);
 	pPropUI->AddSubItem(pProp);
 
 	//endellipsis
-	pProp=new CMFCPropertyGridProperty(_T("EndEllipsis"),(_variant_t)false,_T("指示句末显示不全是否使用...代替"),tagEndEllipsis);
+	pProp=new CBCGPProp(_T("EndEllipsis"),false,_T("指示句末显示不全是否使用...代替"),tagEndEllipsis);
 	pPropUI->AddSubItem(pProp);
 
 	m_wndPropList.AddProperty(pPropUI);
+#if _MSC_VER > 1200
 #pragma endregion Label
+#endif //_MSC_VER
 
 	//Button
+#if _MSC_VER > 1200
 #pragma region Button
-	pPropUI=new CMFCPropertyGridProperty(_T("Button"),classButton);
+#endif //_MSC_VER
+	pPropUI=new CBCGPProp(_T("Button"),classButton);
 
-	pPropImage=new CMFCPropertyGridImageProperty(_T("NormalImage"),_T(""),_T("指定按钮正常显示时的图片"),tagNormalImage);//normalimage
+	pPropImage=new CBCGPImageProp(_T("NormalImage"),_T(""),_T("指定按钮正常显示时的图片"),tagNormalImage);//normalimage
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
-	pPropImage=new CMFCPropertyGridImageProperty(_T("HotImage"),_T(""),_T("指定按钮获得热点时的图片"),tagHotImage);//hotimage
+	pPropImage=new CBCGPImageProp(_T("HotImage"),_T(""),_T("指定按钮获得热点时的图片"),tagHotImage);//hotimage
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
-	pPropImage=new CMFCPropertyGridImageProperty(_T("PushedImage"),_T(""),_T("指定按钮被按压下时的图片"),tagPushedImage);//pushedimage
+	pPropImage=new CBCGPImageProp(_T("PushedImage"),_T(""),_T("指定按钮被按压下时的图片"),tagPushedImage);//pushedimage
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
-	pPropImage=new CMFCPropertyGridImageProperty(_T("FocusedImage"),_T(""),_T("指定按钮获得焦点后的图片"),tagFocusedImage);//focusedimage
+	pPropImage=new CBCGPImageProp(_T("FocusedImage"),_T(""),_T("指定按钮获得焦点后的图片"),tagFocusedImage);//focusedimage
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
-	pPropImage=new CMFCPropertyGridImageProperty(_T("DisabledImage"),_T(""),_T("指定按钮被禁用后的图片"),tagDisabledImage);//disabledimage
+	pPropImage=new CBCGPImageProp(_T("DisabledImage"),_T(""),_T("指定按钮被禁用后的图片"),tagDisabledImage);//disabledimage
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
 	m_wndPropList.AddProperty(pPropUI);
+#if _MSC_VER > 1200
 #pragma endregion Button
+#endif //_MSC_VER
 
 	//Edit
+#if _MSC_VER > 1200
 #pragma region Edit
-	pPropUI=new CMFCPropertyGridProperty(_T("Edit"),classEdit);
+#endif //_MSC_VER
+	pPropUI=new CBCGPProp(_T("Edit"),classEdit);
 
 	//normalimage
-	pPropImage=new CMFCPropertyGridImageProperty(_T("NormalImage"),_T(""),_T("指定编辑框正常显示时的图片"),tagEditNormalImage);
+	pPropImage=new CBCGPImageProp(_T("NormalImage"),_T(""),_T("指定编辑框正常显示时的图片"),tagEditNormalImage);
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
 	//hotimage
-	pPropImage=new CMFCPropertyGridImageProperty(_T("HotImage"),_T(""),_T("指定编辑框获得热点时的图片"),tagEditHotImage);
+	pPropImage=new CBCGPImageProp(_T("HotImage"),_T(""),_T("指定编辑框获得热点时的图片"),tagEditHotImage);
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
 	//focusedimage
-	pPropImage=new CMFCPropertyGridImageProperty(_T("FocusedImage"),_T(""),_T("指定编辑框获得焦点后的图片"),tagEditFocusedImage);
+	pPropImage=new CBCGPImageProp(_T("FocusedImage"),_T(""),_T("指定编辑框获得焦点后的图片"),tagEditFocusedImage);
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
 	//disabledimage
-	pPropImage=new CMFCPropertyGridImageProperty(_T("DisabledImage"),_T(""),_T("指定编辑框被禁用后的图片"),tagEditDisabledImage);
+	pPropImage=new CBCGPImageProp(_T("DisabledImage"),_T(""),_T("指定编辑框被禁用后的图片"),tagEditDisabledImage);
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
 	//readonly
-	pProp=new CMFCPropertyGridProperty(_T("ReadOnly"),(_variant_t)false,_T("指示是否只读"),tagReadOnly);
+	pProp=new CBCGPProp(_T("ReadOnly"),false,_T("指示是否只读"),tagReadOnly);
 	pPropUI->AddSubItem(pProp);
 
 	//password
-	pProp=new CMFCPropertyGridProperty(_T("Password"),(_variant_t)false,_T("指示是否使用密码框"),tagPassword);
+	pProp=new CBCGPProp(_T("Password"),false,_T("指示是否使用密码框"),tagPassword);
 	pPropUI->AddSubItem(pProp);
 
 	//maxchar
-	pProp=new CMFCPropertyGridProperty(_T("MaxChar"),(LONG)0,_T("指示输入字符最大长度\n255"),tagMaxChar);
+	pProp=new CBCGPProp(_T("MaxChar"),(long)0,_T("指示输入字符最大长度\n255"),tagMaxChar);
 	pPropUI->AddSubItem(pProp);
 
 	//nativebkcolor
-	pPropColor=new CMFCPropertyGridColor32Property(_T("NativeBKColor"),(LONG)ARGB(0,0,0,0),NULL,_T("指定Windows原生Edit控件的背景颜色"),tagNativeBKColor);
+	pPropColor=new CBCGPColor32Prop(_T("NativeBKColor"),(long)ARGB(0,0,0,0),NULL,_T("指定Windows原生Edit控件的背景颜色"),tagNativeBKColor);
 	pPropColor->EnableOtherButton(_T("其他..."));
 	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
 	pPropUI->AddSubItem(pPropColor);
 
 	m_wndPropList.AddProperty(pPropUI);
+#if _MSC_VER > 1200
 #pragma endregion Edit
+#endif //_MSC_VER
 
 	//Option
+#if _MSC_VER > 1200
 #pragma region Option
-	pPropUI=new CMFCPropertyGridProperty(_T("Option"),classOption);
+#endif //_MSC_VER
+	pPropUI=new CBCGPProp(_T("Option"),classOption);
 
-	pPropImage=new CMFCPropertyGridImageProperty(_T("ForeImage"),_T(""),_T("指定复选框的前景图片"),tagOptForeImage);//foreimage
+	pPropImage=new CBCGPImageProp(_T("ForeImage"),_T(""),_T("指定复选框的前景图片"),tagOptForeImage);//foreimage
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
-	pPropImage=new CMFCPropertyGridImageProperty(_T("SelectedImage"),_T(""),_T("指定复选框被选择后的图片"),tagSelectedImage);//selectedimage
+	pPropImage=new CBCGPImageProp(_T("SelectedImage"),_T(""),_T("指定复选框被选择后的图片"),tagSelectedImage);//selectedimage
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
-	pProp=new CMFCPropertyGridProperty(_T("Selected"),(_variant_t)false,_T("指示是否已被选中"),tagSelected);//selected
+	pProp=new CBCGPProp(_T("Selected"),false,_T("指示是否已被选中"),tagSelected);//selected
 	pPropUI->AddSubItem(pProp);
 
-	pProp=new CMFCPropertyGridProperty(_T("Group"),(_variant_t)_T(""),_T("指定参与组合的名称"),tagGroup);//group
+	pProp=new CBCGPProp(_T("Group"),_T(""),_T("指定参与组合的名称"),tagGroup);//group
 	pPropUI->AddSubItem(pProp);
 
 	m_wndPropList.AddProperty(pPropUI);
+#if _MSC_VER > 1200
 #pragma endregion Option
+#endif //_MSC_VER
 
 	//Progress
+#if _MSC_VER > 1200
 #pragma region Progress
-	pPropUI=new CMFCPropertyGridProperty(_T("Progress"),classProgress);
+#endif //_MSC_VER
+	pPropUI=new CBCGPProp(_T("Progress"),classProgress);
 
-	pPropImage=new CMFCPropertyGridImageProperty(_T("ForeImage"),_T(""),_T("指定进度条的前景图片"),tagForeImage);//foreimage
+	pPropImage=new CBCGPImageProp(_T("ForeImage"),_T(""),_T("指定进度条的前景图片"),tagForeImage);//foreimage
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
-	pValueList=new CMFCPropertyGridProperty(_T("MinMax"),tagMinMax,TRUE);//minmax
-	pProp=new CMFCPropertyGridProperty(_T("Min"),(LONG)0,_T("指定进度条的最小值"));
+	pValueList=new CBCGPProp(_T("MinMax"),tagMinMax,TRUE);//minmax
+	pProp=new CBCGPProp(_T("Min"),0,_T("指定进度条的最小值"));
 	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Max"),(LONG)0,_T("指定进度条的最大值"));
+	pProp=new CBCGPProp(_T("Max"),0,_T("指定进度条的最大值"));
 	pValueList->AddSubItem(pProp);
 	pPropUI->AddSubItem(pValueList);
 
-	pProp=new CMFCPropertyGridProperty(_T("Value"),(LONG)0,_T("指定进度条的值"),tagValue);//value
+	pProp=new CBCGPProp(_T("Value"),(long)0,_T("指定进度条的值"),tagValue);//value
 	pPropUI->AddSubItem(pProp);
 
-	pProp=new CMFCPropertyGridProperty(_T("Hor"),(_variant_t)false,_T("指示进度条是否水平"),tagHor);//hor
+	pProp=new CBCGPProp(_T("Hor"),false,_T("指示进度条是否水平"),tagHor);//hor
 	pPropUI->AddSubItem(pProp);
 
-	pProp=new CMFCPropertyGridProperty(_T("IsStretchFore"),(_variant_t)false,_T("指定前景是否缩放"),tagIsStretchFore);
+	pProp=new CBCGPProp(_T("IsStretchFore"),false,_T("指定前景是否缩放"),tagIsStretchFore);
 	pPropUI->AddSubItem(pProp);
 
 	m_wndPropList.AddProperty(pPropUI);
+#if _MSC_VER > 1200
 #pragma endregion Progress
+#endif //_MSC_VER
 
 	//Slider
+#if _MSC_VER > 1200
 #pragma region Slider
-	pPropUI=new CMFCPropertyGridProperty(_T("Slider"),classSlider);
+#endif //_MSC_VER
+	pPropUI=new CBCGPProp(_T("Slider"),classSlider);
 
-	pPropImage=new CMFCPropertyGridImageProperty(_T("ThumbImage"),_T(""),_T("指定滑块的滑条图片"),tagThumbImage);//thumbimage
+	pPropImage=new CBCGPImageProp(_T("ThumbImage"),_T(""),_T("指定滑块的滑条图片"),tagThumbImage);//thumbimage
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
-	pPropImage=new CMFCPropertyGridImageProperty(_T("ThumbHotImage"),_T(""),_T("指定滑条获得热点时的图片"),tagThumbHotImage);//thumbhotimage
+	pPropImage=new CBCGPImageProp(_T("ThumbHotImage"),_T(""),_T("指定滑条获得热点时的图片"),tagThumbHotImage);//thumbhotimage
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
-	pPropImage=new CMFCPropertyGridImageProperty(_T("ThumbPushedImage"),_T(""),_T("指定滑条被按压后的图片"),tagThumbPushedImage);//thumbpushedimage
+	pPropImage=new CBCGPImageProp(_T("ThumbPushedImage"),_T(""),_T("指定滑条被按压后的图片"),tagThumbPushedImage);//thumbpushedimage
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
-	pValueList=new CMFCPropertyGridProperty(_T("ThumbSize"),tagThumbSize,TRUE);//thumbsize
-	pProp=new CMFCPropertyGridProperty(_T("Width"),(LONG)0,_T("指定滑条的宽度"));
+	pValueList=new CBCGPProp(_T("ThumbSize"),tagThumbSize,TRUE);//thumbsize
+	pProp=new CBCGPProp(_T("Width"),0,_T("指定滑条的宽度"));
 	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Height"),(LONG)0,_T("指定滑条的高度"));
+	pProp=new CBCGPProp(_T("Height"),0,_T("指定滑条的高度"));
 	pValueList->AddSubItem(pProp);
 	pPropUI->AddSubItem(pValueList);
 
 	m_wndPropList.AddProperty(pPropUI);
+#if _MSC_VER > 1200
 #pragma endregion Slider
+#endif //_MSC_VER
 
 	//ActiveX
+#if _MSC_VER > 1200
 #pragma region ActiveX
-	pPropUI=new CMFCPropertyGridProperty(_T("ActiveX"),classActiveX);
+#endif //_MSC_VER
+	pPropUI=new CBCGPProp(_T("ActiveX"),classActiveX);
 
 	//clsid
-	pProp=new CMFCPropertyGridProperty(_T("Clsid"),(_variant_t)_T(""),_T("指定ActiveX控件的Clsid值"),tagClsid);
+	pProp=new CBCGPProp(_T("Clsid"),_T(""),_T("指定ActiveX控件的Clsid值"),tagClsid);
 	pPropUI->AddSubItem(pProp);
 
 	//delaycreate
-	pProp=new CMFCPropertyGridProperty(_T("DelayCreate"),(_variant_t)true,_T("指示是否延迟加载ActiveX控件"),tagDelayCreate);
+	pProp=new CBCGPProp(_T("DelayCreate"),true,_T("指示是否延迟加载ActiveX控件"),tagDelayCreate);
 	pPropUI->AddSubItem(pProp);//added by 邓景仁 2011-09-08
 
 	// modulename
-	pProp=new CMFCPropertyGridProperty(_T("ModuleName"),(_variant_t)_T(""),_T("指示从指定位置加载ActiveX控件\n如(flash/flash.ocx)"),tagModuleName);
+	pProp=new CBCGPProp(_T("ModuleName"),_T(""),_T("指示从指定位置加载ActiveX控件\n如(flash/flash.ocx)"),tagModuleName);
 	pPropUI->AddSubItem(pProp);
 
 	m_wndPropList.AddProperty(pPropUI);
+#if _MSC_VER > 1200
 #pragma endregion ActiveX
+#endif //_MSC_VER
 
 	//Container
+#if _MSC_VER > 1200
 #pragma region Container
-	pPropUI=new CMFCPropertyGridProperty(_T("Container"),classContainer);
+#endif //_MSC_VER
+	pPropUI=new CBCGPProp(_T("Container"),classContainer);
 
-	pValueList=new CMFCPropertyGridProperty(_T("Inset"),tagInset,TRUE);//inset
-	pProp=new CMFCPropertyGridProperty(_T("Left"),(LONG)0,_T("指定容器客户区域的左边距\n0"));
+	pValueList=new CBCGPProp(_T("Inset"),tagInset,TRUE);//inset
+	pProp=new CBCGPProp(_T("Left"),0,_T("指定容器客户区域的左边距\n0"));
 	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Top"),(LONG)0,_T("指定容器客户区域的上边距\n0"));
+	pProp=new CBCGPProp(_T("Top"),0,_T("指定容器客户区域的上边距\n0"));
 	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Right"),(LONG)0,_T("指定容器客户区域的右边距\n0"));
+	pProp=new CBCGPProp(_T("Right"),0,_T("指定容器客户区域的右边距\n0"));
 	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Bottom"),(LONG)0,_T("指定容器客户区域的下边距\n0"));
+	pProp=new CBCGPProp(_T("Bottom"),0,_T("指定容器客户区域的下边距\n0"));
 	pValueList->AddSubItem(pProp);
 	pPropUI->AddSubItem(pValueList);
 
-	pProp=new CMFCPropertyGridProperty(_T("ChildPadding"),(LONG)0,_T("指定子控件之间的间距\n0"),tagChildPadding);//childpadding
+	pProp=new CBCGPProp(_T("ChildPadding"),(long)0,_T("指定子控件之间的间距\n0"),tagChildPadding);//childpadding
 	pPropUI->AddSubItem(pProp);
 
-	pProp=new CMFCPropertyGridProperty(_T("MouseChild"),(_variant_t)false,_T("指定本控件的子控件是否可以响应用户操作\nTrue"),tagMouseChild);//mousechild
+	pProp=new CBCGPProp(_T("MouseChild"),false,_T("指定本控件的子控件是否可以响应用户操作\nTrue"),tagMouseChild);//mousechild
 	pPropUI->AddSubItem(pProp);
 
-	pProp=new CMFCPropertyGridProperty(_T("HScrollBar"),(_variant_t)false,_T("指示是否启用水平滚动条\nFalse"),tagHScrollBar);//hscrollbar
+	pProp=new CBCGPProp(_T("HScrollBar"),false,_T("指示是否启用水平滚动条\nFalse"),tagHScrollBar);//hscrollbar
 	pPropUI->AddSubItem(pProp);
 
-	pProp=new CMFCPropertyGridProperty(_T("VScrollBar"),(_variant_t)false,_T("指示是否启用垂直滚动条\nFalse"),tagVScrollBar);//vscrollbar
+	pProp=new CBCGPProp(_T("VScrollBar"),false,_T("指示是否启用垂直滚动条\nFalse"),tagVScrollBar);//vscrollbar
 	pPropUI->AddSubItem(pProp);
 
 	m_wndPropList.AddProperty(pPropUI);
+#if _MSC_VER > 1200
 #pragma endregion Container
+#endif //_MSC_VER
 
 	//Item
+#if _MSC_VER > 1200
 #pragma region Item
-	pPropUI=new CMFCPropertyGridProperty(_T("Item"),classItem);
+#endif //_MSC_VER
+	pPropUI=new CBCGPProp(_T("Item"),classItem);
 
-	pPropImage=new CMFCPropertyGridImageProperty(_T("ItemBkImage"),_T(""),_T("指定组项正常显示时的图片"),tagItemBkImage);//itembkimage
+	pPropImage=new CBCGPImageProp(_T("ItemBkImage"),_T(""),_T("指定组项正常显示时的图片"),tagItemBkImage);//itembkimage
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
-	pPropImage=new CMFCPropertyGridImageProperty(_T("ItemHotImage"),_T(""),_T("指定组项获得热点时的图片"),tagItemHotImage);//itemhotimage
+	pPropImage=new CBCGPImageProp(_T("ItemHotImage"),_T(""),_T("指定组项获得热点时的图片"),tagItemHotImage);//itemhotimage
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
-	pPropImage=new CMFCPropertyGridImageProperty(_T("ItemSelectedImage"),_T(""),_T("指定组项被选择时的图片"),tagItemSelectedImage);//itemselectedimage
+	pPropImage=new CBCGPImageProp(_T("ItemSelectedImage"),_T(""),_T("指定组项被选择时的图片"),tagItemSelectedImage);//itemselectedimage
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
-	pPropImage=new CMFCPropertyGridImageProperty(_T("ItemDisabledImage"),_T(""),_T("指定组项被禁用后的图片"),tagItemDisabledImage);//itemdisabledimage
+	pPropImage=new CBCGPImageProp(_T("ItemDisabledImage"),_T(""),_T("指定组项被禁用后的图片"),tagItemDisabledImage);//itemdisabledimage
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
 	//itemtextpadding
-	pValueList=new CMFCPropertyGridProperty(_T("ItemTextPadding"),tagItemTextPadding,TRUE);
-	pProp=new CMFCPropertyGridProperty(_T("Left"),(LONG)0,_T("指定组项文本区域的左边距\n0"));
+	pValueList=new CBCGPProp(_T("ItemTextPadding"),tagItemTextPadding,TRUE);
+	pProp=new CBCGPProp(_T("Left"),0,_T("指定组项文本区域的左边距\n0"));
 	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Top"),(LONG)0,_T("指定组项文本区域的上边距\n0"));
+	pProp=new CBCGPProp(_T("Top"),0,_T("指定组项文本区域的上边距\n0"));
 	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Right"),(LONG)0,_T("指定组项文本区域的右边距\n0"));
+	pProp=new CBCGPProp(_T("Right"),0,_T("指定组项文本区域的右边距\n0"));
 	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Bottom"),(LONG)0,_T("指定组项文本区域的下边距\n0"));
+	pProp=new CBCGPProp(_T("Bottom"),0,_T("指定组项文本区域的下边距\n0"));
 	pValueList->AddSubItem(pProp);
 	pPropUI->AddSubItem(pValueList);
 
 	//itemalign
-	pProp=new CMFCPropertyGridProperty(_T("ItemAlign"),_T("Center"),_T("指示组项文本的对齐方式\nCenter"),tagItemAlign);
+	pProp=new CBCGPProp(_T("ItemAlign"),_T("Center"),_T("指示组项文本的对齐方式\nCenter"),tagItemAlign);
 	pProp->AddOption(_T("Center"));
 	pProp->AddOption(_T("Left"));
 	pProp->AddOption(_T("Right"));
@@ -872,307 +915,340 @@ void CUIProperties::InitPropList()
 	pPropUI->AddSubItem(pProp);
 
 	//itemtextcolor
-	pPropColor=new CMFCPropertyGridColor32Property(_T("ItemTextColor"),(LONG)ARGB(0,0,0,0),NULL,_T("指定组项文本的颜色"),tagItemTextColor);
+	pPropColor=new CBCGPColor32Prop(_T("ItemTextColor"),(long)ARGB(0,0,0,0),NULL,_T("指定组项文本的颜色"),tagItemTextColor);
 	pPropColor->EnableOtherButton(_T("其他..."));
 	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
 	pPropUI->AddSubItem(pPropColor);
 
 	//itembkcolor
-	pPropColor=new CMFCPropertyGridColor32Property(_T("ItemBkColor"),(LONG)ARGB(0,0,0,0),NULL,_T("指定组项背景的颜色"),tagItemBkColor);
+	pPropColor=new CBCGPColor32Prop(_T("ItemBkColor"),(long)ARGB(0,0,0,0),NULL,_T("指定组项背景的颜色"),tagItemBkColor);
 	pPropColor->EnableOtherButton(_T("其他..."));
 	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
 	pPropUI->AddSubItem(pPropColor);
 
 	//itemselectedtextcolor
-	pPropColor=new CMFCPropertyGridColor32Property(_T("ItemSelectedTextColor"),(LONG)ARGB(0,0,0,0),NULL,_T("指定组项被选中后文本的颜色"),tagItemSelectedTextColor);
+	pPropColor=new CBCGPColor32Prop(_T("ItemSelectedTextColor"),(long)ARGB(0,0,0,0),NULL,_T("指定组项被选中后文本的颜色"),tagItemSelectedTextColor);
 	pPropColor->EnableOtherButton(_T("其他..."));
 	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
 	pPropUI->AddSubItem(pPropColor);
 
 	//itemselectedbkcolor
-	pPropColor=new CMFCPropertyGridColor32Property(_T("ItemSelectedBkColor"),(LONG)ARGB(0,0,0,0),NULL,_T("指定组项被选中后背景的颜色"),tagItemSelectedBkColor);
+	pPropColor=new CBCGPColor32Prop(_T("ItemSelectedBkColor"),(long)ARGB(0,0,0,0),NULL,_T("指定组项被选中后背景的颜色"),tagItemSelectedBkColor);
 	pPropColor->EnableOtherButton(_T("其他..."));
 	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
 	pPropUI->AddSubItem(pPropColor);
 
 	//itemhottextcolor
-	pPropColor=new CMFCPropertyGridColor32Property(_T("ItemHotTextColor"),(LONG)ARGB(0,0,0,0),NULL,_T("指定组项获得热点时文本的颜色"),tagItemHotTextColor);
+	pPropColor=new CBCGPColor32Prop(_T("ItemHotTextColor"),(long)ARGB(0,0,0,0),NULL,_T("指定组项获得热点时文本的颜色"),tagItemHotTextColor);
 	pPropColor->EnableOtherButton(_T("其他..."));
 	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
 	pPropUI->AddSubItem(pPropColor);
 
 	//itemhotbkcolor
-	pPropColor=new CMFCPropertyGridColor32Property(_T("ItemHotBkColor"),(LONG)ARGB(0,0,0,0),NULL,_T("指定组项获得热点时背景的颜色"),tagItemHotBkColor);
+	pPropColor=new CBCGPColor32Prop(_T("ItemHotBkColor"),(long)ARGB(0,0,0,0),NULL,_T("指定组项获得热点时背景的颜色"),tagItemHotBkColor);
 	pPropColor->EnableOtherButton(_T("其他..."));
 	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
 	pPropUI->AddSubItem(pPropColor);
 
 	//itemdisabledtextcolor
-	pPropColor=new CMFCPropertyGridColor32Property(_T("ItemDisabledTextColor"),(LONG)ARGB(0,0,0,0),NULL,_T("指定组项被禁用后文本的颜色"),tagItemDisabledTextColor);
+	pPropColor=new CBCGPColor32Prop(_T("ItemDisabledTextColor"),(long)ARGB(0,0,0,0),NULL,_T("指定组项被禁用后文本的颜色"),tagItemDisabledTextColor);
 	pPropColor->EnableOtherButton(_T("其他..."));
 	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
 	pPropUI->AddSubItem(pPropColor);
 
 	//itemdisabledbkcolor
-	pPropColor=new CMFCPropertyGridColor32Property(_T("ItemDisabledBkColor"),(LONG)ARGB(0,0,0,0),NULL,_T("指定组项被禁用后背景的颜色"),tagItemDisabledBkColor);
+	pPropColor=new CBCGPColor32Prop(_T("ItemDisabledBkColor"),(long)ARGB(0,0,0,0),NULL,_T("指定组项被禁用后背景的颜色"),tagItemDisabledBkColor);
 	pPropColor->EnableOtherButton(_T("其他..."));
 	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
 	pPropUI->AddSubItem(pPropColor);
 
 	//ItemLineColor
-	pPropColor=new CMFCPropertyGridColor32Property(_T("ItemLineColor"),(LONG)ARGB(0,0,0,0),NULL,_T("指定组项分割线的颜色"),tagItemLineColor);
+	pPropColor=new CBCGPColor32Prop(_T("ItemLineColor"),(long)ARGB(0,0,0,0),NULL,_T("指定组项分割线的颜色"),tagItemLineColor);
 	pPropColor->EnableOtherButton(_T("其他..."));
 	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
 	pPropUI->AddSubItem(pPropColor);
 
 	//ItemFont
-	pProp=new CMFCPropertyGridProperty(_T("ItemFont"),(LONG)-1,_T("指定组项文本的字体\n-1"),tagItemFont);
+	pProp=new CBCGPProp(_T("ItemFont"),(long)-1,_T("指定组项文本的字体\n-1"),tagItemFont);
 	pPropUI->AddSubItem(pProp);
 
 	//ItemShowHtml
-	pProp=new CMFCPropertyGridProperty(_T("ItemShowHtml"),(_variant_t)false,_T("指示是否使用Html格式文本\nFalse"),tagItemShowHtml);
+	pProp=new CBCGPProp(_T("ItemShowHtml"),false,_T("指示是否使用Html格式文本\nFalse"),tagItemShowHtml);
 	pPropUI->AddSubItem(pProp);
 
 	//MultiExpanding
-	pProp=new CMFCPropertyGridProperty(_T("MultiExpanding"),(_variant_t)false,_T("指示是否支持多个item同时打开\nFalse"),tagMultiExpanding);
+	pProp=new CBCGPProp(_T("MultiExpanding"),false,_T("指示是否支持多个item同时打开\nFalse"),tagMultiExpanding);
 	pPropUI->AddSubItem(pProp);
 
 	m_wndPropList.AddProperty(pPropUI);
+#if _MSC_VER > 1200
 #pragma endregion Item
+#endif //_MSC_VER
 
 	//Combo
+#if _MSC_VER > 1200
 #pragma region Combo
-	pPropUI=new CMFCPropertyGridProperty(_T("Combo"),classCombo);
+#endif //_MSC_VER
+	pPropUI=new CBCGPProp(_T("Combo"),classCombo);
 
-	pPropImage=new CMFCPropertyGridImageProperty(_T("NormalImage"),_T(""),_T("指定组合框正常显示时的图片"),tagComboNormalImage);//normalimage
+	pPropImage=new CBCGPImageProp(_T("NormalImage"),_T(""),_T("指定组合框正常显示时的图片"),tagComboNormalImage);//normalimage
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
-	pPropImage=new CMFCPropertyGridImageProperty(_T("HotImage"),_T(""),_T("指定组合框获得热点时的图片"),tagComboHotImage);//hotimage
+	pPropImage=new CBCGPImageProp(_T("HotImage"),_T(""),_T("指定组合框获得热点时的图片"),tagComboHotImage);//hotimage
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
-	pPropImage=new CMFCPropertyGridImageProperty(_T("PushedImage"),_T(""),_T("指定组合框被按压下时的图片"),tagComboPushedImage);//pushedimage
+	pPropImage=new CBCGPImageProp(_T("PushedImage"),_T(""),_T("指定组合框被按压下时的图片"),tagComboPushedImage);//pushedimage
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
-	pPropImage=new CMFCPropertyGridImageProperty(_T("FocusedImage"),_T(""),_T("指定组合框获得焦点后的图片"),tagComboFocusedImage);//focusedimage
+	pPropImage=new CBCGPImageProp(_T("FocusedImage"),_T(""),_T("指定组合框获得焦点后的图片"),tagComboFocusedImage);//focusedimage
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
-	pPropImage=new CMFCPropertyGridImageProperty(_T("DisabledImage"),_T(""),_T("指定组合框被禁用后的图片"),tagComboDisabledImage);//disabledimage
+	pPropImage=new CBCGPImageProp(_T("DisabledImage"),_T(""),_T("指定组合框被禁用后的图片"),tagComboDisabledImage);//disabledimage
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
-	pValueList=new CMFCPropertyGridProperty(_T("TextPadding"),tagComboTextPadding,TRUE);//textpadding
-	pProp=new CMFCPropertyGridProperty(_T("Left"),(LONG)0,_T("指定文本区域的左边距"));
+	pValueList=new CBCGPProp(_T("TextPadding"),tagComboTextPadding,TRUE);//textpadding
+	pProp=new CBCGPProp(_T("Left"),0,_T("指定文本区域的左边距"));
 	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Top"),(LONG)0,_T("指定文本区域的上边距"));
+	pProp=new CBCGPProp(_T("Top"),0,_T("指定文本区域的上边距"));
 	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Right"),(LONG)0,_T("指定文本区域的右边距"));
+	pProp=new CBCGPProp(_T("Right"),0,_T("指定文本区域的右边距"));
 	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Bottom"),(LONG)0,_T("指定文本区域的下边距"));
+	pProp=new CBCGPProp(_T("Bottom"),0,_T("指定文本区域的下边距"));
 	pValueList->AddSubItem(pProp);
 	pPropUI->AddSubItem(pValueList);
 
-	pValueList=new CMFCPropertyGridProperty(_T("DropBoxSize"),tagComboDropBoxSize,TRUE);//dropboxsize
-	pProp=new CMFCPropertyGridProperty(_T("Width"),(LONG)0,_T("下拉列表的宽度"));
+	pValueList=new CBCGPProp(_T("DropBoxSize"),tagComboDropBoxSize,TRUE);//dropboxsize
+	pProp=new CBCGPProp(_T("Width"),0,_T("下拉列表的宽度"));
 	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Height"),(LONG)0,_T("下拉列表的高度"));
+	pProp=new CBCGPProp(_T("Height"),0,_T("下拉列表的高度"));
 	pValueList->AddSubItem(pProp);
 	pPropUI->AddSubItem(pValueList);
 
 	m_wndPropList.AddProperty(pPropUI);
+#if _MSC_VER > 1200
 #pragma endregion Combo
+#endif //_MSC_VER
 
 	//HorizontalLayout
+#if _MSC_VER > 1200
 #pragma region HorizontalLayout
-	pPropUI=new CMFCPropertyGridProperty(_T("HorizontalLayout"),classHorizontalLayout);
+#endif //_MSC_VER
+	pPropUI=new CBCGPProp(_T("HorizontalLayout"),classHorizontalLayout);
 
-	pProp=new CMFCPropertyGridProperty(_T("SepWidth"),(LONG)0,_T("分隔符宽,正负表示分隔符在左边还是右边\n0"),tagSepWidth);//sepwidth
+	pProp=new CBCGPProp(_T("SepWidth"),(long)0,_T("分隔符宽,正负表示分隔符在左边还是右边\n0"),tagSepWidth);//sepwidth
 	pPropUI->AddSubItem(pProp);
 
-	pProp=new CMFCPropertyGridProperty(_T("SepImm"),(_variant_t)false,_T("拖动分隔符是否立即改变大小\nfalse"),tagSepImm);//sepimm
+	pProp=new CBCGPProp(_T("SepImm"),false,_T("拖动分隔符是否立即改变大小\nfalse"),tagSepImm);//sepimm
 	pPropUI->AddSubItem(pProp);
 
 	m_wndPropList.AddProperty(pPropUI);
+#if _MSC_VER > 1200
 #pragma endregion HorizontalLayout
+#endif //_MSC_VER
 
 	//TileLayout
+#if _MSC_VER > 1200
 #pragma region TileLayout
-	pPropUI=new CMFCPropertyGridProperty(_T("TileLayout"),classTileLayout);
+#endif //_MSC_VER
+	pPropUI=new CBCGPProp(_T("TileLayout"),classTileLayout);
 
-	pProp=new CMFCPropertyGridProperty(_T("Columns"),(LONG)0,_T("指定并列布局的列数"),tagColumns);//columns
+	pProp=new CBCGPProp(_T("Columns"),(long)0,_T("指定并列布局的列数"),tagColumns);//columns
 	pPropUI->AddSubItem(pProp);
 
 	m_wndPropList.AddProperty(pPropUI);
+#if _MSC_VER > 1200
 #pragma endregion TileLayout
+#endif //_MSC_VER
 
 	//List
+#if _MSC_VER > 1200
 #pragma region List
-	pPropUI=new CMFCPropertyGridProperty(_T("List"),classList);
+#endif //_MSC_VER
+	pPropUI=new CBCGPProp(_T("List"),classList);
 
-	pProp=new CMFCPropertyGridProperty(_T("Header"),(_variant_t)false,_T("指定是否显示列表表头\nTrue"),tagListHeader);
+	pProp=new CBCGPProp(_T("Header"),false,_T("指定是否显示列表表头\nTrue"),tagListHeader);
 	pPropUI->AddSubItem(pProp);
 
-	pPropImage=new CMFCPropertyGridImageProperty(_T("headerbkimage"),_T(""),_T("指定表头背景图片"),tagListHeaderBKImage);//normalimage
+	pPropImage=new CBCGPImageProp(_T("headerbkimage"),_T(""),_T("指定表头背景图片"),tagListHeaderBKImage);//normalimage
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
 	m_wndPropList.AddProperty(pPropUI);
+#if _MSC_VER > 1200
 #pragma endregion List
+#endif //_MSC_VER
 
 	//ScrollBar
+#if _MSC_VER > 1200
 #pragma region ScrollBar
+#endif //_MSC_VER
 
-	pPropUI=new CMFCPropertyGridProperty(_T("ScrollBar"),classScrollBar);
+	pPropUI=new CBCGPProp(_T("ScrollBar"),classScrollBar);
 
-	pProp=new CMFCPropertyGridProperty(_T("Range"),(LONG)0,_T("指定滚动范围\n100"),tagScrollBarRange);
+	pProp=new CBCGPProp(_T("Range"),(long)0,_T("指定滚动范围\n100"),tagScrollBarRange);
 	pPropUI->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Value"),(LONG)0,_T("指定滚动位置\n0"),tagScrollBarValue);
+	pProp=new CBCGPProp(_T("Value"),(long)0,_T("指定滚动位置\n0"),tagScrollBarValue);
 	pPropUI->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("LineSize"),(LONG)0,_T("指定滚动一行的大小\n8"),tagScrollBarLineSize);
-	pPropUI->AddSubItem(pProp);
-
-	pProp=new CMFCPropertyGridProperty(_T("ShowButton1"),(_variant_t)false,_T("是否显示左或上按钮\nTrue"),tagScrollBarShowButton1);
-	pPropUI->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("ShowButton2"),(_variant_t)false,_T("是否显示左或上按钮\nTrue"),tagScrollBarShowButton2);
+	pProp=new CBCGPProp(_T("LineSize"),(long)0,_T("指定滚动一行的大小\n8"),tagScrollBarLineSize);
 	pPropUI->AddSubItem(pProp);
 
-	pPropImage=new CMFCPropertyGridImageProperty(_T("Button1NormalImage"),_T(""),_T("指定左或上按钮普通状态图片"),tagScrollBarButton1NormalImage);
+	pProp=new CBCGPProp(_T("ShowButton1"),false,_T("是否显示左或上按钮\nTrue"),tagScrollBarShowButton1);
+	pPropUI->AddSubItem(pProp);
+	pProp=new CBCGPProp(_T("ShowButton2"),false,_T("是否显示左或上按钮\nTrue"),tagScrollBarShowButton2);
+	pPropUI->AddSubItem(pProp);
+
+	pPropImage=new CBCGPImageProp(_T("Button1NormalImage"),_T(""),_T("指定左或上按钮普通状态图片"),tagScrollBarButton1NormalImage);
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
-	pPropImage=new CMFCPropertyGridImageProperty(_T("Button1HotImage"),_T(""),_T("指定左或上按钮鼠标悬浮状态图片"),tagScrollBarButton1HotImage);
+	pPropImage=new CBCGPImageProp(_T("Button1HotImage"),_T(""),_T("指定左或上按钮鼠标悬浮状态图片"),tagScrollBarButton1HotImage);
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
-	pPropImage=new CMFCPropertyGridImageProperty(_T("Button1PushedImage"),_T(""),_T("指定左或上按钮鼠标按下状态图片"),tagScrollBarButton1PushedImage);
+	pPropImage=new CBCGPImageProp(_T("Button1PushedImage"),_T(""),_T("指定左或上按钮鼠标按下状态图片"),tagScrollBarButton1PushedImage);
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
-	pPropImage=new CMFCPropertyGridImageProperty(_T("Button1DisabledImage"),_T(""),_T("指定左或上按钮鼠标禁用状态图片"),tagScrollBarButton1DisabledImage);
+	pPropImage=new CBCGPImageProp(_T("Button1DisabledImage"),_T(""),_T("指定左或上按钮鼠标禁用状态图片"),tagScrollBarButton1DisabledImage);
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
-	pPropImage=new CMFCPropertyGridImageProperty(_T("Button2NormalImage"),_T(""),_T("指定左或上按钮普通状态图片"),tagScrollBarButton2NormalImage);
+	pPropImage=new CBCGPImageProp(_T("Button2NormalImage"),_T(""),_T("指定左或上按钮普通状态图片"),tagScrollBarButton2NormalImage);
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
-	pPropImage=new CMFCPropertyGridImageProperty(_T("Button2HotImage"),_T(""),_T("指定左或上按钮鼠标悬浮状态图片"),tagScrollBarButton2HotImage);
+	pPropImage=new CBCGPImageProp(_T("Button2HotImage"),_T(""),_T("指定左或上按钮鼠标悬浮状态图片"),tagScrollBarButton2HotImage);
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
-	pPropImage=new CMFCPropertyGridImageProperty(_T("Button2PushedImage"),_T(""),_T("指定左或上按钮鼠标按下状态图片"),tagScrollBarButton2PushedImage);
+	pPropImage=new CBCGPImageProp(_T("Button2PushedImage"),_T(""),_T("指定左或上按钮鼠标按下状态图片"),tagScrollBarButton2PushedImage);
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
-	pPropImage=new CMFCPropertyGridImageProperty(_T("Button2DisabledImage"),_T(""),_T("指定左或上按钮鼠标悬禁用态图片"),tagScrollBarButton2DisabledImage);
-	pPropImage->AllowEdit(FALSE);
-	pPropUI->AddSubItem(pPropImage);
-
-	pPropImage=new CMFCPropertyGridImageProperty(_T("ThumbNormalImage"),_T(""),_T("指定滑块普通状态图片"),tagScrollBarThumbNormalImage);
-	pPropImage->AllowEdit(FALSE);
-	pPropUI->AddSubItem(pPropImage);
-	pPropImage=new CMFCPropertyGridImageProperty(_T("ThumbHotImage"),_T(""),_T("指定滑块鼠标悬浮状态图片"),tagScrollBarThumbHotImage);
-	pPropImage->AllowEdit(FALSE);
-	pPropUI->AddSubItem(pPropImage);
-	pPropImage=new CMFCPropertyGridImageProperty(_T("ThumbPushedImage"),_T(""),_T("指定滑块鼠标按下状态图片"),tagScrollBarThumbPushedImage);
-	pPropImage->AllowEdit(FALSE);
-	pPropUI->AddSubItem(pPropImage);
-	pPropImage=new CMFCPropertyGridImageProperty(_T("ThumbDisabledImage"),_T(""),_T("指定滑块禁用状态图片"),tagScrollBarThumbDisabledImage);
+	pPropImage=new CBCGPImageProp(_T("Button2DisabledImage"),_T(""),_T("指定左或上按钮鼠标悬禁用态图片"),tagScrollBarButton2DisabledImage);
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
-	pPropImage=new CMFCPropertyGridImageProperty(_T("RailNormalImage"),_T(""),_T("指定滑块中间标识普通状态图片"),tagScrollBarRailNormalImage);
+	pPropImage=new CBCGPImageProp(_T("ThumbNormalImage"),_T(""),_T("指定滑块普通状态图片"),tagScrollBarThumbNormalImage);
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
-	pPropImage=new CMFCPropertyGridImageProperty(_T("RailHotImage"),_T(""),_T("指定滑块中间标识鼠标悬浮状态图片"),tagScrollBarRailHotImage);
+	pPropImage=new CBCGPImageProp(_T("ThumbHotImage"),_T(""),_T("指定滑块鼠标悬浮状态图片"),tagScrollBarThumbHotImage);
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
-	pPropImage=new CMFCPropertyGridImageProperty(_T("RailPushedImage"),_T(""),_T("指定滑块中间标识鼠标按下状态图片"),tagScrollBarRailPushedImage);
+	pPropImage=new CBCGPImageProp(_T("ThumbPushedImage"),_T(""),_T("指定滑块鼠标按下状态图片"),tagScrollBarThumbPushedImage);
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
-	pPropImage=new CMFCPropertyGridImageProperty(_T("RailDisabledImage"),_T(""),_T("指定滑块中间标识禁用状态图片"),tagScrollBarRailDisabledImage);
+	pPropImage=new CBCGPImageProp(_T("ThumbDisabledImage"),_T(""),_T("指定滑块禁用状态图片"),tagScrollBarThumbDisabledImage);
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
-	pPropImage=new CMFCPropertyGridImageProperty(_T("BKNormalImage"),_T(""),_T("指定背景普通状态图片"),tagScrollBarBKNormalImage);
+	pPropImage=new CBCGPImageProp(_T("RailNormalImage"),_T(""),_T("指定滑块中间标识普通状态图片"),tagScrollBarRailNormalImage);
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
-	pPropImage=new CMFCPropertyGridImageProperty(_T("BKHotImage"),_T(""),_T("指定背景鼠标悬浮状态图片"),tagScrollBarBKHotImage);
+	pPropImage=new CBCGPImageProp(_T("RailHotImage"),_T(""),_T("指定滑块中间标识鼠标悬浮状态图片"),tagScrollBarRailHotImage);
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
-	pPropImage=new CMFCPropertyGridImageProperty(_T("BKPushedImage"),_T(""),_T("指定背景鼠标按下状态图片"),tagScrollBarBKPushedImage);
+	pPropImage=new CBCGPImageProp(_T("RailPushedImage"),_T(""),_T("指定滑块中间标识鼠标按下状态图片"),tagScrollBarRailPushedImage);
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
-	pPropImage=new CMFCPropertyGridImageProperty(_T("BKDisabledImage"),_T(""),_T("指定背景禁用状态图片"),tagScrollBarBKDisabledImage);
+	pPropImage=new CBCGPImageProp(_T("RailDisabledImage"),_T(""),_T("指定滑块中间标识禁用状态图片"),tagScrollBarRailDisabledImage);
+	pPropImage->AllowEdit(FALSE);
+	pPropUI->AddSubItem(pPropImage);
+
+	pPropImage=new CBCGPImageProp(_T("BKNormalImage"),_T(""),_T("指定背景普通状态图片"),tagScrollBarBKNormalImage);
+	pPropImage->AllowEdit(FALSE);
+	pPropUI->AddSubItem(pPropImage);
+	pPropImage=new CBCGPImageProp(_T("BKHotImage"),_T(""),_T("指定背景鼠标悬浮状态图片"),tagScrollBarBKHotImage);
+	pPropImage->AllowEdit(FALSE);
+	pPropUI->AddSubItem(pPropImage);
+	pPropImage=new CBCGPImageProp(_T("BKPushedImage"),_T(""),_T("指定背景鼠标按下状态图片"),tagScrollBarBKPushedImage);
+	pPropImage->AllowEdit(FALSE);
+	pPropUI->AddSubItem(pPropImage);
+	pPropImage=new CBCGPImageProp(_T("BKDisabledImage"),_T(""),_T("指定背景禁用状态图片"),tagScrollBarBKDisabledImage);
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
 	m_wndPropList.AddProperty(pPropUI);
 
+#if _MSC_VER > 1200
 #pragma endregion ScrollBar
+#endif //_MSC_VER
 
+#if _MSC_VER > 1200
 #pragma region TabLayout
-	pPropUI=new CMFCPropertyGridProperty(_T("TabLayout"),classTabLayout);
+#endif //_MSC_VER
+	pPropUI=new CBCGPProp(_T("TabLayout"),classTabLayout);
 
 	// selectedid
-	pProp=new CMFCPropertyGridProperty(_T("selectedid"),(LONG)0,_T("默认选中的页面ID\n从0开始计数"),tagSelectedID);
+	pProp=new CBCGPProp(_T("selectedid"),(long)0,_T("默认选中的页面ID\n从0开始计数"),tagSelectedID);
 	pPropUI->AddSubItem(pProp);
 
 	m_wndPropList.AddProperty(pPropUI);
 
+#if _MSC_VER > 1200
 #pragma endregion TabLayout
+#endif //_MSC_VER
 
+#if _MSC_VER > 1200
 #pragma region ListHeaderItem
-	pPropUI=new CMFCPropertyGridProperty(_T("ListHeaderItem"),classListHeaderItem);
+#endif //_MSC_VER
+	pPropUI=new CBCGPProp(_T("ListHeaderItem"),classListHeaderItem);
 
 	// dragable
-	pProp=new CMFCPropertyGridProperty(_T("Dragable"),(_variant_t)true,_T("是否可拖动改变大小\ntrue"),tagDragable);
+	pProp=new CBCGPProp(_T("Dragable"),true,_T("是否可拖动改变大小\ntrue"),tagDragable);
 	pPropUI->AddSubItem(pProp);
 
 	// sepwidth
-	pProp=new CMFCPropertyGridProperty(_T("SepWidth"),(LONG)0,_T("分隔符宽\n4"),tagListHeaderItemSepWidth);
+	pProp=new CBCGPProp(_T("SepWidth"),(long)0,_T("分隔符宽\n4"),tagListHeaderItemSepWidth);
 	pPropUI->AddSubItem(pProp);
 
 	// normalimage
-	pPropImage=new CMFCPropertyGridImageProperty(_T("NormalImage"),_T(""),_T("普通状态图片"),tagListHeaderItemNormalImage);
+	pPropImage=new CBCGPImageProp(_T("NormalImage"),_T(""),_T("普通状态图片"),tagListHeaderItemNormalImage);
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
 	// hotimage
-	pPropImage=new CMFCPropertyGridImageProperty(_T("HotImage"),_T(""),_T("鼠标悬浮的状态图片"),tagListHeaderItemHotImage);
+	pPropImage=new CBCGPImageProp(_T("HotImage"),_T(""),_T("鼠标悬浮的状态图片"),tagListHeaderItemHotImage);
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
 	// PushedImage
-	pPropImage=new CMFCPropertyGridImageProperty(_T("PushedImage"),_T(""),_T("鼠标按下的状态图片"),tagListHeaderItemPushedImage);
+	pPropImage=new CBCGPImageProp(_T("PushedImage"),_T(""),_T("鼠标按下的状态图片"),tagListHeaderItemPushedImage);
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
 	// focusedimage
-	pPropImage=new CMFCPropertyGridImageProperty(_T("FocusedImage"),_T(""),_T("获得焦点时的状态图片"),tagListHeaderItemFocusedImage);
+	pPropImage=new CBCGPImageProp(_T("FocusedImage"),_T(""),_T("获得焦点时的状态图片"),tagListHeaderItemFocusedImage);
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
 	// sepimage
-	pPropImage=new CMFCPropertyGridImageProperty(_T("SepImage"),_T(""),_T("拖动条图片"),tagSepImage);
+	pPropImage=new CBCGPImageProp(_T("SepImage"),_T(""),_T("拖动条图片"),tagSepImage);
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
 	m_wndPropList.AddProperty(pPropUI);
+#if _MSC_VER > 1200
 #pragma endregion ListHeaderItem
+#endif //_MSC_VER
 
+#if _MSC_VER > 1200
 #pragma region WebBrowser
+#endif //_MSC_VER
 
-	pPropUI=new CMFCPropertyGridProperty(_T("WebBrowser"),classWebBrowser);
+	pPropUI=new CBCGPProp(_T("WebBrowser"),classWebBrowser);
 
 	// homepage
-	pProp=new CMFCPropertyGridProperty(_T("homepage"),(_variant_t)_T(""),_T("默认网址\n"),tagWebBrowserHomePage);
+	pProp=new CBCGPProp(_T("homepage"),_T(""),_T("默认网址\n"),tagWebBrowserHomePage);
 	pPropUI->AddSubItem(pProp);
 
 	// autonavi
-	pProp=new CMFCPropertyGridProperty(_T("autonavi"),(_variant_t)true,_T("是否显示默认页面\ntrue"),tagDragable);
+	pProp=new CBCGPProp(_T("autonavi"),true,_T("是否显示默认页面\ntrue"),tagDragable);
 	pPropUI->AddSubItem(pProp);
 
 	m_wndPropList.AddProperty(pPropUI);
+#if _MSC_VER > 1200
 #pragma endregion WebBrowser
-
+#endif //_MSC_VER
 	HideAllProperties();
 }
 
@@ -1181,12 +1257,12 @@ void CUIProperties::SetPropListFont()
 	::DeleteObject(m_fntPropList.Detach());
 
 	LOGFONT lf;
-	afxGlobalData.fontRegular.GetLogFont(&lf);
+	globalData.fontRegular.GetLogFont(&lf);
 
 	NONCLIENTMETRICS info;
 	info.cbSize = sizeof(info);
 
-	afxGlobalData.GetNonClientMetrics(info);
+	globalData.GetNonClientMetrics(info);
 
 	lf.lfHeight = info.lfMenuFont.lfHeight;
 	lf.lfWeight = info.lfMenuFont.lfWeight;
@@ -1301,90 +1377,90 @@ void CUIProperties::ShowWindowProperty(CControlUI* pControl)
 	CWindowUI* pForm=static_cast<CWindowUI*>(pControl->GetInterface(_T("Form")));
 	ASSERT(pForm);
 
-	CMFCPropertyGridProperty* pPropForm=m_wndPropList.FindItemByData(classWindow,FALSE);
+	CBCGPProp* pPropForm=m_wndPropList.FindItemByData(classWindow,FALSE);
 	ASSERT(pPropForm);
 
 	//size
 	SIZE size=pForm->GetInitSize();
-	CMFCPropertyGridProperty* pValueList=pPropForm->GetSubItem(tagWindowSize-tagWindow);
-	pValueList->GetSubItem(0)->SetValue((LONG)size.cx);
-	pValueList->GetSubItem(1)->SetValue((LONG)size.cy);
-	pValueList->GetSubItem(0)->SetOriginalValue((LONG)size.cx);
-	pValueList->GetSubItem(1)->SetOriginalValue((LONG)size.cy);
+	CBCGPProp* pValueList=pPropForm->GetSubItem(tagWindowSize-tagWindow);
+	pValueList->GetSubItem(0)->SetValue((long)size.cx);
+	pValueList->GetSubItem(1)->SetValue((long)size.cy);
+	pValueList->GetSubItem(0)->SetOriginalValue((long)size.cx);
+	pValueList->GetSubItem(1)->SetOriginalValue((long)size.cy);
 	//caption
 	RECT rect=pForm->GetCaptionRect();
 	pValueList=pPropForm->GetSubItem(tagCaption-tagWindow);
-	pValueList->GetSubItem(0)->SetValue((LONG)rect.left);
-	pValueList->GetSubItem(1)->SetValue((LONG)rect.top);
-	pValueList->GetSubItem(2)->SetValue((LONG)rect.right);
-	pValueList->GetSubItem(3)->SetValue((LONG)rect.bottom);
-	pValueList->GetSubItem(0)->SetOriginalValue((LONG)rect.left);
-	pValueList->GetSubItem(1)->SetOriginalValue((LONG)rect.top);
-	pValueList->GetSubItem(2)->SetOriginalValue((LONG)rect.right);
-	pValueList->GetSubItem(3)->SetOriginalValue((LONG)rect.bottom);
+	pValueList->GetSubItem(0)->SetValue((long)rect.left);
+	pValueList->GetSubItem(1)->SetValue((long)rect.top);
+	pValueList->GetSubItem(2)->SetValue((long)rect.right);
+	pValueList->GetSubItem(3)->SetValue((long)rect.bottom);
+	pValueList->GetSubItem(0)->SetOriginalValue((long)rect.left);
+	pValueList->GetSubItem(1)->SetOriginalValue((long)rect.top);
+	pValueList->GetSubItem(2)->SetOriginalValue((long)rect.right);
+	pValueList->GetSubItem(3)->SetOriginalValue((long)rect.bottom);
 	//sizebox
 	rect=pForm->GetSizeBox();
 	pValueList=pPropForm->GetSubItem(tagSizeBox-tagWindow);
-	pValueList->GetSubItem(0)->SetValue((LONG)rect.left);
-	pValueList->GetSubItem(1)->SetValue((LONG)rect.top);
-	pValueList->GetSubItem(2)->SetValue((LONG)rect.right);
-	pValueList->GetSubItem(3)->SetValue((LONG)rect.bottom);
-	pValueList->GetSubItem(0)->SetOriginalValue((LONG)rect.left);
-	pValueList->GetSubItem(1)->SetOriginalValue((LONG)rect.top);
-	pValueList->GetSubItem(2)->SetOriginalValue((LONG)rect.right);
-	pValueList->GetSubItem(3)->SetOriginalValue((LONG)rect.bottom);
+	pValueList->GetSubItem(0)->SetValue((long)rect.left);
+	pValueList->GetSubItem(1)->SetValue((long)rect.top);
+	pValueList->GetSubItem(2)->SetValue((long)rect.right);
+	pValueList->GetSubItem(3)->SetValue((long)rect.bottom);
+	pValueList->GetSubItem(0)->SetOriginalValue((long)rect.left);
+	pValueList->GetSubItem(1)->SetOriginalValue((long)rect.top);
+	pValueList->GetSubItem(2)->SetOriginalValue((long)rect.right);
+	pValueList->GetSubItem(3)->SetOriginalValue((long)rect.bottom);
 	//roundcorner
 	size=pForm->GetRoundCorner();
 	pValueList=pPropForm->GetSubItem(tagRoundCorner-tagWindow);
-	pValueList->GetSubItem(0)->SetValue((LONG)size.cx);
-	pValueList->GetSubItem(1)->SetValue((LONG)size.cy);
-	pValueList->GetSubItem(0)->SetOriginalValue((LONG)size.cx);
-	pValueList->GetSubItem(1)->SetOriginalValue((LONG)size.cy);
+	pValueList->GetSubItem(0)->SetValue((long)size.cx);
+	pValueList->GetSubItem(1)->SetValue((long)size.cy);
+	pValueList->GetSubItem(0)->SetOriginalValue((long)size.cx);
+	pValueList->GetSubItem(1)->SetOriginalValue((long)size.cy);
 	//mininfo
 	size=pForm->GetMinInfo();
 	pValueList=pPropForm->GetSubItem(tagMinInfo-tagWindow);
-	pValueList->GetSubItem(0)->SetValue((LONG)size.cx);
-	pValueList->GetSubItem(1)->SetValue((LONG)size.cy);
-	pValueList->GetSubItem(0)->SetOriginalValue((LONG)size.cx);
-	pValueList->GetSubItem(1)->SetOriginalValue((LONG)size.cy);
+	pValueList->GetSubItem(0)->SetValue((long)size.cx);
+	pValueList->GetSubItem(1)->SetValue((long)size.cy);
+	pValueList->GetSubItem(0)->SetOriginalValue((long)size.cx);
+	pValueList->GetSubItem(1)->SetOriginalValue((long)size.cy);
 	//maxinfo
 	size=pForm->GetMaxInfo();
 	pValueList=pPropForm->GetSubItem(tagMaxInfo-tagWindow);
-	pValueList->GetSubItem(0)->SetValue((LONG)size.cx);
-	pValueList->GetSubItem(1)->SetValue((LONG)size.cy);
-	pValueList->GetSubItem(0)->SetOriginalValue((LONG)size.cx);
-	pValueList->GetSubItem(1)->SetOriginalValue((LONG)size.cy);
+	pValueList->GetSubItem(0)->SetValue((long)size.cx);
+	pValueList->GetSubItem(1)->SetValue((long)size.cy);
+	pValueList->GetSubItem(0)->SetOriginalValue((long)size.cx);
+	pValueList->GetSubItem(1)->SetOriginalValue((long)size.cy);
 	//showdirty
-	pPropForm->GetSubItem(tagShowDirty-tagWindow)->SetValue((_variant_t)pForm->IsShowUpdateRect());
-	pPropForm->GetSubItem(tagShowDirty-tagWindow)->SetOriginalValue((_variant_t)pForm->IsShowUpdateRect());
+	pPropForm->GetSubItem(tagShowDirty-tagWindow)->SetValue(pForm->IsShowUpdateRect());
+	pPropForm->GetSubItem(tagShowDirty-tagWindow)->SetOriginalValue(pForm->IsShowUpdateRect());
 
 	// tagAlpha
-	pPropForm->GetSubItem(tagAlpha-tagWindow)->SetValue((LONG)pForm->GetAlpha());
-	pPropForm->GetSubItem(tagAlpha-tagWindow)->SetOriginalValue((LONG)pForm->GetAlpha());
+	pPropForm->GetSubItem(tagAlpha-tagWindow)->SetValue((long)pForm->GetAlpha());
+	pPropForm->GetSubItem(tagAlpha-tagWindow)->SetOriginalValue((long)pForm->GetAlpha());
 
 	// tagBkTrans
-	pPropForm->GetSubItem(tagBkTrans-tagWindow)->SetValue((_variant_t)pForm->GetBackgroundTransparent());
-	pPropForm->GetSubItem(tagBkTrans-tagWindow)->SetOriginalValue((_variant_t)pForm->GetBackgroundTransparent());
+	pPropForm->GetSubItem(tagBkTrans-tagWindow)->SetValue(pForm->GetBackgroundTransparent());
+	pPropForm->GetSubItem(tagBkTrans-tagWindow)->SetOriginalValue(pForm->GetBackgroundTransparent());
 
 	// tagDefaultFontColor
-	static_cast<CMFCPropertyGridColor32Property*>(pPropForm->GetSubItem(tagDefaultFontColor-tagWindow))->SetColor((LONG)(pForm->GetDefaultFontColor()));
-	static_cast<CMFCPropertyGridColor32Property*>(pPropForm->GetSubItem(tagDefaultFontColor-tagWindow))->SetOriginalValue((LONG)(pForm->GetDefaultFontColor()));
+	static_cast<CBCGPColor32Prop*>(pPropForm->GetSubItem(tagDefaultFontColor-tagWindow))->SetColor((long)(pForm->GetDefaultFontColor()));
+	static_cast<CBCGPColor32Prop*>(pPropForm->GetSubItem(tagDefaultFontColor-tagWindow))->SetOriginalValue((long)(pForm->GetDefaultFontColor()));
 
 	// tagSelectedFontColor
-	static_cast<CMFCPropertyGridColor32Property*>(pPropForm->GetSubItem(tagSelectedFontColor-tagWindow))->SetColor((LONG)(pForm->GetDefaultSelectedFontColor()));
-	static_cast<CMFCPropertyGridColor32Property*>(pPropForm->GetSubItem(tagSelectedFontColor-tagWindow))->SetOriginalValue((LONG)(pForm->GetDefaultSelectedFontColor()));
+	static_cast<CBCGPColor32Prop*>(pPropForm->GetSubItem(tagSelectedFontColor-tagWindow))->SetColor((long)(pForm->GetDefaultSelectedFontColor()));
+	static_cast<CBCGPColor32Prop*>(pPropForm->GetSubItem(tagSelectedFontColor-tagWindow))->SetOriginalValue((long)(pForm->GetDefaultSelectedFontColor()));
 
 	// tagDisabledFontColor
-	static_cast<CMFCPropertyGridColor32Property*>(pPropForm->GetSubItem(tagDisabledFontColor-tagWindow))->SetColor((LONG)(pForm->GetDefaultDisabledFontColor()));
-	static_cast<CMFCPropertyGridColor32Property*>(pPropForm->GetSubItem(tagDisabledFontColor-tagWindow))->SetOriginalValue((LONG)(pForm->GetDefaultDisabledFontColor()));
+	static_cast<CBCGPColor32Prop*>(pPropForm->GetSubItem(tagDisabledFontColor-tagWindow))->SetColor((long)(pForm->GetDefaultDisabledFontColor()));
+	static_cast<CBCGPColor32Prop*>(pPropForm->GetSubItem(tagDisabledFontColor-tagWindow))->SetOriginalValue((long)(pForm->GetDefaultDisabledFontColor()));
 
 	// tagLinkFontColor
-	static_cast<CMFCPropertyGridColor32Property*>(pPropForm->GetSubItem(tagLinkFontColor-tagWindow))->SetColor((LONG)(pForm->GetDefaultLinkFontColor()));
-	static_cast<CMFCPropertyGridColor32Property*>(pPropForm->GetSubItem(tagLinkFontColor-tagWindow))->SetOriginalValue((LONG)(pForm->GetDefaultLinkFontColor()));
+	static_cast<CBCGPColor32Prop*>(pPropForm->GetSubItem(tagLinkFontColor-tagWindow))->SetColor((long)(pForm->GetDefaultLinkFontColor()));
+	static_cast<CBCGPColor32Prop*>(pPropForm->GetSubItem(tagLinkFontColor-tagWindow))->SetOriginalValue((long)(pForm->GetDefaultLinkFontColor()));
 
 	// tagLinkHoverFontColor
-	static_cast<CMFCPropertyGridColor32Property*>(pPropForm->GetSubItem(tagLinkHoverFontColor-tagWindow))->SetColor((LONG)(pForm->GetDefaultLinkHoverFontColor()));
-	static_cast<CMFCPropertyGridColor32Property*>(pPropForm->GetSubItem(tagLinkHoverFontColor-tagWindow))->SetOriginalValue((LONG)(pForm->GetDefaultLinkHoverFontColor()));
+	static_cast<CBCGPColor32Prop*>(pPropForm->GetSubItem(tagLinkHoverFontColor-tagWindow))->SetColor((long)(pForm->GetDefaultLinkHoverFontColor()));
+	static_cast<CBCGPColor32Prop*>(pPropForm->GetSubItem(tagLinkHoverFontColor-tagWindow))->SetOriginalValue((long)(pForm->GetDefaultLinkHoverFontColor()));
 
 	pPropForm->Show(TRUE,FALSE);
 }
@@ -1393,28 +1469,28 @@ void CUIProperties::ShowControlProperty(CControlUI* pControl)
 {
 	ASSERT(pControl);
 
-	CMFCPropertyGridProperty* pPropControl=m_wndPropList.FindItemByData(classControl,FALSE);
+	CBCGPProp* pPropControl=m_wndPropList.FindItemByData(classControl,FALSE);
 	ASSERT(pPropControl);
 
 	//name
-	pPropControl->GetSubItem(tagName-tagControl)->SetValue((_variant_t)pControl->GetName());
-	pPropControl->GetSubItem(tagName-tagControl)->SetOriginalValue((_variant_t)pControl->GetName());
+	pPropControl->GetSubItem(tagName-tagControl)->SetValue((LPCTSTR)pControl->GetName());
+	pPropControl->GetSubItem(tagName-tagControl)->SetOriginalValue((LPCTSTR)pControl->GetName());
 	//text
-	pPropControl->GetSubItem(tagText-tagControl)->SetValue((_variant_t)pControl->GetText());
-	pPropControl->GetSubItem(tagText-tagControl)->SetOriginalValue((_variant_t)pControl->GetText());
+	pPropControl->GetSubItem(tagText-tagControl)->SetValue((LPCTSTR)pControl->GetText());
+	pPropControl->GetSubItem(tagText-tagControl)->SetOriginalValue((LPCTSTR)pControl->GetText());
 	//pos
 	SIZE szXY=pControl->GetFixedXY();
 	int nWidth=pControl->GetFixedWidth();
 	int nHeight=pControl->GetFixedHeight();
-	CMFCPropertyGridProperty* pValueList=pPropControl->GetSubItem(tagPos-tagControl);
-	pValueList->GetSubItem(0)->SetValue((LONG)szXY.cx);
-	pValueList->GetSubItem(1)->SetValue((LONG)szXY.cy);
-	pValueList->GetSubItem(2)->SetValue((LONG)(szXY.cx+nWidth));
-	pValueList->GetSubItem(3)->SetValue((LONG)(szXY.cy+nHeight));
-	pValueList->GetSubItem(0)->SetOriginalValue((LONG)szXY.cx);
-	pValueList->GetSubItem(1)->SetOriginalValue((LONG)szXY.cy);
-	pValueList->GetSubItem(2)->SetOriginalValue((LONG)(szXY.cx+nWidth));
-	pValueList->GetSubItem(3)->SetOriginalValue((LONG)(szXY.cy+nHeight));
+	CBCGPProp* pValueList=pPropControl->GetSubItem(tagPos-tagControl);
+	pValueList->GetSubItem(0)->SetValue((long)szXY.cx);
+	pValueList->GetSubItem(1)->SetValue((long)szXY.cy);
+	pValueList->GetSubItem(2)->SetValue((long)(szXY.cx+nWidth));
+	pValueList->GetSubItem(3)->SetValue((long)(szXY.cy+nHeight));
+	pValueList->GetSubItem(0)->SetOriginalValue((long)szXY.cx);
+	pValueList->GetSubItem(1)->SetOriginalValue((long)szXY.cy);
+	pValueList->GetSubItem(2)->SetOriginalValue((long)(szXY.cx+nWidth));
+	pValueList->GetSubItem(3)->SetOriginalValue((long)(szXY.cy+nHeight));
 	//relativepos
 	RECT posRelative=pControl->GetRelativePos();
 	pValueList=pPropControl->GetSubItem(tagRelativePos-tagControl);
@@ -1428,84 +1504,84 @@ void CUIProperties::ShowControlProperty(CControlUI* pControl)
 	pValueList->GetSubItem(3)->SetOriginalValue(posRelative.bottom);
 	//size
 	pValueList=pPropControl->GetSubItem(tagSize-tagControl);
-	pValueList->GetSubItem(0)->SetValue((LONG)pControl->GetWidth());
-	pValueList->GetSubItem(1)->SetValue((LONG)pControl->GetHeight());
-	pValueList->GetSubItem(0)->SetOriginalValue((LONG)pControl->GetWidth());
-	pValueList->GetSubItem(1)->SetOriginalValue((LONG)pControl->GetHeight());
+	pValueList->GetSubItem(0)->SetValue((long)pControl->GetWidth());
+	pValueList->GetSubItem(1)->SetValue((long)pControl->GetHeight());
+	pValueList->GetSubItem(0)->SetOriginalValue((long)pControl->GetWidth());
+	pValueList->GetSubItem(1)->SetOriginalValue((long)pControl->GetHeight());
 	//minsize
 	pValueList=pPropControl->GetSubItem(tagMinSize-tagControl);
-	pValueList->GetSubItem(0)->SetValue((LONG)pControl->GetMinWidth());
-	pValueList->GetSubItem(1)->SetValue((LONG)pControl->GetMinHeight());
-	pValueList->GetSubItem(0)->SetOriginalValue((LONG)pControl->GetMinWidth());
-	pValueList->GetSubItem(1)->SetOriginalValue((LONG)pControl->GetMinHeight());
+	pValueList->GetSubItem(0)->SetValue((long)pControl->GetMinWidth());
+	pValueList->GetSubItem(1)->SetValue((long)pControl->GetMinHeight());
+	pValueList->GetSubItem(0)->SetOriginalValue((long)pControl->GetMinWidth());
+	pValueList->GetSubItem(1)->SetOriginalValue((long)pControl->GetMinHeight());
 	//maxsize
 	pValueList=pPropControl->GetSubItem(tagMaxSize-tagControl);
-	pValueList->GetSubItem(0)->SetValue((LONG)pControl->GetMaxWidth());
-	pValueList->GetSubItem(1)->SetValue((LONG)pControl->GetMaxHeight());
-	pValueList->GetSubItem(0)->SetOriginalValue((LONG)pControl->GetMaxWidth());
-	pValueList->GetSubItem(1)->SetOriginalValue((LONG)pControl->GetMaxHeight());
+	pValueList->GetSubItem(0)->SetValue((long)pControl->GetMaxWidth());
+	pValueList->GetSubItem(1)->SetValue((long)pControl->GetMaxHeight());
+	pValueList->GetSubItem(0)->SetOriginalValue((long)pControl->GetMaxWidth());
+	pValueList->GetSubItem(1)->SetOriginalValue((long)pControl->GetMaxHeight());
 	//padding
 	pValueList=pPropControl->GetSubItem(tagPadding-tagControl);
 	RECT rect=pControl->GetPadding();
-	pValueList->GetSubItem(0)->SetValue((LONG)rect.left);
-	pValueList->GetSubItem(1)->SetValue((LONG)rect.top);
-	pValueList->GetSubItem(2)->SetValue((LONG)rect.right);
-	pValueList->GetSubItem(3)->SetValue((LONG)rect.bottom);
-	pValueList->GetSubItem(0)->SetOriginalValue((LONG)rect.left);
-	pValueList->GetSubItem(1)->SetOriginalValue((LONG)rect.top);
-	pValueList->GetSubItem(2)->SetOriginalValue((LONG)rect.right);
-	pValueList->GetSubItem(3)->SetOriginalValue((LONG)rect.bottom);
+	pValueList->GetSubItem(0)->SetValue((long)rect.left);
+	pValueList->GetSubItem(1)->SetValue((long)rect.top);
+	pValueList->GetSubItem(2)->SetValue((long)rect.right);
+	pValueList->GetSubItem(3)->SetValue((long)rect.bottom);
+	pValueList->GetSubItem(0)->SetOriginalValue((long)rect.left);
+	pValueList->GetSubItem(1)->SetOriginalValue((long)rect.top);
+	pValueList->GetSubItem(2)->SetOriginalValue((long)rect.right);
+	pValueList->GetSubItem(3)->SetOriginalValue((long)rect.bottom);
 	//bkimage
-	pPropControl->GetSubItem(tagBkImage-tagControl)->SetValue((_variant_t)pControl->GetBkImage());
-	pPropControl->GetSubItem(tagBkImage-tagControl)->SetOriginalValue((_variant_t)pControl->GetBkImage());
+	pPropControl->GetSubItem(tagBkImage-tagControl)->SetValue(pControl->GetBkImage());
+	pPropControl->GetSubItem(tagBkImage-tagControl)->SetOriginalValue(pControl->GetBkImage());
 	//bkcolor
-	static_cast<CMFCPropertyGridColor32Property*>(pPropControl->GetSubItem(tagBkColor-tagControl))->SetColor((LONG)(pControl->GetBkColor()));
-	static_cast<CMFCPropertyGridColor32Property*>(pPropControl->GetSubItem(tagBkColor-tagControl))->SetOriginalValue((LONG)(pControl->GetBkColor()));
+	static_cast<CBCGPColor32Prop*>(pPropControl->GetSubItem(tagBkColor-tagControl))->SetColor((long)(pControl->GetBkColor()));
+	static_cast<CBCGPColor32Prop*>(pPropControl->GetSubItem(tagBkColor-tagControl))->SetOriginalValue((long)(pControl->GetBkColor()));
 	//bkcolor2
-	static_cast<CMFCPropertyGridColor32Property*>(pPropControl->GetSubItem(tagBkColor2-tagControl))->SetColor((LONG)(pControl->GetBkColor2()));
-	static_cast<CMFCPropertyGridColor32Property*>(pPropControl->GetSubItem(tagBkColor2-tagControl))->SetOriginalValue((LONG)(pControl->GetBkColor2()));
+	static_cast<CBCGPColor32Prop*>(pPropControl->GetSubItem(tagBkColor2-tagControl))->SetColor((long)(pControl->GetBkColor2()));
+	static_cast<CBCGPColor32Prop*>(pPropControl->GetSubItem(tagBkColor2-tagControl))->SetOriginalValue((long)(pControl->GetBkColor2()));
 	//bordercolor
-	static_cast<CMFCPropertyGridColor32Property*>(pPropControl->GetSubItem(tagBorderColor-tagControl))->SetColor((LONG)(pControl->GetBorderColor()));
-	static_cast<CMFCPropertyGridColor32Property*>(pPropControl->GetSubItem(tagBorderColor-tagControl))->SetOriginalValue((LONG)(pControl->GetBorderColor()));
+	static_cast<CBCGPColor32Prop*>(pPropControl->GetSubItem(tagBorderColor-tagControl))->SetColor((long)(pControl->GetBorderColor()));
+	static_cast<CBCGPColor32Prop*>(pPropControl->GetSubItem(tagBorderColor-tagControl))->SetOriginalValue((long)(pControl->GetBorderColor()));
 	//focusbordercolor
-	static_cast<CMFCPropertyGridColor32Property*>(pPropControl->GetSubItem(tagFocusBorderColor-tagControl))->SetColor((LONG)(pControl->GetFocusBorderColor()));
-	static_cast<CMFCPropertyGridColor32Property*>(pPropControl->GetSubItem(tagFocusBorderColor-tagControl))->SetOriginalValue((LONG)(pControl->GetFocusBorderColor()));
+	static_cast<CBCGPColor32Prop*>(pPropControl->GetSubItem(tagFocusBorderColor-tagControl))->SetColor((long)(pControl->GetFocusBorderColor()));
+	static_cast<CBCGPColor32Prop*>(pPropControl->GetSubItem(tagFocusBorderColor-tagControl))->SetOriginalValue((long)(pControl->GetFocusBorderColor()));
 	//bordersize
-	//pPropControl->GetSubItem(tagBorderSize-tagControl)->SetValue((LONG)pControl->GetBorderSize());
-	//pPropControl->GetSubItem(tagBorderSize-tagControl)->SetOriginalValue((LONG)pControl->GetBorderSize());
+	//pPropControl->GetSubItem(tagBorderSize-tagControl)->SetValue((long)pControl->GetBorderSize());
+	//pPropControl->GetSubItem(tagBorderSize-tagControl)->SetOriginalValue((long)pControl->GetBorderSize());
 	//borderround
 	pValueList=pPropControl->GetSubItem(tagBorderRound-tagControl);
-	pValueList->GetSubItem(0)->SetValue((LONG)pControl->GetBorderRound().cx);
-	pValueList->GetSubItem(1)->SetValue((LONG)pControl->GetBorderRound().cy);
-	pValueList->GetSubItem(0)->SetOriginalValue((LONG)pControl->GetBorderRound().cx);
-	pValueList->GetSubItem(1)->SetOriginalValue((LONG)pControl->GetBorderRound().cy);
+	pValueList->GetSubItem(0)->SetValue((long)pControl->GetBorderRound().cx);
+	pValueList->GetSubItem(1)->SetValue((long)pControl->GetBorderRound().cy);
+	pValueList->GetSubItem(0)->SetOriginalValue((long)pControl->GetBorderRound().cx);
+	pValueList->GetSubItem(1)->SetOriginalValue((long)pControl->GetBorderRound().cy);
 	//enabled
-	pPropControl->GetSubItem(tagEnabled-tagControl)->SetValue((_variant_t)pControl->IsEnabled());
-	pPropControl->GetSubItem(tagEnabled-tagControl)->SetOriginalValue((_variant_t)pControl->IsEnabled());
+	pPropControl->GetSubItem(tagEnabled-tagControl)->SetValue(pControl->IsEnabled());
+	pPropControl->GetSubItem(tagEnabled-tagControl)->SetOriginalValue(pControl->IsEnabled());
 	//float
-	pPropControl->GetSubItem(tagFloat-tagControl)->SetValue((_variant_t)pControl->IsFloat());
-	pPropControl->GetSubItem(tagFloat-tagControl)->SetOriginalValue((_variant_t)pControl->IsFloat());
+	pPropControl->GetSubItem(tagFloat-tagControl)->SetValue(pControl->IsFloat());
+	pPropControl->GetSubItem(tagFloat-tagControl)->SetOriginalValue(pControl->IsFloat());
 	//visible
-	pPropControl->GetSubItem(tagVisible-tagControl)->SetValue((_variant_t)pControl->IsVisible());
-	pPropControl->GetSubItem(tagVisible-tagControl)->SetOriginalValue((_variant_t)pControl->IsVisible());
+	pPropControl->GetSubItem(tagVisible-tagControl)->SetValue(pControl->IsVisible());
+	pPropControl->GetSubItem(tagVisible-tagControl)->SetOriginalValue(pControl->IsVisible());
 	//mouse
-	pPropControl->GetSubItem(tagMouse-tagControl)->SetValue((_variant_t)pControl->IsMouseEnabled());
-	pPropControl->GetSubItem(tagMouse-tagControl)->SetOriginalValue((_variant_t)pControl->IsMouseEnabled());
+	pPropControl->GetSubItem(tagMouse-tagControl)->SetValue(pControl->IsMouseEnabled());
+	pPropControl->GetSubItem(tagMouse-tagControl)->SetOriginalValue(pControl->IsMouseEnabled());
 	//menu
-	pPropControl->GetSubItem(tagMenu-tagControl)->SetValue((_variant_t)pControl->IsContextMenuUsed());
-	pPropControl->GetSubItem(tagMenu-tagControl)->SetOriginalValue((_variant_t)pControl->IsContextMenuUsed());
+	pPropControl->GetSubItem(tagMenu-tagControl)->SetValue(pControl->IsContextMenuUsed());
+	pPropControl->GetSubItem(tagMenu-tagControl)->SetOriginalValue(pControl->IsContextMenuUsed());
 	//colorhsl
-	pPropControl->GetSubItem(tagColorHSL-tagControl)->SetValue((_variant_t)pControl->IsColorHSL());
-	pPropControl->GetSubItem(tagColorHSL-tagControl)->SetOriginalValue((_variant_t)pControl->IsColorHSL());
+	pPropControl->GetSubItem(tagColorHSL-tagControl)->SetValue(pControl->IsColorHSL());
+	pPropControl->GetSubItem(tagColorHSL-tagControl)->SetOriginalValue(pControl->IsColorHSL());
 	//tooltip
-	pPropControl->GetSubItem(tagTooltip-tagControl)->SetValue((_variant_t)pControl->GetToolTip());
-	pPropControl->GetSubItem(tagTooltip-tagControl)->SetOriginalValue((_variant_t)pControl->GetToolTip());
+	pPropControl->GetSubItem(tagTooltip-tagControl)->SetValue((LPCTSTR)pControl->GetToolTip());
+	pPropControl->GetSubItem(tagTooltip-tagControl)->SetOriginalValue((LPCTSTR)pControl->GetToolTip());
 	//userdata
-	pPropControl->GetSubItem(tagUserData-tagControl)->SetValue((_variant_t)pControl->GetUserData());
-	pPropControl->GetSubItem(tagUserData-tagControl)->SetOriginalValue((_variant_t)pControl->GetUserData());
+	pPropControl->GetSubItem(tagUserData-tagControl)->SetValue((LPCTSTR)pControl->GetUserData());
+	pPropControl->GetSubItem(tagUserData-tagControl)->SetOriginalValue((LPCTSTR)pControl->GetUserData());
 	//keyboard
-	pPropControl->GetSubItem(tagKeyBoard-tagControl)->SetValue((_variant_t)pControl->IsKeyboardEnabled());
-	pPropControl->GetSubItem(tagKeyBoard-tagControl)->SetOriginalValue((_variant_t)pControl->IsKeyboardEnabled());
+	pPropControl->GetSubItem(tagKeyBoard-tagControl)->SetValue(pControl->IsKeyboardEnabled());
+	pPropControl->GetSubItem(tagKeyBoard-tagControl)->SetOriginalValue(pControl->IsKeyboardEnabled());
 
 	pPropControl->Show(TRUE,FALSE);
 }
@@ -1518,7 +1594,7 @@ void CUIProperties::ShowLabelProperty(CControlUI* pControl)
 	CLabelUI* pLabel=static_cast<CLabelUI*>(pControl->GetInterface(_T("Label")));
 	ASSERT(pLabel);
 
-	CMFCPropertyGridProperty* pPropLabel=m_wndPropList.FindItemByData(classLabel,FALSE);
+	CBCGPProp* pPropLabel=m_wndPropList.FindItemByData(classLabel,FALSE);
 	ASSERT(pPropLabel);
 
 	//align
@@ -1534,36 +1610,36 @@ void CUIProperties::ShowLabelProperty(CControlUI* pControl)
 		strStyle=_T("Top");
 	else if(uStyle&DT_BOTTOM)
 		strStyle=_T("Bottom");
-	pPropLabel->GetSubItem(tagAlign-tagLabel)->SetValue((_variant_t)strStyle);
-	pPropLabel->GetSubItem(tagAlign-tagLabel)->SetOriginalValue((_variant_t)strStyle);
+	pPropLabel->GetSubItem(tagAlign-tagLabel)->SetValue((LPCTSTR)strStyle);
+	pPropLabel->GetSubItem(tagAlign-tagLabel)->SetOriginalValue((LPCTSTR)strStyle);
 	//textcolor
-	static_cast<CMFCPropertyGridColor32Property*>(pPropLabel->GetSubItem(tagTextColor-tagLabel))->SetColor((LONG)(pLabel->GetTextColor()));
-	static_cast<CMFCPropertyGridColor32Property*>(pPropLabel->GetSubItem(tagTextColor-tagLabel))->SetOriginalValue((LONG)(pLabel->GetTextColor()));
+	static_cast<CBCGPColor32Prop*>(pPropLabel->GetSubItem(tagTextColor-tagLabel))->SetColor((long)(pLabel->GetTextColor()));
+	static_cast<CBCGPColor32Prop*>(pPropLabel->GetSubItem(tagTextColor-tagLabel))->SetOriginalValue((long)(pLabel->GetTextColor()));
 	//disabledtextcolor
-	static_cast<CMFCPropertyGridColor32Property*>(pPropLabel->GetSubItem(tagTextColor-tagLabel))->SetColor((LONG)(pLabel->GetTextColor()));
-	static_cast<CMFCPropertyGridColor32Property*>(pPropLabel->GetSubItem(tagTextColor-tagLabel))->SetOriginalValue((LONG)(pLabel->GetTextColor()));
+	static_cast<CBCGPColor32Prop*>(pPropLabel->GetSubItem(tagTextColor-tagLabel))->SetColor((long)(pLabel->GetTextColor()));
+	static_cast<CBCGPColor32Prop*>(pPropLabel->GetSubItem(tagTextColor-tagLabel))->SetOriginalValue((long)(pLabel->GetTextColor()));
 	//font
-	pPropLabel->GetSubItem(tagFont-tagLabel)->SetValue((LONG)pLabel->GetFont());
-	pPropLabel->GetSubItem(tagFont-tagLabel)->SetOriginalValue((LONG)pLabel->GetFont());
+	pPropLabel->GetSubItem(tagFont-tagLabel)->SetValue((long)pLabel->GetFont());
+	pPropLabel->GetSubItem(tagFont-tagLabel)->SetOriginalValue((long)pLabel->GetFont());
 	//textpadding
-	CMFCPropertyGridProperty* pValueList=pPropLabel->GetSubItem(tagTextPadding-tagLabel);
+	CBCGPProp* pValueList=pPropLabel->GetSubItem(tagTextPadding-tagLabel);
 	RECT rect=pLabel->GetTextPadding();
-	pValueList->GetSubItem(0)->SetValue((LONG)rect.left);
-	pValueList->GetSubItem(1)->SetValue((LONG)rect.top);
-	pValueList->GetSubItem(2)->SetValue((LONG)rect.right);
-	pValueList->GetSubItem(3)->SetValue((LONG)rect.bottom);
-	pValueList->GetSubItem(0)->SetOriginalValue((LONG)rect.left);
-	pValueList->GetSubItem(1)->SetOriginalValue((LONG)rect.top);
-	pValueList->GetSubItem(2)->SetOriginalValue((LONG)rect.right);
-	pValueList->GetSubItem(3)->SetOriginalValue((LONG)rect.bottom);
+	pValueList->GetSubItem(0)->SetValue(rect.left);
+	pValueList->GetSubItem(1)->SetValue(rect.top);
+	pValueList->GetSubItem(2)->SetValue(rect.right);
+	pValueList->GetSubItem(3)->SetValue(rect.bottom);
+	pValueList->GetSubItem(0)->SetOriginalValue(rect.left);
+	pValueList->GetSubItem(1)->SetOriginalValue(rect.top);
+	pValueList->GetSubItem(2)->SetOriginalValue(rect.right);
+	pValueList->GetSubItem(3)->SetOriginalValue(rect.bottom);
 	//showhtml
-	pPropLabel->GetSubItem(tagShowHtml-tagLabel)->SetValue((_variant_t)pLabel->IsShowHtml());
-	pPropLabel->GetSubItem(tagShowHtml-tagLabel)->SetOriginalValue((_variant_t)pLabel->IsShowHtml());
+	pPropLabel->GetSubItem(tagShowHtml-tagLabel)->SetValue(pLabel->IsShowHtml());
+	pPropLabel->GetSubItem(tagShowHtml-tagLabel)->SetOriginalValue(pLabel->IsShowHtml());
 	//endellipsis
 	DWORD dwStyle=pLabel->GetTextStyle();
 	bool bEndEllipsis=(dwStyle&DT_END_ELLIPSIS) !=0 ;
-	pPropLabel->GetSubItem(tagEndEllipsis-tagLabel)->SetValue((_variant_t)bEndEllipsis);
-	pPropLabel->GetSubItem(tagEndEllipsis-tagLabel)->SetOriginalValue((_variant_t)bEndEllipsis);
+	pPropLabel->GetSubItem(tagEndEllipsis-tagLabel)->SetValue(bEndEllipsis);
+	pPropLabel->GetSubItem(tagEndEllipsis-tagLabel)->SetOriginalValue(bEndEllipsis);
 
 	pPropLabel->Show(TRUE,FALSE);
 }
@@ -1576,7 +1652,7 @@ void CUIProperties::ShowButtonProperty(CControlUI* pControl)
 	CButtonUI* pButton=static_cast<CButtonUI*>(pControl->GetInterface(_T("Button")));
 	ASSERT(pButton);
 
-	CMFCPropertyGridProperty* pPropButton=m_wndPropList.FindItemByData(classButton,FALSE);
+	CBCGPProp* pPropButton=m_wndPropList.FindItemByData(classButton,FALSE);
 	ASSERT(pPropButton);
 
 	//normalimage
@@ -1606,7 +1682,7 @@ void CUIProperties::ShowEditProperty(CControlUI* pControl)
 	CEditUI* pEdit=static_cast<CEditUI*>(pControl->GetInterface(_T("Edit")));
 	ASSERT(pEdit);
 
-	CMFCPropertyGridProperty* pPropEdit=m_wndPropList.FindItemByData(classEdit,FALSE);
+	CBCGPProp* pPropEdit=m_wndPropList.FindItemByData(classEdit,FALSE);
 	ASSERT(pPropEdit);
 
 	//normalimage
@@ -1628,11 +1704,11 @@ void CUIProperties::ShowEditProperty(CControlUI* pControl)
 	pPropEdit->GetSubItem(tagPassword-tagEdit)->SetValue((_variant_t)pEdit->IsPasswordMode());
 	pPropEdit->GetSubItem(tagPassword-tagEdit)->SetOriginalValue((_variant_t)pEdit->IsPasswordMode());
 	//maxchar
-	pPropEdit->GetSubItem(tagMaxChar-tagEdit)->SetValue((LONG)pEdit->GetMaxChar());
-	pPropEdit->GetSubItem(tagMaxChar-tagEdit)->SetOriginalValue((LONG)pEdit->GetMaxChar());
+	pPropEdit->GetSubItem(tagMaxChar-tagEdit)->SetValue((long)pEdit->GetMaxChar());
+	pPropEdit->GetSubItem(tagMaxChar-tagEdit)->SetOriginalValue((long)pEdit->GetMaxChar());
 	//nativebkcolor
-	static_cast<CMFCPropertyGridColor32Property*>(pPropEdit->GetSubItem(tagNativeBKColor-tagEdit))->SetColor((LONG)pEdit->GetNativeEditBkColor());
-	static_cast<CMFCPropertyGridColor32Property*>(pPropEdit->GetSubItem(tagNativeBKColor-tagEdit))->SetOriginalValue((LONG)pEdit->GetNativeEditBkColor());
+	static_cast<CBCGPColor32Prop*>(pPropEdit->GetSubItem(tagNativeBKColor-tagEdit))->SetColor((long)pEdit->GetNativeEditBkColor());
+	static_cast<CBCGPColor32Prop*>(pPropEdit->GetSubItem(tagNativeBKColor-tagEdit))->SetOriginalValue((long)pEdit->GetNativeEditBkColor());
 
 	pPropEdit->Show(TRUE,FALSE);
 }
@@ -1645,7 +1721,7 @@ void CUIProperties::ShowOptionProperty(CControlUI* pControl)
 	COptionUI* pOption=static_cast<COptionUI*>(pControl->GetInterface(_T("Option")));
 	ASSERT(pOption);
 
-	CMFCPropertyGridProperty* pPropOption=m_wndPropList.FindItemByData(classOption,FALSE);
+	CBCGPProp* pPropOption=m_wndPropList.FindItemByData(classOption,FALSE);
 	ASSERT(pPropOption);
 
 	//foreimage
@@ -1673,21 +1749,21 @@ void CUIProperties::ShowProgressProperty(CControlUI* pControl)
 	CProgressUI* pProgress=static_cast<CProgressUI*>(pControl->GetInterface(_T("Progress")));
 	ASSERT(pProgress);
 
-	CMFCPropertyGridProperty* pPropProgress=m_wndPropList.FindItemByData(classProgress,FALSE);
+	CBCGPProp* pPropProgress=m_wndPropList.FindItemByData(classProgress,FALSE);
 	ASSERT(pPropProgress);
 
 	//foreimage
 	pPropProgress->GetSubItem(tagForeImage-tagProgress)->SetValue((_variant_t)pProgress->GetForeImage());
 	pPropProgress->GetSubItem(tagForeImage-tagProgress)->SetOriginalValue((_variant_t)pProgress->GetForeImage());
 	//minmax
-	CMFCPropertyGridProperty* pValueList=pPropProgress->GetSubItem(tagMinMax-tagProgress);
-	pValueList->GetSubItem(0)->SetValue((LONG)pProgress->GetMinValue());
-	pValueList->GetSubItem(1)->SetValue((LONG)pProgress->GetMaxValue());
-	pValueList->GetSubItem(0)->SetOriginalValue((LONG)pProgress->GetMinValue());
-	pValueList->GetSubItem(1)->SetOriginalValue((LONG)pProgress->GetMaxValue());
+	CBCGPProp* pValueList=pPropProgress->GetSubItem(tagMinMax-tagProgress);
+	pValueList->GetSubItem(0)->SetValue((long)pProgress->GetMinValue());
+	pValueList->GetSubItem(1)->SetValue((long)pProgress->GetMaxValue());
+	pValueList->GetSubItem(0)->SetOriginalValue((long)pProgress->GetMinValue());
+	pValueList->GetSubItem(1)->SetOriginalValue((long)pProgress->GetMaxValue());
 	//value
-	pPropProgress->GetSubItem(tagValue-tagProgress)->SetValue((LONG)pProgress->GetValue());
-	pPropProgress->GetSubItem(tagValue-tagProgress)->SetOriginalValue((LONG)pProgress->GetValue());
+	pPropProgress->GetSubItem(tagValue-tagProgress)->SetValue((long)pProgress->GetValue());
+	pPropProgress->GetSubItem(tagValue-tagProgress)->SetOriginalValue((long)pProgress->GetValue());
 	//hor
 	pPropProgress->GetSubItem(tagHor-tagProgress)->SetValue((_variant_t)pProgress->IsHorizontal());
 	pPropProgress->GetSubItem(tagHor-tagProgress)->SetOriginalValue((_variant_t)pProgress->IsHorizontal());
@@ -1706,7 +1782,7 @@ void CUIProperties::ShowSliderProperty(CControlUI* pControl)
 	CSliderUI* pSlider=static_cast<CSliderUI*>(pControl->GetInterface(_T("Slider")));
 	ASSERT(pSlider);
 
-	CMFCPropertyGridProperty* pPropSlider=m_wndPropList.FindItemByData(classSlider,FALSE);
+	CBCGPProp* pPropSlider=m_wndPropList.FindItemByData(classSlider,FALSE);
 	ASSERT(pPropSlider);
 
 	//thumbimage
@@ -1719,12 +1795,12 @@ void CUIProperties::ShowSliderProperty(CControlUI* pControl)
 	pPropSlider->GetSubItem(tagThumbPushedImage-tagSlider)->SetValue((_variant_t)pSlider->GetThumbPushedImage());
 	pPropSlider->GetSubItem(tagThumbPushedImage-tagSlider)->SetOriginalValue((_variant_t)pSlider->GetThumbPushedImage());
 	//thumbsize
-	CMFCPropertyGridProperty* pValueList=pPropSlider->GetSubItem(tagThumbSize-tagSlider);
+	CBCGPProp* pValueList=pPropSlider->GetSubItem(tagThumbSize-tagSlider);
 	RECT rect=pSlider->GetThumbRect();
-	pValueList->GetSubItem(0)->SetValue((LONG)(rect.right-rect.left));
-	pValueList->GetSubItem(1)->SetValue((LONG)(rect.bottom-rect.top));
-	pValueList->GetSubItem(0)->SetOriginalValue((LONG)(rect.right-rect.left));
-	pValueList->GetSubItem(1)->SetOriginalValue((LONG)(rect.bottom-rect.top));
+	pValueList->GetSubItem(0)->SetValue((long)(rect.right-rect.left));
+	pValueList->GetSubItem(1)->SetValue((long)(rect.bottom-rect.top));
+	pValueList->GetSubItem(0)->SetOriginalValue((long)(rect.right-rect.left));
+	pValueList->GetSubItem(1)->SetOriginalValue((long)(rect.bottom-rect.top));
 
 	pPropSlider->Show(TRUE,FALSE);
 }
@@ -1738,7 +1814,7 @@ void CUIProperties::ShowComboProperty(CControlUI* pControl)
 	CComboUI* pCombo=static_cast<CComboUI*>(pControl->GetInterface(_T("Combo")));
 	ASSERT(pCombo);
 
-	CMFCPropertyGridProperty* pPropCombo=m_wndPropList.FindItemByData(classCombo,FALSE);
+	CBCGPProp* pPropCombo=m_wndPropList.FindItemByData(classCombo,FALSE);
 	ASSERT(pPropCombo);
 
 	//normalimage
@@ -1758,22 +1834,22 @@ void CUIProperties::ShowComboProperty(CControlUI* pControl)
 	pPropCombo->GetSubItem(tagComboDisabledImage-tagCombo)->SetOriginalValue((_variant_t)pCombo->GetDisabledImage());
 	//textpadding
 	RECT rect=pCombo->GetTextPadding();
-	CMFCPropertyGridProperty* pValueList=pPropCombo->GetSubItem(tagComboTextPadding-tagCombo);
-	pValueList->GetSubItem(0)->SetValue((LONG)rect.left);
-	pValueList->GetSubItem(1)->SetValue((LONG)rect.top);
-	pValueList->GetSubItem(2)->SetValue((LONG)rect.right);
-	pValueList->GetSubItem(3)->SetValue((LONG)rect.bottom);
-	pValueList->GetSubItem(0)->SetOriginalValue((LONG)rect.left);
-	pValueList->GetSubItem(1)->SetOriginalValue((LONG)rect.top);
-	pValueList->GetSubItem(2)->SetOriginalValue((LONG)rect.right);
-	pValueList->GetSubItem(3)->SetOriginalValue((LONG)rect.bottom);
+	CBCGPProp* pValueList=pPropCombo->GetSubItem(tagComboTextPadding-tagCombo);
+	pValueList->GetSubItem(0)->SetValue((long)rect.left);
+	pValueList->GetSubItem(1)->SetValue((long)rect.top);
+	pValueList->GetSubItem(2)->SetValue((long)rect.right);
+	pValueList->GetSubItem(3)->SetValue((long)rect.bottom);
+	pValueList->GetSubItem(0)->SetOriginalValue((long)rect.left);
+	pValueList->GetSubItem(1)->SetOriginalValue((long)rect.top);
+	pValueList->GetSubItem(2)->SetOriginalValue((long)rect.right);
+	pValueList->GetSubItem(3)->SetOriginalValue((long)rect.bottom);
 	//dropboxsize
 	SIZE size=pCombo->GetDropBoxSize();
 	pValueList=pPropCombo->GetSubItem(tagComboDropBoxSize-tagCombo);
-	pValueList->GetSubItem(0)->SetValue((LONG)size.cx);
-	pValueList->GetSubItem(1)->SetValue((LONG)size.cy);
-	pValueList->GetSubItem(0)->SetOriginalValue((LONG)size.cx);
-	pValueList->GetSubItem(1)->SetOriginalValue((LONG)size.cy);
+	pValueList->GetSubItem(0)->SetValue((long)size.cx);
+	pValueList->GetSubItem(1)->SetValue((long)size.cy);
+	pValueList->GetSubItem(0)->SetOriginalValue((long)size.cx);
+	pValueList->GetSubItem(1)->SetOriginalValue((long)size.cy);
 	pPropCombo->Show(TRUE,FALSE);
 }
 
@@ -1785,15 +1861,15 @@ void CUIProperties::ShowActiveXProperty(CControlUI* pControl)
 	CActiveXUI* pActiveX=static_cast<CActiveXUI*>(pControl->GetInterface(_T("ActiveX")));
 	ASSERT(pActiveX);
 
-	CMFCPropertyGridProperty* pPropActiveX=m_wndPropList.FindItemByData(classActiveX,FALSE);
+	CBCGPProp* pPropActiveX=m_wndPropList.FindItemByData(classActiveX,FALSE);
 	ASSERT(pPropActiveX);
 
 	CLSID clsid=pActiveX->GetClisd();
-	TCHAR strCLSID[48];
+	WCHAR strCLSID[48];
 	StringFromGUID2(clsid,strCLSID,48);
 	//clsid
-	pPropActiveX->GetSubItem(tagClsid-tagActiveX)->SetValue((_variant_t)strCLSID);
-	pPropActiveX->GetSubItem(tagClsid-tagActiveX)->SetOriginalValue((_variant_t)strCLSID);
+	pPropActiveX->GetSubItem(tagClsid-tagActiveX)->SetValue(strCLSID);
+	pPropActiveX->GetSubItem(tagClsid-tagActiveX)->SetOriginalValue(strCLSID);
 
 	//delaycreate
 	pPropActiveX->GetSubItem(tagDelayCreate-tagActiveX)->SetValue((_variant_t)pActiveX->IsDelayCreate());
@@ -1814,23 +1890,23 @@ void CUIProperties::ShowContainerProperty(CControlUI* pControl)
 	CContainerUI* pContainer=static_cast<CContainerUI*>(pControl->GetInterface(_T("Container")));
 	ASSERT(pContainer);
 
-	CMFCPropertyGridProperty* pPropContainer=m_wndPropList.FindItemByData(classContainer,FALSE);
+	CBCGPProp* pPropContainer=m_wndPropList.FindItemByData(classContainer,FALSE);
 	ASSERT(pPropContainer);
 
 	//inset
 	RECT rect=pContainer->GetInset();
-	CMFCPropertyGridProperty* pValueList=pPropContainer->GetSubItem(tagInset-tagContainer);
-	pValueList->GetSubItem(0)->SetValue((LONG)rect.left);
-	pValueList->GetSubItem(1)->SetValue((LONG)rect.top);
-	pValueList->GetSubItem(2)->SetValue((LONG)rect.right);
-	pValueList->GetSubItem(3)->SetValue((LONG)rect.bottom);
-	pValueList->GetSubItem(0)->SetOriginalValue((LONG)rect.left);
-	pValueList->GetSubItem(1)->SetOriginalValue((LONG)rect.top);
-	pValueList->GetSubItem(2)->SetOriginalValue((LONG)rect.right);
-	pValueList->GetSubItem(3)->SetOriginalValue((LONG)rect.bottom);
+	CBCGPProp* pValueList=pPropContainer->GetSubItem(tagInset-tagContainer);
+	pValueList->GetSubItem(0)->SetValue((long)rect.left);
+	pValueList->GetSubItem(1)->SetValue((long)rect.top);
+	pValueList->GetSubItem(2)->SetValue((long)rect.right);
+	pValueList->GetSubItem(3)->SetValue((long)rect.bottom);
+	pValueList->GetSubItem(0)->SetOriginalValue((long)rect.left);
+	pValueList->GetSubItem(1)->SetOriginalValue((long)rect.top);
+	pValueList->GetSubItem(2)->SetOriginalValue((long)rect.right);
+	pValueList->GetSubItem(3)->SetOriginalValue((long)rect.bottom);
 	//childpadding
-	pPropContainer->GetSubItem(tagChildPadding-tagContainer)->SetValue((LONG)pContainer->GetChildPadding());
-	pPropContainer->GetSubItem(tagChildPadding-tagContainer)->SetOriginalValue((LONG)pContainer->GetChildPadding());
+	pPropContainer->GetSubItem(tagChildPadding-tagContainer)->SetValue((long)pContainer->GetChildPadding());
+	pPropContainer->GetSubItem(tagChildPadding-tagContainer)->SetOriginalValue((long)pContainer->GetChildPadding());
 	//mousechild
 	pPropContainer->GetSubItem(tagMouseChild-tagContainer)->SetValue((_variant_t)pContainer->IsMouseChildEnabled());
 	pPropContainer->GetSubItem(tagMouseChild-tagContainer)->SetOriginalValue((_variant_t)pContainer->IsMouseChildEnabled());
@@ -1852,12 +1928,12 @@ void CUIProperties::ShowHorizontalLayoutProperty(CControlUI* pControl)
 	CHorizontalLayoutUI* pHorizontalLayout=static_cast<CHorizontalLayoutUI*>(pControl->GetInterface(_T("HorizontalLayout")));
 	ASSERT(pHorizontalLayout);
 
-	CMFCPropertyGridProperty* pPropHorizontalLayout=m_wndPropList.FindItemByData(classHorizontalLayout,FALSE);
+	CBCGPProp* pPropHorizontalLayout=m_wndPropList.FindItemByData(classHorizontalLayout,FALSE);
 	ASSERT(pPropHorizontalLayout);
 
 	//sepwidth
-	pPropHorizontalLayout->GetSubItem(tagSepWidth-tagHorizontalLayout)->SetValue((LONG)pHorizontalLayout->GetSepWidth());
-	pPropHorizontalLayout->GetSubItem(tagSepWidth-tagHorizontalLayout)->SetOriginalValue((LONG)pHorizontalLayout->GetSepWidth());
+	pPropHorizontalLayout->GetSubItem(tagSepWidth-tagHorizontalLayout)->SetValue((long)pHorizontalLayout->GetSepWidth());
+	pPropHorizontalLayout->GetSubItem(tagSepWidth-tagHorizontalLayout)->SetOriginalValue((long)pHorizontalLayout->GetSepWidth());
 	//sepimm
 	pPropHorizontalLayout->GetSubItem(tagSepImm-tagHorizontalLayout)->SetValue((_variant_t)pHorizontalLayout->IsSepImmMode());
 	pPropHorizontalLayout->GetSubItem(tagSepImm-tagHorizontalLayout)->SetOriginalValue((_variant_t)pHorizontalLayout->IsSepImmMode());
@@ -1873,22 +1949,22 @@ void CUIProperties::ShowTileLayoutProperty(CControlUI* pControl)
 	CTileLayoutUI* pTileLayout=static_cast<CTileLayoutUI*>(pControl->GetInterface(_T("TileLayout")));
 	ASSERT(pTileLayout);
 
-	CMFCPropertyGridProperty* pPropTileLayout=m_wndPropList.FindItemByData(classTileLayout,FALSE);
+	CBCGPProp* pPropTileLayout=m_wndPropList.FindItemByData(classTileLayout,FALSE);
 	ASSERT(pPropTileLayout);
 
 	//sepwidth
-	pPropTileLayout->GetSubItem(tagSepWidth-tagHorizontalLayout)->SetValue((LONG)pTileLayout->GetColumns());
-	pPropTileLayout->GetSubItem(tagSepWidth-tagHorizontalLayout)->SetOriginalValue((LONG)pTileLayout->GetColumns());
+	pPropTileLayout->GetSubItem(tagSepWidth-tagHorizontalLayout)->SetValue((long)pTileLayout->GetColumns());
+	pPropTileLayout->GetSubItem(tagSepWidth-tagHorizontalLayout)->SetOriginalValue((long)pTileLayout->GetColumns());
 
 	pPropTileLayout->Show(TRUE,FALSE);
 }
 
-CMFCPropertyGridProperty* CUIProperties::FindPropByData(DWORD_PTR dwData, BOOL bSearchSubProps/* = TRUE*/) const
+CBCGPProp* CUIProperties::FindPropByData(DWORD_PTR dwData, BOOL bSearchSubProps/* = TRUE*/) const
 {
 	return m_wndPropList.FindItemByData(dwData, bSearchSubProps);
 }
 
-CString CUIProperties::FormatOrigProperty(CMFCPropertyGridProperty* pProp)
+CString CUIProperties::FormatOrigProperty(CBCGPProp* pProp)
 {
 	ASSERT(pProp);
 
@@ -1900,7 +1976,7 @@ CString CUIProperties::FormatOrigProperty(CMFCPropertyGridProperty* pProp)
 	{
 		for (int i=0; i<nCount; i++)
 		{
-			CMFCPropertyGridProperty* pSubProp = pProp->GetSubItem(i);
+			CBCGPProp* pSubProp = pProp->GetSubItem(i);
 			ASSERT_VALID(pSubProp);
 
 			strOrigVal += FormatOrigProperty(pSubProp);
@@ -1975,7 +2051,7 @@ void CUIProperties::ShowListProperty( CControlUI* pControl )
 	CListUI* pList=static_cast<CListUI*>(pControl->GetInterface(_T("List")));
 	ASSERT(pList);
 
-	CMFCPropertyGridProperty* pPropList=m_wndPropList.FindItemByData(classList,FALSE);
+	CBCGPProp* pPropList=m_wndPropList.FindItemByData(classList,FALSE);
 	ASSERT(pPropList);
 
 	//Header
@@ -1994,7 +2070,7 @@ void CUIProperties::ShowItemProperty( CControlUI* pControl )
 	IListOwnerUI* pList=static_cast<IListOwnerUI*>(pControl->GetInterface(_T("IListOwner")));
 	ASSERT(pList);
 
-	CMFCPropertyGridProperty* pPropItem=m_wndPropList.FindItemByData(classItem,FALSE);
+	CBCGPProp* pPropItem=m_wndPropList.FindItemByData(classItem,FALSE);
 	ASSERT(pPropItem);
 
 	//itembkimage
@@ -2011,15 +2087,15 @@ void CUIProperties::ShowItemProperty( CControlUI* pControl )
 	//pPropItem->GetSubItem(tagItemDisabledImage-tagItem)->SetValue((_variant_t)pListInfo->sDisabledImage);
 	//pPropItem->GetSubItem(tagItemDisabledImage-tagItem)->SetOriginalValue((_variant_t)pListInfo->sDisabledImage);
 	//itemtextpadding
-	CMFCPropertyGridProperty*  pValueList=pPropItem->GetSubItem(tagItemTextPadding-tagItem);
-	pValueList->GetSubItem(0)->SetValue((LONG)pListInfo->rcTextPadding.left);
-	pValueList->GetSubItem(1)->SetValue((LONG)pListInfo->rcTextPadding.top);
-	pValueList->GetSubItem(2)->SetValue((LONG)pListInfo->rcTextPadding.right);
-	pValueList->GetSubItem(3)->SetValue((LONG)pListInfo->rcTextPadding.bottom);
-	pValueList->GetSubItem(0)->SetOriginalValue((LONG)pListInfo->rcTextPadding.left);
-	pValueList->GetSubItem(1)->SetOriginalValue((LONG)pListInfo->rcTextPadding.top);
-	pValueList->GetSubItem(2)->SetOriginalValue((LONG)pListInfo->rcTextPadding.right);
-	pValueList->GetSubItem(3)->SetOriginalValue((LONG)pListInfo->rcTextPadding.bottom);
+	CBCGPProp*  pValueList=pPropItem->GetSubItem(tagItemTextPadding-tagItem);
+	pValueList->GetSubItem(0)->SetValue((long)pListInfo->rcTextPadding.left);
+	pValueList->GetSubItem(1)->SetValue((long)pListInfo->rcTextPadding.top);
+	pValueList->GetSubItem(2)->SetValue((long)pListInfo->rcTextPadding.right);
+	pValueList->GetSubItem(3)->SetValue((long)pListInfo->rcTextPadding.bottom);
+	pValueList->GetSubItem(0)->SetOriginalValue((long)pListInfo->rcTextPadding.left);
+	pValueList->GetSubItem(1)->SetOriginalValue((long)pListInfo->rcTextPadding.top);
+	pValueList->GetSubItem(2)->SetOriginalValue((long)pListInfo->rcTextPadding.right);
+	pValueList->GetSubItem(3)->SetOriginalValue((long)pListInfo->rcTextPadding.bottom);
 	//itemalign
 	CString strStyle;
 	if(pListInfo->uTextStyle==DT_LEFT)
@@ -2031,35 +2107,35 @@ void CUIProperties::ShowItemProperty( CControlUI* pControl )
 	pPropItem->GetSubItem(tagItemAlign-tagItem)->SetValue((_variant_t)strStyle);
 	pPropItem->GetSubItem(tagItemAlign-tagItem)->SetOriginalValue((_variant_t)strStyle);
 	//itemtextcolor
-	static_cast<CMFCPropertyGridColor32Property*>(pPropItem->GetSubItem(tagItemTextColor-tagItem))->SetColor((LONG)pListInfo->dwTextColor);
-	static_cast<CMFCPropertyGridColor32Property*>(pPropItem->GetSubItem(tagItemTextColor-tagItem))->SetOriginalValue((LONG)pListInfo->dwTextColor);
+	static_cast<CBCGPColor32Prop*>(pPropItem->GetSubItem(tagItemTextColor-tagItem))->SetColor((long)pListInfo->dwTextColor);
+	static_cast<CBCGPColor32Prop*>(pPropItem->GetSubItem(tagItemTextColor-tagItem))->SetOriginalValue((long)pListInfo->dwTextColor);
 	//itembkcolor
-	static_cast<CMFCPropertyGridColor32Property*>(pPropItem->GetSubItem(tagItemBkColor-tagItem))->SetColor((LONG)pListInfo->dwBkColor);
-	static_cast<CMFCPropertyGridColor32Property*>(pPropItem->GetSubItem(tagItemBkColor-tagItem))->SetOriginalValue((LONG)pListInfo->dwBkColor);
+	static_cast<CBCGPColor32Prop*>(pPropItem->GetSubItem(tagItemBkColor-tagItem))->SetColor((long)pListInfo->dwBkColor);
+	static_cast<CBCGPColor32Prop*>(pPropItem->GetSubItem(tagItemBkColor-tagItem))->SetOriginalValue((long)pListInfo->dwBkColor);
 	//itemselectedtextcolor
-	static_cast<CMFCPropertyGridColor32Property*>(pPropItem->GetSubItem(tagItemSelectedTextColor-tagItem))->SetColor((LONG)pListInfo->dwSelectedTextColor);
-	static_cast<CMFCPropertyGridColor32Property*>(pPropItem->GetSubItem(tagItemSelectedTextColor-tagItem))->SetOriginalValue((LONG)pListInfo->dwSelectedTextColor);
+	static_cast<CBCGPColor32Prop*>(pPropItem->GetSubItem(tagItemSelectedTextColor-tagItem))->SetColor((long)pListInfo->dwSelectedTextColor);
+	static_cast<CBCGPColor32Prop*>(pPropItem->GetSubItem(tagItemSelectedTextColor-tagItem))->SetOriginalValue((long)pListInfo->dwSelectedTextColor);
 	//itemselectedbkcolor
-	static_cast<CMFCPropertyGridColor32Property*>(pPropItem->GetSubItem(tagItemSelectedBkColor-tagItem))->SetColor((LONG)pListInfo->dwSelectedBkColor);
-	static_cast<CMFCPropertyGridColor32Property*>(pPropItem->GetSubItem(tagItemSelectedBkColor-tagItem))->SetOriginalValue((LONG)pListInfo->dwSelectedBkColor);
+	static_cast<CBCGPColor32Prop*>(pPropItem->GetSubItem(tagItemSelectedBkColor-tagItem))->SetColor((long)pListInfo->dwSelectedBkColor);
+	static_cast<CBCGPColor32Prop*>(pPropItem->GetSubItem(tagItemSelectedBkColor-tagItem))->SetOriginalValue((long)pListInfo->dwSelectedBkColor);
 	//itemhottextcolor
-	static_cast<CMFCPropertyGridColor32Property*>(pPropItem->GetSubItem(tagItemHotTextColor-tagItem))->SetColor((LONG)pListInfo->dwHotTextColor);
-	static_cast<CMFCPropertyGridColor32Property*>(pPropItem->GetSubItem(tagItemHotTextColor-tagItem))->SetOriginalValue((LONG)pListInfo->dwHotTextColor);
+	static_cast<CBCGPColor32Prop*>(pPropItem->GetSubItem(tagItemHotTextColor-tagItem))->SetColor((long)pListInfo->dwHotTextColor);
+	static_cast<CBCGPColor32Prop*>(pPropItem->GetSubItem(tagItemHotTextColor-tagItem))->SetOriginalValue((long)pListInfo->dwHotTextColor);
 	//itemhotbkcolor
-	static_cast<CMFCPropertyGridColor32Property*>(pPropItem->GetSubItem(tagItemHotBkColor-tagItem))->SetColor((LONG)pListInfo->dwHotBkColor);
-	static_cast<CMFCPropertyGridColor32Property*>(pPropItem->GetSubItem(tagItemHotBkColor-tagItem))->SetOriginalValue((LONG)pListInfo->dwHotBkColor);
+	static_cast<CBCGPColor32Prop*>(pPropItem->GetSubItem(tagItemHotBkColor-tagItem))->SetColor((long)pListInfo->dwHotBkColor);
+	static_cast<CBCGPColor32Prop*>(pPropItem->GetSubItem(tagItemHotBkColor-tagItem))->SetOriginalValue((long)pListInfo->dwHotBkColor);
 	//itemdisabledtextcolor
-	static_cast<CMFCPropertyGridColor32Property*>(pPropItem->GetSubItem(tagItemDisabledTextColor-tagItem))->SetColor((LONG)pListInfo->dwDisabledTextColor);
-	static_cast<CMFCPropertyGridColor32Property*>(pPropItem->GetSubItem(tagItemDisabledTextColor-tagItem))->SetOriginalValue((LONG)pListInfo->dwDisabledTextColor);
+	static_cast<CBCGPColor32Prop*>(pPropItem->GetSubItem(tagItemDisabledTextColor-tagItem))->SetColor((long)pListInfo->dwDisabledTextColor);
+	static_cast<CBCGPColor32Prop*>(pPropItem->GetSubItem(tagItemDisabledTextColor-tagItem))->SetOriginalValue((long)pListInfo->dwDisabledTextColor);
 	//itemdisabledbkcolor
-	static_cast<CMFCPropertyGridColor32Property*>(pPropItem->GetSubItem(tagItemDisabledBkColor-tagItem))->SetColor((LONG)pListInfo->dwDisabledBkColor);
-	static_cast<CMFCPropertyGridColor32Property*>(pPropItem->GetSubItem(tagItemDisabledBkColor-tagItem))->SetOriginalValue((LONG)pListInfo->dwDisabledBkColor);
+	static_cast<CBCGPColor32Prop*>(pPropItem->GetSubItem(tagItemDisabledBkColor-tagItem))->SetColor((long)pListInfo->dwDisabledBkColor);
+	static_cast<CBCGPColor32Prop*>(pPropItem->GetSubItem(tagItemDisabledBkColor-tagItem))->SetOriginalValue((long)pListInfo->dwDisabledBkColor);
 	//itemlinecolor
-	static_cast<CMFCPropertyGridColor32Property*>(pPropItem->GetSubItem(tagItemLineColor-tagItem))->SetColor((LONG)pListInfo->dwHLineColor);
-	static_cast<CMFCPropertyGridColor32Property*>(pPropItem->GetSubItem(tagItemLineColor-tagItem))->SetOriginalValue((LONG)pListInfo->dwHLineColor);
+	static_cast<CBCGPColor32Prop*>(pPropItem->GetSubItem(tagItemLineColor-tagItem))->SetColor((long)pListInfo->dwHLineColor);
+	static_cast<CBCGPColor32Prop*>(pPropItem->GetSubItem(tagItemLineColor-tagItem))->SetOriginalValue((long)pListInfo->dwHLineColor);
 	//itemfont
-	pPropItem->GetSubItem(tagItemFont-tagItem)->SetValue((LONG)pListInfo->nFont);
-	pPropItem->GetSubItem(tagItemFont-tagItem)->SetOriginalValue((LONG)pListInfo->nFont);
+	pPropItem->GetSubItem(tagItemFont-tagItem)->SetValue((long)pListInfo->nFont);
+	pPropItem->GetSubItem(tagItemFont-tagItem)->SetOriginalValue((long)pListInfo->nFont);
 	//itemshowhtml
 	pPropItem->GetSubItem(tagMultiExpanding-tagItem)->SetValue((_variant_t)pListInfo->bMultiExpandable);
 	pPropItem->GetSubItem(tagMultiExpanding-tagItem)->SetOriginalValue((_variant_t)pListInfo->bMultiExpandable);
@@ -2077,18 +2153,18 @@ void CUIProperties::ShowScrollBarProperty( CControlUI* pControl )
 	CScrollBarUI* pScrollBar=static_cast<CScrollBarUI*>(pControl->GetInterface(_T("ScrollBar")));
 	ASSERT(pScrollBar);
 
-	CMFCPropertyGridProperty* pPropItem=m_wndPropList.FindItemByData(classScrollBar,FALSE);
+	CBCGPProp* pPropItem=m_wndPropList.FindItemByData(classScrollBar,FALSE);
 	ASSERT(pPropItem);
 
 	//tagScrollBarRange
-	pPropItem->GetSubItem(tagScrollBarRange-tagScrollBar)->SetValue((LONG)pScrollBar->GetScrollRange());
-	pPropItem->GetSubItem(tagScrollBarRange-tagScrollBar)->SetOriginalValue((LONG)pScrollBar->GetScrollRange());
+	pPropItem->GetSubItem(tagScrollBarRange-tagScrollBar)->SetValue((long)pScrollBar->GetScrollRange());
+	pPropItem->GetSubItem(tagScrollBarRange-tagScrollBar)->SetOriginalValue((long)pScrollBar->GetScrollRange());
 	//tagScrollBarValue
-	pPropItem->GetSubItem(tagScrollBarValue-tagScrollBar)->SetValue((LONG)pScrollBar->GetScrollRange());
-	pPropItem->GetSubItem(tagScrollBarValue-tagScrollBar)->SetOriginalValue((LONG)pScrollBar->GetScrollRange());
+	pPropItem->GetSubItem(tagScrollBarValue-tagScrollBar)->SetValue((long)pScrollBar->GetScrollRange());
+	pPropItem->GetSubItem(tagScrollBarValue-tagScrollBar)->SetOriginalValue((long)pScrollBar->GetScrollRange());
 	//tagScrollBarLineSize
-	pPropItem->GetSubItem(tagScrollBarLineSize-tagScrollBar)->SetValue((LONG)pScrollBar->GetScrollRange());
-	pPropItem->GetSubItem(tagScrollBarLineSize-tagScrollBar)->SetOriginalValue((LONG)pScrollBar->GetScrollRange());
+	pPropItem->GetSubItem(tagScrollBarLineSize-tagScrollBar)->SetValue((long)pScrollBar->GetScrollRange());
+	pPropItem->GetSubItem(tagScrollBarLineSize-tagScrollBar)->SetOriginalValue((long)pScrollBar->GetScrollRange());
 	// tagScrollBarShowButton1
 	pPropItem->GetSubItem(tagScrollBarShowButton1-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetShowButton1());
 	pPropItem->GetSubItem(tagScrollBarShowButton1-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetShowButton1());
@@ -2171,12 +2247,12 @@ void CUIProperties::ShowTabLayoutPropery( CControlUI* pControl )
 	CTabLayoutUI* pTabLayout=static_cast<CTabLayoutUI*>(pControl->GetInterface(_T("TabLayout")));
 	ASSERT(pTabLayout);
 
-	CMFCPropertyGridProperty* pPropItem=m_wndPropList.FindItemByData(classTabLayout,FALSE);
+	CBCGPProp* pPropItem=m_wndPropList.FindItemByData(classTabLayout,FALSE);
 	ASSERT(pPropItem);
 
 	//	SelectedID
-	pPropItem->GetSubItem(tagSelectedID-tagTabLayout)->SetValue((LONG)pTabLayout->GetCurSel());
-	pPropItem->GetSubItem(tagSelectedID-tagTabLayout)->SetOriginalValue((LONG)pTabLayout->GetCurSel());
+	pPropItem->GetSubItem(tagSelectedID-tagTabLayout)->SetValue((long)pTabLayout->GetCurSel());
+	pPropItem->GetSubItem(tagSelectedID-tagTabLayout)->SetOriginalValue((long)pTabLayout->GetCurSel());
 
 	pPropItem->Show(TRUE,FALSE);
 }
@@ -2189,15 +2265,15 @@ void CUIProperties::ShowListHeaderItemPropery( CControlUI* pControl )
 	CListHeaderItemUI* pListHeaderItem=static_cast<CListHeaderItemUI*>(pControl->GetInterface(_T("ListHeaderItem")));
 	ASSERT(pListHeaderItem);
 
-	CMFCPropertyGridProperty* pPropItem=m_wndPropList.FindItemByData(classListHeaderItem,FALSE);
+	CBCGPProp* pPropItem=m_wndPropList.FindItemByData(classListHeaderItem,FALSE);
 	ASSERT(pPropItem);
 
 	//	dragable
 	pPropItem->GetSubItem(tagDragable-classListHeaderItem)->SetValue((_variant_t)pListHeaderItem->IsDragable());
 	pPropItem->GetSubItem(tagDragable-classListHeaderItem)->SetOriginalValue((_variant_t)pListHeaderItem->IsDragable());
 	//	sepwidth
-	pPropItem->GetSubItem(tagListHeaderItemSepWidth-classListHeaderItem)->SetValue((LONG)pListHeaderItem->GetSepWidth());
-	pPropItem->GetSubItem(tagListHeaderItemSepWidth-classListHeaderItem)->SetOriginalValue((LONG)pListHeaderItem->GetSepWidth());
+	pPropItem->GetSubItem(tagListHeaderItemSepWidth-classListHeaderItem)->SetValue((long)pListHeaderItem->GetSepWidth());
+	pPropItem->GetSubItem(tagListHeaderItemSepWidth-classListHeaderItem)->SetOriginalValue((long)pListHeaderItem->GetSepWidth());
 	//	normalimage
 	pPropItem->GetSubItem(tagListHeaderItemNormalImage-classListHeaderItem)->SetValue((_variant_t)pListHeaderItem->GetNormalImage());
 	pPropItem->GetSubItem(tagScrollBarBKPushedImage-classListHeaderItem)->SetOriginalValue((_variant_t)pListHeaderItem->GetNormalImage());
@@ -2225,7 +2301,7 @@ void CUIProperties::ShowWebBrowserPropery( CControlUI* pControl )
 	CWebBrowserUI* pWebBrowser=static_cast<CWebBrowserUI*>(pControl->GetInterface(_T("WebBrowser")));
 	ASSERT(pWebBrowser);
 
-	CMFCPropertyGridProperty* pPropItem=m_wndPropList.FindItemByData(classWebBrowser,FALSE);
+	CBCGPProp* pPropItem=m_wndPropList.FindItemByData(classWebBrowser,FALSE);
 	ASSERT(pPropItem);
 
 	//	homepage

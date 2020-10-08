@@ -3,7 +3,7 @@
 
 // CToolBoxWnd
 
-class CToolBoxWnd : public CDockablePane
+class CToolBoxWnd : public CBCGPDockingControlBar
 {
 	DECLARE_DYNAMIC(CToolBoxWnd)
 

@@ -55,13 +55,13 @@ BOOL CDialogUIAttribEdit::OnInitDialog()
 
 LRESULT CDialogUIAttribEdit::OnUIPropChanged(WPARAM wp, LPARAM lp)
 {
-	CMFCPropertyGridProperty* pProp = (CMFCPropertyGridProperty *)lp;
+	CBCGPProp* pProp = (CBCGPProp *)lp;
 	SetUIValue(pProp, pProp->GetData());
 
 	return TRUE;
 }
 
-void CDialogUIAttribEdit::SetUIValue(CMFCPropertyGridProperty* pProp,int nTag)
+void CDialogUIAttribEdit::SetUIValue(CBCGPProp* pProp,int nTag)
 {
 	CControlUI* pControl = m_wndUIProperties.GetCurUI();
 	if(pControl == NULL)

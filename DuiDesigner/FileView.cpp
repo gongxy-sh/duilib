@@ -25,8 +25,8 @@ CFileViewTree::~CFileViewTree()
 }
 
 BEGIN_MESSAGE_MAP(CFileViewTree, CTreeCtrl)
-	ON_NOTIFY_REFLECT(NM_DBLCLK, &CFileViewTree::OnNMDblclk)
-	ON_NOTIFY_REFLECT(TVN_ENDLABELEDIT, &CFileViewTree::OnTvnEndlabeledit)
+	ON_NOTIFY_REFLECT(NM_DBLCLK, CFileViewTree::OnNMDblclk)
+	ON_NOTIFY_REFLECT(TVN_ENDLABELEDIT, CFileViewTree::OnTvnEndlabeledit)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -77,32 +77,32 @@ CFileView::~CFileView()
 {
 }
 
-BEGIN_MESSAGE_MAP(CFileView, CDockablePane)
+BEGIN_MESSAGE_MAP(CFileView, CBCGPDockingControlBar)
 	ON_WM_CREATE()
 	ON_WM_SIZE()
 	ON_WM_CONTEXTMENU()
 	ON_COMMAND(IDR_PROJECT_NEW, OnProjectNew)
 	ON_COMMAND(IDR_FILE_NEW, OnFileNew)
-	ON_UPDATE_COMMAND_UI(IDR_FILE_NEW, &CMainFrame::OnUpdateProjectExist)
+	ON_UPDATE_COMMAND_UI(IDR_FILE_NEW, CMainFrame::OnUpdateProjectExist)
 	ON_COMMAND(IDR_FILE_DELETE, OnFileDelete)
-	ON_UPDATE_COMMAND_UI(IDR_FILE_DELETE, &CMainFrame::OnUpdateProjectExist)
+	ON_UPDATE_COMMAND_UI(IDR_FILE_DELETE, CMainFrame::OnUpdateProjectExist)
 	ON_COMMAND(ID_OPEN, OnFileOpen)
 	ON_WM_PAINT()
 	ON_WM_SETFOCUS()
-	ON_COMMAND(ID_DIRECTORY_NEW, &CFileView::OnDirectoryNew)
-	ON_COMMAND(ID_CREATE_COPY, &CFileView::OnCreateCopy)
-	ON_COMMAND(ID_FILE_RENAME, &CFileView::OnFileRename)
-	ON_COMMAND(ID_TREE_COLLAPSE, &CFileView::OnTreeCollapse)
-	ON_COMMAND(ID_TREE_EXPAND, &CFileView::OnTreeExpand)
-	ON_COMMAND(ID_PROJECT_CLOSE, &CMainFrame::OnProjectClose)
-	ON_UPDATE_COMMAND_UI(ID_PROJECT_CLOSE, &CMainFrame::OnUpdateProjectExist)
-	ON_UPDATE_COMMAND_UI(ID_CREATE_COPY, &CMainFrame::OnUpdateProjectExist)
-	ON_UPDATE_COMMAND_UI(ID_FILE_RENAME, &CMainFrame::OnUpdateProjectExist)
-	ON_UPDATE_COMMAND_UI(ID_TREE_COLLAPSE, &CMainFrame::OnUpdateProjectExist)
-	ON_UPDATE_COMMAND_UI(ID_TREE_EXPAND, &CMainFrame::OnUpdateProjectExist)
-	ON_UPDATE_COMMAND_UI(ID_OPEN, &CMainFrame::OnUpdateProjectExist)
-	ON_UPDATE_COMMAND_UI(ID_EDIT_CLEAR, &CMainFrame::OnUpdateProjectExist)
-	ON_UPDATE_COMMAND_UI(ID_DIRECTORY_NEW, &CMainFrame::OnUpdateProjectExist)
+	ON_COMMAND(ID_DIRECTORY_NEW, CFileView::OnDirectoryNew)
+	ON_COMMAND(ID_CREATE_COPY, CFileView::OnCreateCopy)
+	ON_COMMAND(ID_FILE_RENAME, CFileView::OnFileRename)
+	ON_COMMAND(ID_TREE_COLLAPSE, CFileView::OnTreeCollapse)
+	ON_COMMAND(ID_TREE_EXPAND, CFileView::OnTreeExpand)
+	ON_COMMAND(ID_PROJECT_CLOSE, CMainFrame::OnProjectClose)
+	ON_UPDATE_COMMAND_UI(ID_PROJECT_CLOSE, CMainFrame::OnUpdateProjectExist)
+	ON_UPDATE_COMMAND_UI(ID_CREATE_COPY, CMainFrame::OnUpdateProjectExist)
+	ON_UPDATE_COMMAND_UI(ID_FILE_RENAME, CMainFrame::OnUpdateProjectExist)
+	ON_UPDATE_COMMAND_UI(ID_TREE_COLLAPSE, CMainFrame::OnUpdateProjectExist)
+	ON_UPDATE_COMMAND_UI(ID_TREE_EXPAND, CMainFrame::OnUpdateProjectExist)
+	ON_UPDATE_COMMAND_UI(ID_OPEN, CMainFrame::OnUpdateProjectExist)
+	ON_UPDATE_COMMAND_UI(ID_EDIT_CLEAR, CMainFrame::OnUpdateProjectExist)
+	ON_UPDATE_COMMAND_UI(ID_DIRECTORY_NEW, CMainFrame::OnUpdateProjectExist)
 	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
@@ -111,7 +111,7 @@ END_MESSAGE_MAP()
 
 int CFileView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
-	if (CDockablePane::OnCreate(lpCreateStruct) == -1)
+	if (CBCGPDockingControlBar::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
 	CRect rectDummy;
@@ -135,9 +135,11 @@ int CFileView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	OnChangeVisualStyle();
 
+#if _MSC_VER > 1200
 	m_wndToolBar.SetPaneStyle(m_wndToolBar.GetPaneStyle() | CBRS_TOOLTIPS | CBRS_FLYBY);
 
 	m_wndToolBar.SetPaneStyle(m_wndToolBar.GetPaneStyle() & ~(CBRS_GRIPPER | CBRS_SIZE_DYNAMIC | CBRS_BORDER_TOP | CBRS_BORDER_BOTTOM | CBRS_BORDER_LEFT | CBRS_BORDER_RIGHT));
+#endif //_MSC_VER
 
 	m_wndToolBar.SetOwner(this);
 
@@ -152,7 +154,7 @@ int CFileView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 void CFileView::OnSize(UINT nType, int cx, int cy)
 {
-	CDockablePane::OnSize(nType, cx, cy);
+	CBCGPDockingControlBar::OnSize(nType, cx, cy);
 	AdjustLayout();
 }
 
@@ -163,7 +165,7 @@ void CFileView::OnContextMenu(CWnd* pWnd, CPoint point)
 
 	if (pWnd != pWndTree)
 	{
-		CDockablePane::OnContextMenu(pWnd, point);
+		CBCGPDockingControlBar::OnContextMenu(pWnd, point);
 		return;
 	}
 
@@ -257,7 +259,7 @@ void CFileView::LoadUITree(CString& strPath)
 		return;
 
 	TiXmlDocument xmlDoc;
-	xmlDoc.LoadFile(StringConvertor::WideToAnsi(strPath));
+	xmlDoc.LoadFile(CDuiT2A(strPath));
 	
 	TiXmlElement* pRootElem = xmlDoc.RootElement();
 	HTREEITEM hRoot = m_wndFileView.InsertItem(CGlobalVariable::m_strProjectName, 0, 0, TVI_ROOT);
@@ -278,16 +280,16 @@ void CFileView::LoadUITree(TiXmlElement* pElement, HTREEITEM hParent)
 		if(pNode->Type() == TiXmlNode::ELEMENT)
 		{
 			DWORD dwInfo = 0;
-			CStringA strName = pNode->ToElement()->Attribute("Name");
+			CString strName = CDuiU2T(pNode->ToElement()->Attribute("Name"));
 			HTREEITEM hItem;
 			if(strcmp(pNode->Value(), "File") == 0)
 			{
-				hItem = m_wndFileView.InsertItem(StringConvertor::Utf8ToWide(strName), 2, 2, hParent);
+				hItem = m_wndFileView.InsertItem(strName, 2, 2, hParent);
 				dwInfo = INFO_FILE;
 			}
 			else if(strcmp(pNode->Value(), "Directory") == 0)
 			{
-				hItem = m_wndFileView.InsertItem(StringConvertor::Utf8ToWide(strName), 1, 1, hParent);
+				hItem = m_wndFileView.InsertItem(strName, 1, 1, hParent);
 				dwInfo = INFO_DIRECTORY;
 			}
 			m_wndFileView.SetItemData(hItem, dwInfo);
@@ -307,13 +309,12 @@ void CFileView::SaveProject()
 		return;
 
 	CString strPathName = CGlobalVariable::m_strProjectPath + CGlobalVariable::m_strProjectName + _T(".uiproj");
-	TiXmlDocument xmlDoc(StringConvertor::WideToAnsi(strPathName));
+	TiXmlDocument xmlDoc(CDuiT2A(strPathName).c_str());
 	TiXmlDeclaration Declaration("1.0","utf-8","yes");
 	xmlDoc.InsertEndChild(Declaration);
 
 	TiXmlElement xmlElem("DirectUIProject");
-	xmlElem.SetAttribute("Name", StringConvertor::WideToUtf8(CGlobalVariable::m_strProjectName));
-	xmlElem.SetAttribute("Version", StringConvertor::WideToUtf8(UIDESIGNER_VERSION));
+	xmlElem.SetAttribute("Name", CDuiT2U(CGlobalVariable::m_strProjectName));
 	TiXmlNode* pNode = xmlDoc.InsertEndChild(xmlElem);
 
 	SaveUITree(m_wndFileView.GetRootItem(), pNode->ToElement());
@@ -335,7 +336,7 @@ void CFileView::SaveUITree(HTREEITEM hItem, TiXmlElement* pParentNode)
 		if(dwInfo == INFO_FILE)
 		{
 			 pNode = new TiXmlElement("File");
-			 pNode->SetAttribute("Name", StringConvertor::WideToUtf8(strName));
+			 pNode->SetAttribute("Name", CDuiT2U(strName));
 			 pParentNode->InsertEndChild(*pNode);
 
 			 delete pNode;
@@ -344,7 +345,7 @@ void CFileView::SaveUITree(HTREEITEM hItem, TiXmlElement* pParentNode)
 		else if(dwInfo == INFO_DIRECTORY)
 		{
 			pNode = new TiXmlElement("Directory");
-			pNode->SetAttribute("Name", StringConvertor::WideToUtf8(strName));
+			pNode->SetAttribute("Name", CDuiT2U(strName));
 			TiXmlNode* pChildNode = pParentNode->InsertEndChild(*pNode);
 			SaveUITree(hChild, pChildNode->ToElement());
 
@@ -501,7 +502,7 @@ void CFileView::OnPaint()
 
 void CFileView::OnSetFocus(CWnd* pOldWnd)
 {
-	CDockablePane::OnSetFocus(pOldWnd);
+	CBCGPDockingControlBar::OnSetFocus(pOldWnd);
 
 	m_wndFileView.SetFocus();
 }
@@ -639,7 +640,7 @@ void CFileView::ExpandFileViewTree(HTREEITEM hItem, UINT nCode)
 }
 void CFileView::OnDestroy()
 {
-	CDockablePane::OnDestroy();
+	CBCGPDockingControlBar::OnDestroy();
 
 	// TODO: 在此处添加消息处理程序代码
 	SaveProject();

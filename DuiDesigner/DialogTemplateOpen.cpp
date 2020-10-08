@@ -29,9 +29,9 @@ void CDialogTemplateOpen::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(CDialogTemplateOpen, CDialog)
-	ON_LBN_SELCHANGE(IDC_LIST_TEMPLATES, &CDialogTemplateOpen::OnLbnSelchangeListTemplates)
-	ON_BN_CLICKED(IDC_BUTTON_TEMPLATE_DELETE, &CDialogTemplateOpen::OnBnClickedButtonTemplateDelete)
-	ON_BN_CLICKED(IDOK, &CDialogTemplateOpen::OnBnClickedOk)
+	ON_LBN_SELCHANGE(IDC_LIST_TEMPLATES, OnLbnSelchangeListTemplates)
+	ON_BN_CLICKED(IDC_BUTTON_TEMPLATE_DELETE, OnBnClickedButtonTemplateDelete)
+	ON_BN_CLICKED(IDOK, OnBnClickedOk)
 END_MESSAGE_MAP()
 
 

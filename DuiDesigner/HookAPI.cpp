@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "HookAPI.h"
 #include <Dbghelp.h>
+#include "UIUtil.h"
 
 bool CHookAPI::m_bCreateFileEnabled=false;
 TCHAR CHookAPI::m_sSkinDir[MAX_PATH]={0};
@@ -15,22 +16,22 @@ HOOKSTRUCT CHookAPI::m_GetImageExHookInfo={0};
 CHookAPI::CHookAPI(void)
 {
 #ifdef _DEBUG
-	CreateFileAPI=(pfnCreateFile)HookAPI(_T("KERNEL32.dll"),LPCSTR("CreateFileW"),(FARPROC)Hook_CreateFile,GetModuleHandle(_T("Duilib_ud.dll")));
+	CreateFileAPI=(pfnCreateFile)HookAPI(_T("KERNEL32.dll"),LPCSTR("CreateFileW"),(FARPROC)Hook_CreateFile,GetModuleHandle(_T("DuilibUD.dll")));
 	EnableCreateFile(true);
 
-	HookAPI(_T("Duilib_ud.dll"),LPCSTR("?Invalidate@CPaintManagerUI@DuiLib@@QAEXAAUtagRECT@@@Z"),(FARPROC)Hook_Invalidate,m_InvalidateHookInfo);
+	HookAPI(_T("DuilibUD.dll"),LPCSTR("?Invalidate@CPaintManagerUI@DuiLib@@QAEXAAUtagRECT@@@Z"),(FARPROC)Hook_Invalidate,m_InvalidateHookInfo);
 	EnableInvalidate(true);
 
-	HookAPI(_T("Duilib_ud.dll"),LPCSTR("?GetImageEx@CPaintManagerUI@DuiLib@@QAEPAUtagTImageInfo@2@PB_W0K@Z"),(FARPROC)Hook_GetImageEx,m_GetImageExHookInfo);
+	HookAPI(_T("DuilibUD.dll"),LPCSTR("?GetImageEx@CPaintManagerUI@DuiLib@@QAEPAUtagTImageInfo@2@PB_W0K@Z"),(FARPROC)Hook_GetImageEx,m_GetImageExHookInfo);
 	EnableGetImageEx(true);
 #else
-	CreateFileAPI=(pfnCreateFile)HookAPI(_T("KERNEL32.dll"),LPCSTR("CreateFileW"),(FARPROC)Hook_CreateFile,GetModuleHandle(_T("Duilib_u.dll")));
+	CreateFileAPI=(pfnCreateFile)HookAPI(_T("KERNEL32.dll"),LPCSTR("CreateFileW"),(FARPROC)Hook_CreateFile,GetModuleHandle(_T("DuilibU.dll")));
 	EnableCreateFile(true);
 
-	HookAPI(_T("Duilib_u.dll"),LPCSTR("?Invalidate@CPaintManagerUI@DuiLib@@QAEXAAUtagRECT@@@Z"),(FARPROC)Hook_Invalidate,m_InvalidateHookInfo);
+	HookAPI(_T("DuilibU.dll"),LPCSTR("?Invalidate@CPaintManagerUI@DuiLib@@QAEXAAUtagRECT@@@Z"),(FARPROC)Hook_Invalidate,m_InvalidateHookInfo);
 	EnableInvalidate(true);
 
-	HookAPI(_T("Duilib_u.dll"),LPCSTR("?GetImageEx@CPaintManagerUI@DuiLib@@QAEPAUtagTImageInfo@2@PB_W0K@Z"),(FARPROC)Hook_GetImageEx,m_GetImageExHookInfo);
+	HookAPI(_T("DuilibU.dll"),LPCSTR("?GetImageEx@CPaintManagerUI@DuiLib@@QAEPAUtagTImageInfo@2@PB_W0K@Z"),(FARPROC)Hook_GetImageEx,m_GetImageExHookInfo);
 	EnableGetImageEx(true);
 #endif
 }
@@ -55,8 +56,7 @@ FARPROC CHookAPI::HookAPI(LPCTSTR pstrDllName,LPCSTR pstrFuncName,FARPROC pfnNew
 	FARPROC pfnOriginFunc=GetProcAddress(hModule,pstrFuncName);
 
 	//查找记录,看看有没有我们想要的DLL
-	USES_CONVERSION;
-	char* pstrDest=W2A(pstrDllName);
+	const char* pstrDest = CDuiT2A(pstrDllName).c_str();
 	for(;pImportDesc->Name;pImportDesc++)
 	{
 		LPSTR pszDllName=(LPSTR)((PBYTE)hModCaller+pImportDesc->Name);
@@ -178,7 +178,7 @@ __declspec(naked) TImageInfo* WINAPI CHookAPI::Hook_GetImageEx(LPCTSTR pstrBitma
 		push ecx;//save this pointer
 	}
 	EnableHook(m_GetImageExHookInfo,FALSE);
-
+/*
 	if(m_bGetImageExEnabled)
 	{
 		if(_tcslen(pstrBitmap)>=2&&*(pstrBitmap+1)!=':')//relative path
@@ -213,7 +213,7 @@ __declspec(naked) TImageInfo* WINAPI CHookAPI::Hook_GetImageEx(LPCTSTR pstrBitma
 		call m_GetImageExHookInfo.pfnFuncAddr;
 		push eax;//save return value
 	}
-
+*/
 	EnableHook(m_GetImageExHookInfo,TRUE);
 	_asm
 	{

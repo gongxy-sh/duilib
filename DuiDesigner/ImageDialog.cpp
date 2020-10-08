@@ -7,7 +7,7 @@
 //////////////////////////////////////////////////////////////////////////
 //CMyColorButton
 
-IMPLEMENT_DYNAMIC(CMyColorButton, CMFCColorButton)
+IMPLEMENT_DYNAMIC(CMyColorButton, CBCGPColorButton)
 
 static const int nImageHorzMargin = 8;
 const CString CImageDialog::m_strNullImage=_T("");
@@ -24,7 +24,7 @@ void CMyColorButton::OnDraw(CDC* pDC, const CRect& rect, UINT uiState)
 	CPalette* pCurPalette = pDC->SelectPalette(m_pPalette, FALSE);
 	pDC->RealizePalette();
 
-	CSize sizeArrow = CMenuImages::Size();
+	CSize sizeArrow = CBCGPMenuImages::Size();
 
 	CRect rectColor = rect;
 	rectColor.right -= sizeArrow.cx + nImageHorzMargin;
@@ -48,7 +48,7 @@ void CMyColorButton::OnDraw(CDC* pDC, const CRect& rect, UINT uiState)
 
 	CFont* pOldFont=(CFont *)pDC->SelectStockObject(DEFAULT_GUI_FONT);
 	pDC->SetBkMode(TRANSPARENT);
-	pDC->SetTextColor(afxGlobalData.clrBtnText);
+	pDC->SetTextColor(globalData.clrBtnText);
 	pDC->DrawText(strColor, rectText, DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS);
 	pDC->SelectObject(pOldFont);
 
@@ -56,14 +56,14 @@ void CMyColorButton::OnDraw(CDC* pDC, const CRect& rect, UINT uiState)
 	// Draw color box:
 	//----------------
 	rectColor.DeflateRect(2, 2);
-	pDC->Draw3dRect(rectColor, afxGlobalData.clrBtnHilite, afxGlobalData.clrBtnHilite);
+	pDC->Draw3dRect(rectColor, globalData.clrBtnHilite, globalData.clrBtnHilite);
 	rectColor.DeflateRect(1, 1);
-	pDC->Draw3dRect(rectColor, afxGlobalData.clrBtnDkShadow, afxGlobalData.clrBtnDkShadow);
+	pDC->Draw3dRect(rectColor, globalData.clrBtnDkShadow, globalData.clrBtnDkShadow);
 	rectColor.DeflateRect(1, 1);
 
 	if (color != (COLORREF)-1 &&(uiState & ODS_DISABLED) == 0)
 	{
-		if (afxGlobalData.m_nBitsPerPixel == 8) // 256 colors
+		if (globalData.m_nBitsPerPixel == 8) // 256 colors
 		{
 			ASSERT_VALID(m_pPalette);
 			color =  PALETTEINDEX(m_pPalette->GetNearestPaletteIndex(color));
@@ -79,15 +79,15 @@ void CMyColorButton::OnDraw(CDC* pDC, const CRect& rect, UINT uiState)
 	CRect rectArrowWinXP = rectArrow;
 	rectArrowWinXP.DeflateRect(2, 2);
 
-	if (!m_bWinXPTheme || !CMFCVisualManager::GetInstance()->DrawComboDropButtonWinXP(pDC, rectArrowWinXP, (uiState & ODS_DISABLED), m_bPushed, m_bHighlighted))
+	if (!m_bWinXPTheme || !CBCGPVisualManager::GetInstance()->DrawComboDropButtonWinXP(pDC, rectArrowWinXP, (uiState & ODS_DISABLED), m_bPushed, m_bHighlighted))
 	{
-		pDC->FillRect(rectArrow, &afxGlobalData.brBtnFace);
+		pDC->FillRect(rectArrow, &globalData.brBtnFace);
 
-		CMenuImages::Draw(pDC, CMenuImages::IdArrowDownLarge, rectArrow, (uiState & ODS_DISABLED) ? CMenuImages::ImageGray : CMenuImages::ImageBlack);
+		CBCGPMenuImages::Draw(pDC, CBCGPMenuImages::IdArowDownLarge, rectArrow, (uiState & ODS_DISABLED) ? CBCGPMenuImages::ImageGray : CBCGPMenuImages::ImageBlack);
 
-		pDC->Draw3dRect(rectArrow, afxGlobalData.clrBtnLight, afxGlobalData.clrBtnDkShadow);
+		pDC->Draw3dRect(rectArrow, globalData.clrBtnLight, globalData.clrBtnDkShadow);
 		rectArrow.DeflateRect(1, 1);
-		pDC->Draw3dRect(rectArrow, afxGlobalData.clrBtnHilite, afxGlobalData.clrBtnShadow);
+		pDC->Draw3dRect(rectArrow, globalData.clrBtnHilite, globalData.clrBtnShadow);
 	}
 
 	if (pCurPalette != NULL)
@@ -138,18 +138,18 @@ void CImageDialog::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CImageDialog, CDialog)
 	ON_WM_HSCROLL()
-	ON_BN_CLICKED(IDC_BUTTON_IMAGE_IMPORT, &CImageDialog::OnBnClickedButtonImageImport)
-	ON_BN_CLICKED(IDC_BUTTON_IMAGE_CLEAR, &CImageDialog::OnBnClickedButtonImageClear)
-	ON_EN_KILLFOCUS(IDC_EDIT_IMAGE_FADE, &CImageDialog::OnEnKillfocusEditImageFade)
-	ON_LBN_DBLCLK(IDC_LIST_IMAGE_RESOURCE, &CImageDialog::OnLbnDblclkListImageResource)
+	ON_BN_CLICKED(IDC_BUTTON_IMAGE_IMPORT, CImageDialog::OnBnClickedButtonImageImport)
+	ON_BN_CLICKED(IDC_BUTTON_IMAGE_CLEAR, CImageDialog::OnBnClickedButtonImageClear)
+	ON_EN_KILLFOCUS(IDC_EDIT_IMAGE_FADE, CImageDialog::OnEnKillfocusEditImageFade)
+	ON_LBN_DBLCLK(IDC_LIST_IMAGE_RESOURCE, CImageDialog::OnLbnDblclkListImageResource)
 	ON_WM_DESTROY()
-	ON_EN_KILLFOCUS(IDC_EDIT_IMAGE_DEST, &CImageDialog::OnEnKillfocusEditImageDest)
-	ON_EN_KILLFOCUS(IDC_EDIT_IMAGE_SOURCE, &CImageDialog::OnEnKillfocusEditImageSource)
-	ON_EN_KILLFOCUS(IDC_EDIT_IMAGE_CORNER, &CImageDialog::OnEnKillfocusEditImageCorner)
-	ON_BN_CLICKED(IDC_BUTTON_IMAGE_MASK, &CImageDialog::OnBnClickedButtonImageMask)
-	ON_BN_CLICKED(IDC_RADIO_IMAGE_HOLE_FALSE, &CImageDialog::OnBnClickedRadioImageHoleFalse)
-	ON_BN_CLICKED(IDC_RADIO_IMAGE_HOLE_TRUE, &CImageDialog::OnBnClickedRadioImageHoleTrue)
-	ON_BN_CLICKED(IDOK, &CImageDialog::OnBnClickedOk)
+	ON_EN_KILLFOCUS(IDC_EDIT_IMAGE_DEST, CImageDialog::OnEnKillfocusEditImageDest)
+	ON_EN_KILLFOCUS(IDC_EDIT_IMAGE_SOURCE, CImageDialog::OnEnKillfocusEditImageSource)
+	ON_EN_KILLFOCUS(IDC_EDIT_IMAGE_CORNER, CImageDialog::OnEnKillfocusEditImageCorner)
+	ON_BN_CLICKED(IDC_BUTTON_IMAGE_MASK, CImageDialog::OnBnClickedButtonImageMask)
+	ON_BN_CLICKED(IDC_RADIO_IMAGE_HOLE_FALSE, CImageDialog::OnBnClickedRadioImageHoleFalse)
+	ON_BN_CLICKED(IDC_RADIO_IMAGE_HOLE_TRUE, CImageDialog::OnBnClickedRadioImageHoleTrue)
+	ON_BN_CLICKED(IDOK, CImageDialog::OnBnClickedOk)
 END_MESSAGE_MAP()
 
 

@@ -106,8 +106,8 @@ void CPropertyTabLayoutUI::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(CPropertyTabLayoutUI, CDialog)
-	ON_BN_CLICKED(IDC_BUTTON_TABLAYOUTUI_ADD, &CPropertyTabLayoutUI::OnBnClickedButtonTabLayoutUIAdd)
-	ON_BN_CLICKED(IDOK, &CPropertyTabLayoutUI::OnBnClickedOk)
+	ON_BN_CLICKED(IDC_BUTTON_TABLAYOUTUI_ADD, CPropertyTabLayoutUI::OnBnClickedButtonTabLayoutUIAdd)
+	ON_BN_CLICKED(IDOK, CPropertyTabLayoutUI::OnBnClickedOk)
 END_MESSAGE_MAP()
 
 

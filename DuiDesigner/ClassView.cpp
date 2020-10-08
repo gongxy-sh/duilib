@@ -16,7 +16,7 @@ CClassViewTree::~CClassViewTree()
 }
 
 BEGIN_MESSAGE_MAP(CClassViewTree, CTreeCtrl)
-	ON_NOTIFY_REFLECT(TVN_SELCHANGED, &CClassViewTree::OnTvnSelChanged)
+	ON_NOTIFY_REFLECT(TVN_SELCHANGED, OnTvnSelChanged)
 	ON_WM_KEYDOWN()
 END_MESSAGE_MAP()
 
@@ -62,7 +62,7 @@ CClassView::~CClassView()
 {
 }
 
-BEGIN_MESSAGE_MAP(CClassView, CDockablePane)
+BEGIN_MESSAGE_MAP(CClassView, CBCGPDockingControlBar)
 	ON_WM_CREATE()
 	ON_WM_SIZE()
 	ON_WM_CONTEXTMENU()
@@ -75,7 +75,7 @@ END_MESSAGE_MAP()
 
 int CClassView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
-	if (CDockablePane::OnCreate(lpCreateStruct) == -1)
+	if (CBCGPDockingControlBar::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
 	CRect rectDummy;
@@ -98,7 +98,7 @@ int CClassView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 void CClassView::OnSize(UINT nType, int cx, int cy)
 {
-	CDockablePane::OnSize(nType, cx, cy);
+	CBCGPDockingControlBar::OnSize(nType, cx, cy);
 	AdjustLayout();
 }
 
@@ -109,7 +109,7 @@ void CClassView::OnContextMenu(CWnd* pWnd, CPoint point)
 
 	if (pWnd != pWndTree)
 	{
-		CDockablePane::OnContextMenu(pWnd, point);
+		CBCGPDockingControlBar::OnContextMenu(pWnd, point);
 		return;
 	}
 
@@ -133,14 +133,14 @@ void CClassView::OnContextMenu(CWnd* pWnd, CPoint point)
 
 	CMenu* pSumMenu = menu.GetSubMenu(0);
 
-	if (AfxGetMainWnd()->IsKindOf(RUNTIME_CLASS(CMDIFrameWndEx)))
+	if (AfxGetMainWnd()->IsKindOf(RUNTIME_CLASS(CMainFrame)))
 	{
-		CMFCPopupMenu* pPopupMenu = new CMFCPopupMenu;
+		CBCGPPopupMenu* pPopupMenu = new CBCGPPopupMenu;
 
 		if (!pPopupMenu->Create(this, point.x, point.y, (HMENU)pSumMenu->m_hMenu, FALSE, TRUE))
 			return;
 
-		((CMDIFrameWndEx*)AfxGetMainWnd())->OnShowPopupMenu(pPopupMenu);
+		((CMainFrame*)AfxGetMainWnd())->OnShowPopupMenu(pPopupMenu);
 		UpdateDialogControls(this, FALSE);
 	}
 }
@@ -160,7 +160,7 @@ void CClassView::AdjustLayout()
 
 BOOL CClassView::PreTranslateMessage(MSG* pMsg)
 {
-	return CDockablePane::PreTranslateMessage(pMsg);
+	return CBCGPDockingControlBar::PreTranslateMessage(pMsg);
 }
 
 void CClassView::OnPaint()
@@ -177,7 +177,7 @@ void CClassView::OnPaint()
 
 void CClassView::OnSetFocus(CWnd* pOldWnd)
 {
-	CDockablePane::OnSetFocus(pOldWnd);
+	CBCGPDockingControlBar::OnSetFocus(pOldWnd);
 
 	m_wndClassView.SetFocus();
 }

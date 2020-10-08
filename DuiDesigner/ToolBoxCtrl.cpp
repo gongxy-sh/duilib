@@ -7,7 +7,7 @@
 
 #define AFX_ID_SCROLL_VERT 2
 
-#define visualManager CMFCVisualManager::GetInstance()
+#define visualManager CBCGPVisualManager::GetInstance()
 
 //////////////////////////////////////////////////////////////////////////
 //CToolElement
@@ -310,7 +310,7 @@ void CToolElement::OnDrawExpandBox(CDC* pDC, CRect rect)
 	rect = CRect(ptCenter, CSize(1, 1));
 	rect.InflateRect(nBoxSize / 2, nBoxSize / 2);
 
-	COLORREF clrText = afxGlobalData.clrBarText;
+	COLORREF clrText = globalData.clrBarText;
 
 	visualManager->OnDrawExpandingBox(pDC, rect, m_bExpanded && !m_lstSubTools.IsEmpty(), clrText);
 }
@@ -336,7 +336,7 @@ void CToolElement::OnDrawName(CDC* pDC, CRect rect)
 	ASSERT_VALID(pDC);
 	ASSERT_VALID(m_pWndList);
 
-	rect.DeflateRect(AFX_TEXT_MARGIN, 0);
+	rect.DeflateRect(TEXT_MARGIN, 0);
 
 	pDC->DrawText(m_strName, rect, DT_LEFT | DT_SINGLELINE | DT_VCENTER | DT_NOPREFIX | DT_END_ELLIPSIS);
 
@@ -420,7 +420,7 @@ END_MESSAGE_MAP()
 // CToolBoxCtrl message handlers
 BOOL CToolBoxCtrl::Create(DWORD dwStyle, const RECT& rect, CWnd* pParentWnd, UINT nID)
 {
-	return CWnd::Create(afxGlobalData.RegisterWindowClass(_T("Afx:ToolBox")), _T(""), dwStyle, rect, pParentWnd, nID, NULL);
+	return CWnd::Create(globalData.RegisterWindowClass(_T("Afx:ToolBox")), _T(""), dwStyle, rect, pParentWnd, nID, NULL);
 }
 
 int CToolBoxCtrl::AddToolTab(CToolElement* pToolTab, BOOL bRedraw, BOOL bAdjustLayout)
@@ -582,7 +582,7 @@ void CToolBoxCtrl::OnPaint()
 	CPaintDC dc(this); // device context for painting
 	// TODO: 在此处添加消息处理程序代码
 	// 不为绘图消息调用 CWnd::OnPaint()
-	CMemDC memDC(dc, this);
+	CBCGPMemDC memDC(dc, this);
 	CDC* pDC = &memDC.GetDC();
 
 	CRect rectClient;
@@ -601,7 +601,7 @@ void CToolBoxCtrl::OnFillBackground(CDC* pDC, CRect rectClient)
 
 	if (m_brBackground.GetSafeHandle() == NULL)
 	{
-		pDC->FillRect(rectClient, &afxGlobalData.brBtnFace);
+		pDC->FillRect(rectClient, &globalData.brBtnFace);
 	}
 	else
 	{
@@ -693,7 +693,7 @@ BOOL CToolBoxCtrl::OnDrawTool(CDC* pDC, CToolElement* pTool) const
 		COLORREF clrTextOld = (COLORREF)-1;
 		if (!pTool->IsEnabled())
 		{
-			clrTextOld = pDC->SetTextColor(afxGlobalData.clrGrayedText);
+			clrTextOld = pDC->SetTextColor(globalData.clrGrayedText);
 		}
 
 		CRect rectIcon = pTool->m_Rect;
@@ -1073,8 +1073,9 @@ void CToolBoxCtrl::OnMouseLeave()
 		m_pHover=NULL;
 		pHover->Redraw();
 	}
-
+#if _MSC_VER > 1200
 	CWnd::OnMouseLeave();
+#endif //_MSC_VER
 }
 
 void CToolBoxCtrl::OnDestroy()

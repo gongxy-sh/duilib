@@ -19,8 +19,8 @@
 IMPLEMENT_DYNCREATE(CUIDesignerDoc, CDocument)
 
 BEGIN_MESSAGE_MAP(CUIDesignerDoc, CDocument)
-	ON_COMMAND(ID_MDITABS_COPY_FULLPATH, &CUIDesignerDoc::OnMdiCopyFullPath)
-	ON_COMMAND(ID_MDITABS_OPEN_FULLPATH, &CUIDesignerDoc::OnMdiOpenFullPath)
+	ON_COMMAND(ID_MDITABS_COPY_FULLPATH, CUIDesignerDoc::OnMdiCopyFullPath)
+	ON_COMMAND(ID_MDITABS_OPEN_FULLPATH, CUIDesignerDoc::OnMdiOpenFullPath)
 END_MESSAGE_MAP()
 
 
@@ -149,11 +149,11 @@ void CUIDesignerDoc::OnMdiCopyFullPath()
 	if(OpenClipboard(NULL))
 	{
 		EmptyClipboard();
-		CStringA strFullPath = StringConvertor::WideToAnsi(m_strPathName);
-		hClip = GlobalAlloc(GMEM_MOVEABLE, strFullPath.GetLength() + 1);
+		CDuiT2A strFullPath(m_strPathName);
+		hClip = GlobalAlloc(GMEM_MOVEABLE, strFullPath.length() + 1);
 		char* pbufCopy;
 		pbufCopy = (char*)GlobalLock(hClip);
-		strcpy(pbufCopy, strFullPath);
+		strcpy(pbufCopy, strFullPath.c_str());
 		GlobalUnlock(hClip);
 		SetClipboardData(CF_TEXT, hClip);
 		CloseClipboard();

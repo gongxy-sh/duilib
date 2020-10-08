@@ -30,7 +30,7 @@ protected:
 
 private:
 	CStatic m_wndUIPropLocation;
-	CMFCMenuButton m_btnAdd;
+	CBCGPMenuButton m_btnAdd;
 	CMenu m_menuUI;
 	CListBox m_lstDefaultAttrib;
 public:

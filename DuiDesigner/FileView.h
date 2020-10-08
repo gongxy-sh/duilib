@@ -29,17 +29,17 @@ public:
 #define INFO_FILE      2
 #define INFO_PROJECT   3
 
-class CFileViewToolBar : public CMFCToolBar
+class CFileViewToolBar : public CBCGPToolBar
 {
 	virtual void OnUpdateCmdUI(CFrameWnd* /*pTarget*/, BOOL bDisableIfNoHndler)
 	{
-		CMFCToolBar::OnUpdateCmdUI((CFrameWnd*) GetOwner(), bDisableIfNoHndler);
+		CBCGPToolBar::OnUpdateCmdUI((CFrameWnd*) GetOwner(), bDisableIfNoHndler);
 	}
 
 	virtual BOOL AllowShowOnList() const { return FALSE; }
 };
 
-class CFileView : public CDockablePane
+class CFileView : public CBCGPDockingControlBar
 {
 	friend class CFileViewTree;
 

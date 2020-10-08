@@ -111,19 +111,19 @@ void CUITracker::Construct()
 
 		// Note: all track cursors must live in same module
 		HINSTANCE hInst = AfxFindResourceHandle(
-			ATL_MAKEINTRESOURCE(AFX_IDC_TRACK4WAY), ATL_RT_GROUP_CURSOR);
+			MAKEINTRESOURCE(AFX_IDC_TRACK4WAY), RT_CURSOR);
 
 		// initialize the cursor array
-		m_hCursors[0] = ::LoadCursor(hInst, ATL_MAKEINTRESOURCE(AFX_IDC_TRACKNWSE));
-		m_hCursors[1] = ::LoadCursor(hInst, ATL_MAKEINTRESOURCE(AFX_IDC_TRACKNESW));
+		m_hCursors[0] = ::LoadCursor(hInst, MAKEINTRESOURCE(AFX_IDC_TRACKNWSE));
+		m_hCursors[1] = ::LoadCursor(hInst, MAKEINTRESOURCE(AFX_IDC_TRACKNESW));
 		m_hCursors[2] = m_hCursors[0];
 		m_hCursors[3] = m_hCursors[1];
-		m_hCursors[4] = ::LoadCursor(hInst, ATL_MAKEINTRESOURCE(AFX_IDC_TRACKNS));
-		m_hCursors[5] = ::LoadCursor(hInst, ATL_MAKEINTRESOURCE(AFX_IDC_TRACKWE));
+		m_hCursors[4] = ::LoadCursor(hInst, MAKEINTRESOURCE(AFX_IDC_TRACKNS));
+		m_hCursors[5] = ::LoadCursor(hInst, MAKEINTRESOURCE(AFX_IDC_TRACKWE));
 		m_hCursors[6] = m_hCursors[4];
 		m_hCursors[7] = m_hCursors[5];
-		m_hCursors[8] = ::LoadCursor(hInst, ATL_MAKEINTRESOURCE(AFX_IDC_TRACK4WAY));
-		m_hCursors[9] = ::LoadCursor(hInst, ATL_MAKEINTRESOURCE(AFX_IDC_MOVE4WAY));
+		m_hCursors[8] = ::LoadCursor(hInst, MAKEINTRESOURCE(AFX_IDC_TRACK4WAY));
+		m_hCursors[9] = ::LoadCursor(hInst, MAKEINTRESOURCE(AFX_IDC_MOVE4WAY));
 
 		// get default handle size from Windows profile setting
 		static const TCHAR szWindows[] = _T("windows");
@@ -358,8 +358,8 @@ void CUITracker::DrawTrackerRect(LPCRECT lpRect, CDC* pDC)
 		}
 		else
 		{
-			size.cx = AFX_CX_BORDER;
-			size.cy = AFX_CY_BORDER;
+			size.cx = CX_BORDER;
+			size.cy = CY_BORDER;
 		}
 
 		if(m_nStyle & (dottedLine|solidLine))
@@ -811,8 +811,8 @@ CMultiUITracker::CMultiUITracker(void):m_pFocused(NULL)
 	m_szForm.cy=0;
 
 	HINSTANCE hInst = AfxFindResourceHandle(
-		ATL_MAKEINTRESOURCE(AFX_IDC_TRACK4WAY), ATL_RT_GROUP_CURSOR);
-	m_hNoDropCursor=::LoadCursor(hInst, ATL_MAKEINTRESOURCE(AFX_IDC_NODROPCRSR));
+		MAKEINTRESOURCE(AFX_IDC_TRACK4WAY), RT_CURSOR);
+	m_hNoDropCursor=::LoadCursor(hInst, MAKEINTRESOURCE(AFX_IDC_NODROPCRSR));
 }
 
 CMultiUITracker::~CMultiUITracker(void)
@@ -1010,7 +1010,8 @@ BOOL CMultiUITracker::MultiTrackHandle(CWnd* pWnd,CDC* pDCClipTo)
 				::SetCursor(hOldCursor);
 			}
 			point=msg.lParam;
-
+ 
+            {
 			for (int i=0;i<m_arrCloneRect.GetSize();i++)
 			{
 				//must have the same father and be float
@@ -1044,6 +1045,7 @@ BOOL CMultiUITracker::MultiTrackHandle(CWnd* pWnd,CDC* pDCClipTo)
 				}
 				m_arrCloneRect.SetAt(i,m_rect);
 			}
+            }
 			oldPoint = msg.lParam;
 			if (m_bFinalErase)
 				goto ExitLoop;
@@ -1145,6 +1147,7 @@ void CMultiUITracker::UpdateUIRect()
 	Msg.lParam=(LPARAM)&arrSelected;
 	m_pFocused->m_pOwner->Notify(Msg);
 
+    {
 	for(int i=0;i<m_arrTracker.GetSize();i++)
 	{
 		CTrackerElement* pArrTracker=m_arrTracker.GetAt(i);
@@ -1153,6 +1156,7 @@ void CMultiUITracker::UpdateUIRect()
 
 		pArrTracker->SetPos(m_arrCloneRect.GetAt(i),TRUE);
 	}
+    }
 
 	Msg.nType=DUI_MSGTYPE_POSENDCHANGED;
 	Msg.wParam=0;
@@ -1295,6 +1299,7 @@ void CMultiUITracker::ExcludeChildren(CArray<CControlUI*,CControlUI*>& arrSelect
 		pDepth[i] = pExtended->nDepth;
 	}
 
+    {
 	for(int i=0; i<arrSelected.GetSize()-1; i++)
 	{
 		CControlUI* pControl1 = arrSelected[i];
@@ -1322,6 +1327,7 @@ void CMultiUITracker::ExcludeChildren(CArray<CControlUI*,CControlUI*>& arrSelect
 			}
 		}
 	}
+    }
 
 	delete[] pDepth;
 }

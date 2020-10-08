@@ -22,8 +22,7 @@ public:
 
 //////////////////////////////////////////////////////////////////////////
 //CClassView
-
-class CClassView : public CDockablePane
+class CClassView : public CBCGPDockingControlBar
 {
 public:
 	CClassView();

@@ -32,8 +32,8 @@ void CDialogSkinFileNew::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(CDialogSkinFileNew, CDialog)
-	ON_LBN_SELCHANGE(IDC_LIST_STYLE, &CDialogSkinFileNew::OnLbnSelchangeListStyle)
-	ON_BN_CLICKED(IDOK, &CDialogSkinFileNew::OnBnClickedOk)
+	ON_LBN_SELCHANGE(IDC_LIST_STYLE, OnLbnSelchangeListStyle)
+	ON_BN_CLICKED(IDOK, OnBnClickedOk)
 END_MESSAGE_MAP()
 
 

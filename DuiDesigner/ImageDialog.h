@@ -6,7 +6,7 @@
 //////////////////////////////////////////////////////////////////////////
 //CMyColorButton
 
-class CMyColorButton : public CMFCColorButton
+class CMyColorButton : public CBCGPColorButton
 {
 	DECLARE_DYNAMIC(CMyColorButton)
 

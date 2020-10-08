@@ -26,7 +26,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 protected:
-	void SetUIValue(CMFCPropertyGridProperty* pProp,int nTag);
+	void SetUIValue(CBCGPProp* pProp,int nTag);
 
 protected:
 	virtual BOOL OnInitDialog();

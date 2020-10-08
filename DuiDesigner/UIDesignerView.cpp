@@ -12,7 +12,9 @@
 #include "tinyxml.h"
 #include "UIUtil.h"
 #include <io.h>
+#if _MSC_VER > 1200
 #include <atlimage.h>
+#endif //_MSC_VER
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -27,50 +29,50 @@ IMPLEMENT_DYNCREATE(CUIDesignerView, CScrollView)
 
 BEGIN_MESSAGE_MAP(CUIDesignerView, CScrollView)
 	// 标准打印命令
-	ON_COMMAND(ID_FILE_PRINT, &CScrollView::OnFilePrint)
-	ON_COMMAND(ID_FILE_PRINT_DIRECT, &CScrollView::OnFilePrint)
-	ON_COMMAND(ID_FILE_PRINT_PREVIEW, &CUIDesignerView::OnFilePrintPreview)
-	ON_COMMAND(ID_FORMEDIT_TEST, &CUIDesignerView::OnFormEditTest)
-	ON_UPDATE_COMMAND_UI(ID_FORMEDIT_TEST, &CUIDesignerView::OnUpdateFormEditTest)
-	ON_COMMAND(ID_FORMEDIT_ALIGN_LEFT, &CUIDesignerView::OnAlignLeft)
-	ON_UPDATE_COMMAND_UI(ID_FORMEDIT_ALIGN_LEFT, &CUIDesignerView::OnUpdateAlignLeft)
-	ON_COMMAND(ID_FORMEDIT_ALIGN_RIGHT, &CUIDesignerView::OnAlignRight)
-	ON_UPDATE_COMMAND_UI(ID_FORMEDIT_ALIGN_RIGHT, &CUIDesignerView::OnUpdateAlignRight)
-	ON_COMMAND(ID_FORMEDIT_ALIGN_TOP, &CUIDesignerView::OnAlignTop)
-	ON_UPDATE_COMMAND_UI(ID_FORMEDIT_ALIGN_TOP, &CUIDesignerView::OnUpdateAlignTop)
-	ON_COMMAND(ID_FORMEDIT_ALIGN_BOTTOM, &CUIDesignerView::OnAlignBottom)
-	ON_UPDATE_COMMAND_UI(ID_FORMEDIT_ALIGN_BOTTOM, &CUIDesignerView::OnUpdateAlignBottom)
-	ON_COMMAND(ID_FORMEDIT_ALIGN_CENTER_VERTICALLY, &CUIDesignerView::OnAlignCenterVertically)
-	ON_UPDATE_COMMAND_UI(ID_FORMEDIT_ALIGN_CENTER_VERTICALLY, &CUIDesignerView::OnUpdateAlignCenterVertically)
-	ON_COMMAND(ID_FORMEDIT_ALIGN_CENTER_HORIZONTALLY, &CUIDesignerView::OnAlignCenterHorizontally)
-	ON_UPDATE_COMMAND_UI(ID_FORMEDIT_ALIGN_CENTER_HORIZONTALLY, &CUIDesignerView::OnUpdateAlignCenterHorizontally)
-	ON_COMMAND(ID_FORMEDIT_ALIGN_HORIZONTAL, &CUIDesignerView::OnAlignHorizontal)
-	ON_UPDATE_COMMAND_UI(ID_FORMEDIT_ALIGN_HORIZONTAL, &CUIDesignerView::OnUpdateAlignHorizontal)
-	ON_COMMAND(ID_FORMEDIT_ALIGN_VERTICAL, &CUIDesignerView::OnAlignVertical)
-	ON_UPDATE_COMMAND_UI(ID_FORMEDIT_ALIGN_VERTICAL, &CUIDesignerView::OnUpdateAlignVertical)
-	ON_COMMAND(ID_FORMEDIT_ALIGN_SAME_WIDTH, &CUIDesignerView::OnAlignSameWidth)
-	ON_UPDATE_COMMAND_UI(ID_FORMEDIT_ALIGN_SAME_WIDTH, &CUIDesignerView::OnUpdateAlignSameWidth)
-	ON_COMMAND(ID_FORMEDIT_ALIGN_SAME_HEIGHT, &CUIDesignerView::OnAlignSameHeight)
-	ON_UPDATE_COMMAND_UI(ID_FORMEDIT_ALIGN_SAME_HEIGHT, &CUIDesignerView::OnUpdateAlignSameHeight)
-	ON_COMMAND(ID_FORMEDIT_ALIGN_SAME_SIZE, &CUIDesignerView::OnAlignSameSize)
-	ON_UPDATE_COMMAND_UI(ID_FORMEDIT_ALIGN_SAME_SIZE, &CUIDesignerView::OnUpdateAlignSameSize)
-	ON_COMMAND(ID_FORMEDIT_SHOW_GRID, &CUIDesignerView::OnShowGrid)
-	ON_UPDATE_COMMAND_UI(ID_FORMEDIT_SHOW_GRID, &CUIDesignerView::OnUpdateShowGrid)
-	ON_COMMAND(ID_FORMEDIT_SHOW_AUXBORDER, &CUIDesignerView::OnShowAuxBorder)
-	ON_UPDATE_COMMAND_UI(ID_FORMEDIT_SHOW_AUXBORDER, &CUIDesignerView::OnUpdateShowAuxBorder)
-	ON_COMMAND(ID_EDIT_CUT, &CUIDesignerView::OnEditCut)
-	ON_UPDATE_COMMAND_UI(ID_EDIT_CUT, &CUIDesignerView::OnUpdateNeedSel)
-	ON_COMMAND(ID_EDIT_COPY, &CUIDesignerView::OnEditCopy)
-	ON_UPDATE_COMMAND_UI(ID_EDIT_COPY, &CUIDesignerView::OnUpdateNeedSel)
-	ON_COMMAND(ID_EDIT_PASTE, &CUIDesignerView::OnEditPaste)
-	ON_UPDATE_COMMAND_UI(ID_EDIT_PASTE, &CUIDesignerView::OnUpdateNeedClip)
-	ON_COMMAND(ID_EDIT_DELETE, &CUIDesignerView::OnDeleteUI)
-	ON_UPDATE_COMMAND_UI(ID_EDIT_DELETE, &CUIDesignerView::OnUpdateNeedSel)
-	ON_COMMAND(ID_EDIT_UNDO, &CUIDesignerView::OnEditUndo)
-	ON_UPDATE_COMMAND_UI(ID_EDIT_UNDO, &CUIDesignerView::OnUpdateEditUndo)
-	ON_COMMAND(ID_EDIT_REDO, &CUIDesignerView::OnEditRedo)
-	ON_UPDATE_COMMAND_UI(ID_EDIT_REDO, &CUIDesignerView::OnUpdateEditRedo)
-	ON_COMMAND(ID_TEMPLATE_SAVE_AS, &CUIDesignerView::OnTemplateSaveAs)
+	ON_COMMAND(ID_FILE_PRINT, CScrollView::OnFilePrint)
+	ON_COMMAND(ID_FILE_PRINT_DIRECT, CScrollView::OnFilePrint)
+	ON_COMMAND(ID_FILE_PRINT_PREVIEW, CUIDesignerView::OnFilePrintPreview)
+	ON_COMMAND(ID_FORMEDIT_TEST, CUIDesignerView::OnFormEditTest)
+	ON_UPDATE_COMMAND_UI(ID_FORMEDIT_TEST, CUIDesignerView::OnUpdateFormEditTest)
+	ON_COMMAND(ID_FORMEDIT_ALIGN_LEFT, CUIDesignerView::OnAlignLeft)
+	ON_UPDATE_COMMAND_UI(ID_FORMEDIT_ALIGN_LEFT, CUIDesignerView::OnUpdateAlignLeft)
+	ON_COMMAND(ID_FORMEDIT_ALIGN_RIGHT, CUIDesignerView::OnAlignRight)
+	ON_UPDATE_COMMAND_UI(ID_FORMEDIT_ALIGN_RIGHT, CUIDesignerView::OnUpdateAlignRight)
+	ON_COMMAND(ID_FORMEDIT_ALIGN_TOP, CUIDesignerView::OnAlignTop)
+	ON_UPDATE_COMMAND_UI(ID_FORMEDIT_ALIGN_TOP, CUIDesignerView::OnUpdateAlignTop)
+	ON_COMMAND(ID_FORMEDIT_ALIGN_BOTTOM, CUIDesignerView::OnAlignBottom)
+	ON_UPDATE_COMMAND_UI(ID_FORMEDIT_ALIGN_BOTTOM, CUIDesignerView::OnUpdateAlignBottom)
+	ON_COMMAND(ID_FORMEDIT_ALIGN_CENTER_VERTICALLY, CUIDesignerView::OnAlignCenterVertically)
+	ON_UPDATE_COMMAND_UI(ID_FORMEDIT_ALIGN_CENTER_VERTICALLY, CUIDesignerView::OnUpdateAlignCenterVertically)
+	ON_COMMAND(ID_FORMEDIT_ALIGN_CENTER_HORIZONTALLY, CUIDesignerView::OnAlignCenterHorizontally)
+	ON_UPDATE_COMMAND_UI(ID_FORMEDIT_ALIGN_CENTER_HORIZONTALLY, CUIDesignerView::OnUpdateAlignCenterHorizontally)
+	ON_COMMAND(ID_FORMEDIT_ALIGN_HORIZONTAL, CUIDesignerView::OnAlignHorizontal)
+	ON_UPDATE_COMMAND_UI(ID_FORMEDIT_ALIGN_HORIZONTAL, CUIDesignerView::OnUpdateAlignHorizontal)
+	ON_COMMAND(ID_FORMEDIT_ALIGN_VERTICAL, CUIDesignerView::OnAlignVertical)
+	ON_UPDATE_COMMAND_UI(ID_FORMEDIT_ALIGN_VERTICAL, CUIDesignerView::OnUpdateAlignVertical)
+	ON_COMMAND(ID_FORMEDIT_ALIGN_SAME_WIDTH, CUIDesignerView::OnAlignSameWidth)
+	ON_UPDATE_COMMAND_UI(ID_FORMEDIT_ALIGN_SAME_WIDTH, CUIDesignerView::OnUpdateAlignSameWidth)
+	ON_COMMAND(ID_FORMEDIT_ALIGN_SAME_HEIGHT, CUIDesignerView::OnAlignSameHeight)
+	ON_UPDATE_COMMAND_UI(ID_FORMEDIT_ALIGN_SAME_HEIGHT, CUIDesignerView::OnUpdateAlignSameHeight)
+	ON_COMMAND(ID_FORMEDIT_ALIGN_SAME_SIZE, CUIDesignerView::OnAlignSameSize)
+	ON_UPDATE_COMMAND_UI(ID_FORMEDIT_ALIGN_SAME_SIZE, CUIDesignerView::OnUpdateAlignSameSize)
+	ON_COMMAND(ID_FORMEDIT_SHOW_GRID, CUIDesignerView::OnShowGrid)
+	ON_UPDATE_COMMAND_UI(ID_FORMEDIT_SHOW_GRID, CUIDesignerView::OnUpdateShowGrid)
+	ON_COMMAND(ID_FORMEDIT_SHOW_AUXBORDER, CUIDesignerView::OnShowAuxBorder)
+	ON_UPDATE_COMMAND_UI(ID_FORMEDIT_SHOW_AUXBORDER, CUIDesignerView::OnUpdateShowAuxBorder)
+	ON_COMMAND(ID_EDIT_CUT, CUIDesignerView::OnEditCut)
+	ON_UPDATE_COMMAND_UI(ID_EDIT_CUT, CUIDesignerView::OnUpdateNeedSel)
+	ON_COMMAND(ID_EDIT_COPY, CUIDesignerView::OnEditCopy)
+	ON_UPDATE_COMMAND_UI(ID_EDIT_COPY, CUIDesignerView::OnUpdateNeedSel)
+	ON_COMMAND(ID_EDIT_PASTE, CUIDesignerView::OnEditPaste)
+	ON_UPDATE_COMMAND_UI(ID_EDIT_PASTE, CUIDesignerView::OnUpdateNeedClip)
+	ON_COMMAND(ID_EDIT_DELETE, CUIDesignerView::OnDeleteUI)
+	ON_UPDATE_COMMAND_UI(ID_EDIT_DELETE, CUIDesignerView::OnUpdateNeedSel)
+	ON_COMMAND(ID_EDIT_UNDO, CUIDesignerView::OnEditUndo)
+	ON_UPDATE_COMMAND_UI(ID_EDIT_UNDO, CUIDesignerView::OnUpdateEditUndo)
+	ON_COMMAND(ID_EDIT_REDO, CUIDesignerView::OnEditRedo)
+	ON_UPDATE_COMMAND_UI(ID_EDIT_REDO, CUIDesignerView::OnUpdateEditRedo)
+	ON_COMMAND(ID_TEMPLATE_SAVE_AS, CUIDesignerView::OnTemplateSaveAs)
 	ON_WM_LBUTTONDOWN()
 	ON_WM_SETCURSOR()
 	ON_WM_SIZE()
@@ -115,7 +117,7 @@ void CUIDesignerView::OnDraw(CDC* pDrawDC)
 		return;
 
 	// TODO: 在此处为本机数据添加绘制代码
-	CMemDC memDC(*pDrawDC, this);
+	CBCGPMemDC memDC(*pDrawDC, this);
 	CDC* pDC = &memDC.GetDC();
 
 	CRect rectClient;
@@ -163,7 +165,7 @@ void CUIDesignerView::OnDraw(CDC* pDrawDC)
 // CUIDesignerView 打印
 void CUIDesignerView::OnFilePrintPreview()
 {
-	AFXPrintPreview(this);
+	BCGPPrintPreview(this);
 }
 
 BOOL CUIDesignerView::OnPreparePrinting(CPrintInfo* pInfo)
@@ -219,7 +221,7 @@ CUIDesignerDoc* CUIDesignerView::GetDocument() const // 非调试版本是内联的
 
 void CUIDesignerView::OnInitialUpdate()
 {
-	__super::OnInitialUpdate();
+	CScrollView::OnInitialUpdate();
 
 	m_brHatch.CreateHatchBrush(HS_DIAGCROSS, RGB(191, 191, 191));
 
@@ -318,7 +320,7 @@ void CUIDesignerView::OnLButtonDown(UINT nFlags, CPoint point)
 	
 	this->Invalidate(FALSE);
 
-// 	__super::OnLButtonDown(nFlags, point);
+// 	CScrollView::OnLButtonDown(nFlags, point);
 }
 
 BOOL CUIDesignerView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
@@ -333,12 +335,12 @@ BOOL CUIDesignerView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 	if (pWnd==this&&m_MultiTracker.SetCursor(point,nHitTest))
 		return TRUE;
 
-	return __super::OnSetCursor(pWnd, nHitTest, message);
+	return CScrollView::OnSetCursor(pWnd, nHitTest, message);
 }
 
 void CUIDesignerView::OnSize(UINT nType, int cx, int cy)
 {
-	__super::OnSize(nType, cx, cy);
+	CScrollView::OnSize(nType, cx, cy);
 
 	// TODO: 在此处添加消息处理程序代码
 	if(m_bInit==false)
@@ -356,7 +358,7 @@ void CUIDesignerView::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
 	UpDateDPtoLPOffset();
 	this->Invalidate(FALSE);
-	__super::OnHScroll(nSBCode, nPos, pScrollBar);
+	CScrollView::OnHScroll(nSBCode, nPos, pScrollBar);
 }
 
 void CUIDesignerView::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
@@ -364,7 +366,7 @@ void CUIDesignerView::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
 	UpDateDPtoLPOffset();
 	this->Invalidate(FALSE);
-	__super::OnVScroll(nSBCode, nPos, pScrollBar);
+	CScrollView::OnVScroll(nSBCode, nPos, pScrollBar);
 }
 
 CTrackerElement* CUIDesignerView::CreateTracker(CControlUI* pControl)
@@ -475,7 +477,7 @@ void CUIDesignerView::OnMouseMove(UINT nFlags, CPoint point)
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
 	UpDateDPtoLPOffset();
 
-	__super::OnMouseMove(nFlags, point);
+	CScrollView::OnMouseMove(nFlags, point);
 }
 
 void CUIDesignerView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
@@ -503,7 +505,7 @@ void CUIDesignerView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 		break;
 	}
 
-	__super::OnKeyDown(nChar, nRepCnt, nFlags);
+	CScrollView::OnKeyDown(nChar, nRepCnt, nFlags);
 }
 
 void CUIDesignerView::OnDeleteUI()
@@ -511,7 +513,7 @@ void CUIDesignerView::OnDeleteUI()
 	CArray<CControlUI*,CControlUI*> arrSelected;
 	m_MultiTracker.GetSelected(arrSelected);
 	RemoveForm(arrSelected);
-	if(arrSelected.IsEmpty())
+	if(0 == arrSelected.GetSize())
 		return;
 
 	m_UICommandHistory.Begin(arrSelected, actionDelete);
@@ -671,7 +673,7 @@ void CUIDesignerView::OnAlignCenterVertically()
 	CArray<CControlUI*,CControlUI*> arrSelected;
 	m_MultiTracker.GetSelected(arrSelected);
 	RemoveForm(arrSelected);
-	if(arrSelected.IsEmpty())
+	if(0 == arrSelected.GetSize())
 		return;
 
 	m_UICommandHistory.Begin(arrSelected, actionModify);
@@ -685,7 +687,7 @@ void CUIDesignerView::OnAlignCenterHorizontally()
 	CArray<CControlUI*,CControlUI*> arrSelected;
 	m_MultiTracker.GetSelected(arrSelected);
 	RemoveForm(arrSelected);
-	if(arrSelected.IsEmpty())
+	if(0 == arrSelected.GetSize())
 		return;
 
 	m_UICommandHistory.Begin(arrSelected, actionModify);
@@ -699,7 +701,7 @@ void CUIDesignerView::OnAlignHorizontal()
 	CArray<CControlUI*,CControlUI*> arrSelected;
 	m_MultiTracker.GetSelected(arrSelected);
 	RemoveForm(arrSelected);
-	if(arrSelected.IsEmpty())
+	if(0 == arrSelected.GetSize())
 		return;
 
 	m_UICommandHistory.Begin(arrSelected, actionModify);
@@ -714,7 +716,7 @@ void CUIDesignerView::OnAlignVertical()
 	CArray<CControlUI*,CControlUI*> arrSelected;
 	m_MultiTracker.GetSelected(arrSelected);
 	RemoveForm(arrSelected);
-	if(arrSelected.IsEmpty())
+	if(0 == arrSelected.GetSize())
 		return;
 
 	m_UICommandHistory.Begin(arrSelected, actionModify);
@@ -848,7 +850,7 @@ void CUIDesignerView::OnUpdateShowAuxBorder(CCmdUI* pCmdUI)
 
 void CUIDesignerView::OnDestroy()
 {
-	__super::OnDestroy();
+	CScrollView::OnDestroy();
 
 	// TODO: 在此处添加消息处理程序代码
 	g_pClassView->RemoveUITreeItem(m_LayoutManager.GetForm());
@@ -932,7 +934,7 @@ void CUIDesignerView::OnEditPaste()
 		char* pstrXML  = new char[len];
 		pFile->Read(pstrXML, len);
 
-		PasteUI(StringConvertor::Utf8ToWide(pstrXML));
+		PasteUI(CDuiU2T(pstrXML));
 
 		delete[] pstrXML;
 		delete pFile;
@@ -942,7 +944,7 @@ void CUIDesignerView::OnEditPaste()
 void CUIDesignerView::PasteUI(LPCTSTR xml)
 {
 	CDialogBuilder builder;
-	CControlUI* pRoot=builder.Create(xml, (UINT)0, NULL, m_LayoutManager.GetManager());
+	CControlUI* pRoot=builder.Create(xml, NULL, NULL, m_LayoutManager.GetManager());
 	if(pRoot)
 	{
 		CControlUI* pParent = m_MultiTracker.GetFocused();
@@ -1199,7 +1201,8 @@ void CUIDesignerView::OnStyleSaveAs()
 
 BOOL CUIDesignerView::SaveSkinImage(LPCTSTR pstrPathName)
 {
-	CImage image;
+  /*
+	CBCGPImage image;
 	CWindowUI* pForm = m_LayoutManager.GetForm();
 	ASSERT(pForm);
 
@@ -1211,6 +1214,8 @@ BOOL CUIDesignerView::SaveSkinImage(LPCTSTR pstrPathName)
 
 	image.ReleaseDC();
 	return bRet;
+  */
+  return FALSE;
 }
 
 void CUIDesignerView::ReDrawForm()

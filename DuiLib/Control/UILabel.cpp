@@ -6,6 +6,20 @@
 using namespace Gdiplus;
 #endif
 
+#if _MSC_VER <= 1200
+#ifdef _UNICODE
+double _tstof(LPCTSTR wszText)
+{
+  char szText[200];
+
+  WideCharToMultiByte(CP_ACP,0,wszText,-1,szText,lengthof(szText),NULL,NULL);
+  return atof(szText);
+}
+#else
+#define _tstof atof
+#endif
+#endif //_MSC_VER
+
 namespace DuiLib
 {
 	Color ARGB2Color(DWORD dwColor)

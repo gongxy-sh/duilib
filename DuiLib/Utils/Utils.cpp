@@ -545,7 +545,7 @@ namespace DuiLib
 	}
 
 #ifdef _UNICODE
-
+#if _MSC_VER > 1200
 	const CDuiString& CDuiString::operator=(LPCSTR lpStr)
 	{
 		if ( lpStr )
@@ -562,6 +562,7 @@ namespace DuiLib
 		}
 		return *this;
 	}
+#endif //_MSC_VER
 
 	const CDuiString& CDuiString::operator+=(LPCSTR lpStr)
 	{
@@ -647,6 +648,7 @@ namespace DuiLib
 		return *this;
 	}
 
+#if _MSC_VER > 1200
 	const CDuiString& CDuiString::operator+=(LPCTSTR lpStr)
 	{      
 		if ( lpStr )
@@ -657,6 +659,7 @@ namespace DuiLib
 		
 		return *this;
 	}
+#endif //_MSC_VER
 
 	const CDuiString& CDuiString::operator+=(const TCHAR ch)
 	{      

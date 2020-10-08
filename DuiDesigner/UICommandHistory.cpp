@@ -27,11 +27,11 @@ CUICommandElement::CUICommandElement(CArray<CControlUI*,CControlUI*>& arrSelecte
 
 		CControlUI* pControl = arrSelected[i];
 		ASSERT(pNode && pControl);
-		pNode->ToElement()->SetAttribute("myname", StringConvertor::WideToUtf8(pControl->GetName()));
+		pNode->ToElement()->SetAttribute("myname", CDuiT2U(pControl->GetName()));
 
 		CControlUI* pParent = arrSelected[i]->GetParent();
 		ASSERT(pNode && pParent);
-		pNode->ToElement()->SetAttribute("parentname", StringConvertor::WideToUtf8(pParent->GetName()));
+		pNode->ToElement()->SetAttribute("parentname", CDuiT2U(pParent->GetName()));
 	}
 }
 
@@ -112,9 +112,9 @@ void CUICommandNode::Begin(CControlUI* pControl, LPCTSTR pstrName, LPCTSTR pstrV
 	TiXmlElement* pElement = new TiXmlElement("UIHistory");
 	CString strClass = m_pControl->GetClass();
 	strClass = strClass.Mid(0, strClass.GetLength() - 2);
-	TiXmlElement* pNode = new TiXmlElement(StringConvertor::WideToUtf8(strClass.GetBuffer()));
-	pNode->SetAttribute("myname", StringConvertor::WideToUtf8(m_pControl->GetName()));
-	pNode->SetAttribute(StringConvertor::WideToUtf8(pstrName), StringConvertor::WideToUtf8(pstrValue));
+	TiXmlElement* pNode = new TiXmlElement(CDuiT2U(strClass));
+	pNode->SetAttribute("myname", CDuiT2U(m_pControl->GetName()));
+	pNode->SetAttribute(CDuiT2U(pstrName), CDuiT2U(pstrValue));
 	pElement->InsertEndChild(*pNode);
 	m_pBefore->m_pElementXml = pElement;
 
@@ -154,9 +154,9 @@ void CUICommandNode::End(CControlUI* pControl, LPCTSTR pstrName, LPCTSTR pstrVal
 	TiXmlElement* pElement = new TiXmlElement("UIHistory");
 	CString strClass = m_pControl->GetClass();
 	strClass = strClass.Mid(0, strClass.GetLength() - 2);
-	TiXmlElement* pNode = new TiXmlElement(StringConvertor::WideToUtf8(strClass.GetBuffer()));
-	pNode->SetAttribute("myname", StringConvertor::WideToUtf8(m_pControl->GetName()));
-	pNode->SetAttribute(StringConvertor::WideToUtf8(pstrName), StringConvertor::WideToUtf8(pstrValue));
+	TiXmlElement* pNode = new TiXmlElement(CDuiT2U(strClass));
+	pNode->SetAttribute("myname", CDuiT2U(m_pControl->GetName()));
+	pNode->SetAttribute(CDuiT2U(pstrName), CDuiT2U(pstrValue));
 	pElement->InsertEndChild(*pNode);
 	m_pAfter->m_pElementXml = pElement;
 
@@ -208,8 +208,8 @@ void CUICommandNode::RemoveSameProperty(TiXmlNode* pBeforeElem, TiXmlNode* pAfte
 		ASSERT(pAfterAttribNext);
 		if(strcmp(pBeforeAttrib->Name(), "myname") == 0)
 		{
-			CStringA strBeforeName = pBeforeAttrib->Value();
-			CStringA strAfterName = pAfterAttrib->Value();
+			CString strBeforeName = CDuiU2T(pBeforeAttrib->Value());
+			CString strAfterName = CDuiU2T(pAfterAttrib->Value());
 			if(strBeforeName != strAfterName)
 			{
 				pBeforeAttrib->SetValue(strAfterName);
@@ -415,14 +415,14 @@ void CUICommandHistory::SetUIAction(TiXmlNode* pElement, UIACTIONPROC Proc)
 void CALLBACK CUICommandHistory::UIAdd(TiXmlNode* pNode)
 {
 	TiXmlElement* pElement = pNode->ToElement();
-	CStringA strParentName = pElement->Attribute("parentname");
+	CString strParentName = CDuiU2T(pElement->Attribute("parentname"));
 	pElement->RemoveAttribute("parentname");
 	if(strParentName.IsEmpty())
 		return;
 
 	CUIDesignerView* pUIView = g_pMainFrame->GetActiveUIView();
 	CPaintManagerUI* pManager = pUIView->GetPaintManager();
-	CControlUI* pParentControl = pManager->FindControl(StringConvertor::Utf8ToWide(strParentName));
+	CControlUI* pParentControl = pManager->FindControl(CDuiU2T(strParentName));
 	if(pParentControl == NULL)
 		return;
 
@@ -437,7 +437,7 @@ void CALLBACK CUICommandHistory::UIAdd(TiXmlNode* pNode)
 	delete pRootElem;
 
 	CDialogBuilder builder;
-	CControlUI* pRoot=builder.Create(StringConvertor::Utf8ToWide(printer.CStr()), (UINT)0, NULL, pManager);
+	CControlUI* pRoot=builder.Create(CDuiU2T(printer.CStr()).c_str(), NULL, NULL, pManager);
  	if(pRoot)
 		pUIView->RedoUI(pRoot, pParentControl);
 }
@@ -445,13 +445,13 @@ void CALLBACK CUICommandHistory::UIAdd(TiXmlNode* pNode)
 void CALLBACK CUICommandHistory::UIModify(TiXmlNode* pNode)
 {
 	TiXmlElement* pElement = pNode->ToElement();
-	CStringA strName = pElement->Attribute("myname");
+	CString strName = CDuiU2T(pElement->Attribute("myname"));
 	pElement->RemoveAttribute("myname");
 	if(strName.IsEmpty())
 		return;
 
 	CPaintManagerUI* pManager = g_pMainFrame->GetActiveUIView()->GetPaintManager();
-	CControlUI* pControl = pManager->FindControl(StringConvertor::Utf8ToWide(strName));
+	CControlUI* pControl = pManager->FindControl(CDuiU2T(strName));
 	TiXmlAttribute* pAttrib = pElement->FirstAttribute();
 	if(pControl == NULL)
 		return;
@@ -461,14 +461,14 @@ void CALLBACK CUICommandHistory::UIModify(TiXmlNode* pNode)
 		if(strcmp(pAttrib->Name(), "name") == 0)
 		{
 			pManager->ReapObjects(pControl);
-			g_pClassView->RenameUITreeItem(pControl, StringConvertor::Utf8ToWide(pAttrib->Value()));
-			pControl->SetAttribute(StringConvertor::Utf8ToWide(pAttrib->Name())
-				, StringConvertor::Utf8ToWide(pAttrib->Value()));
+			g_pClassView->RenameUITreeItem(pControl, CDuiU2T(pAttrib->Value()));
+			pControl->SetAttribute(CDuiU2T(pAttrib->Name()).c_str()
+				, CDuiU2T(pAttrib->Value()));
 			pManager->InitControls(pControl);
 		}
 		else
-			pControl->SetAttribute(StringConvertor::Utf8ToWide(pAttrib->Name())
-				, StringConvertor::Utf8ToWide(pAttrib->Value()));
+			pControl->SetAttribute(CDuiU2T(pAttrib->Name()).c_str()
+				, CDuiU2T(pAttrib->Value()));
 
 		pAttrib = pAttrib->Next();
 	}
@@ -481,13 +481,13 @@ void CALLBACK CUICommandHistory::UIModify(TiXmlNode* pNode)
 void CALLBACK CUICommandHistory::UIDelete(TiXmlNode* pNode)
 {
 	TiXmlElement* pElement = pNode->ToElement();
-	CStringA strName = pElement->Attribute("myname");
+	CString strName = CDuiU2T(pElement->Attribute("myname"));
 	if(strName.IsEmpty())
 		return;
 
 	CUIDesignerView* pUIView = g_pMainFrame->GetActiveUIView();
 	CPaintManagerUI* pManager = pUIView->GetPaintManager();
-	CControlUI* pControl = pManager->FindControl(StringConvertor::Utf8ToWide(strName));
+	CControlUI* pControl = pManager->FindControl(CDuiU2T(strName));
 	if(pControl == NULL)
 		return;
 	CControlUI* pParent=pControl->GetParent();

@@ -14,7 +14,7 @@
 // 有关此类的实现，请参阅 UIDesigner.cpp
 //
 
-class CUIDesignerApp : public CWinAppEx
+class CUIDesignerApp : public CBCGPWinApp
 {
 public:
 	CUIDesignerApp();

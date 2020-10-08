@@ -142,7 +142,6 @@
 #define ID_UI_PROP_WND                  347
 #define IDD_DIALOG_UI_ATTRIB_EDIT       348
 #define IDR_MENU_UI                     349
-#define IDD_DIALOG_CHECK_UPDATE         350
 #define IDC_BUTTON_IMAGE_IMPORT         1000
 #define IDC_BUTTON_IMAGE_CLEAR          1001
 #define IDC_LIST_IMAGE_RESOURCE         1002
@@ -179,11 +178,7 @@
 #define IDC_BUTTON_ATTRIB_MODIFY        1035
 #define IDC_LIST_DEFAULT_ATTRIB         1037
 #define IDC_BUTTON_SAVE_AS_STYLE        1038
-#define IDC_BUTTON_VERSION_UPDATE_LINK  1038
 #define IDC_BUTTON_MY_BLOG_LINK         1038
-#define IDC_STATIC_CURRENT_VERSION      1039
-#define IDC_STATIC_LATEST_VERSION       1040
-#define IDC_STATIC_UPDATE_INFO          1041
 #define IDC_BUTTON_DUILIB_LINK          1042
 #define ID_UI_CONTROL_LISTBOX           32792
 #define ID_UI_CONTROL_BUTTON            32793

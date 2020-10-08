@@ -236,7 +236,6 @@ protected:                                                                \
 #  define __RPC__inout_opt
 //#  define OLECMD UINT
 //#  define OLECMDTEXT BSTR
-#define _tstof atof
 #define __time32_t time_t
 #endif
 #elif defined(__GNUC__)

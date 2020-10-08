@@ -1,15 +1,15 @@
 #pragma once
 
 //////////////////////////////////////////////////////////////////////////
-//CMFCPropertyGridColor32Property
+//CBCGPColor32Prop
 
 #define ARGB(a,r,g,b)        ((COLORREF)(((BYTE)(r)|((WORD)((BYTE)(g))<<8))|(((DWORD)(BYTE)(b))<<16))|(((DWORD)(BYTE)(a))<<24))
 #define GetAValue(argb)      (LOBYTE((argb)>>24))
 
-class CMFCPropertyGridColor32Property : public CMFCPropertyGridColorProperty
+class CBCGPColor32Prop : public CBCGPColorProp
 {
 public:
-	CMFCPropertyGridColor32Property(const CString& strName,const COLORREF& color,CPalette* pPalette=NULL,LPCTSTR lpszDescr=NULL,DWORD_PTR dwData=0);
+	CBCGPColor32Prop(const CString& strName,const COLORREF& color,CPalette* pPalette=NULL,LPCTSTR lpszDescr=NULL,DWORD_PTR dwData=0);
 
 public:
 	virtual BOOL OnUpdateValue();
@@ -18,16 +18,16 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////////
-//CMFCPropertyGridImageProperty
+//CBCGPImageProp
 
 #define AFX_PROP_HAS_BUTTON 0x0002
 
-class CMFCPropertyGridImageProperty : public CMFCPropertyGridProperty
+class CBCGPImageProp : public CBCGPProp
 {
-	DECLARE_DYNAMIC(CMFCPropertyGridImageProperty)
+	DECLARE_DYNAMIC(CBCGPImageProp)
 
 public:
-	CMFCPropertyGridImageProperty(const CString& strName, const CString& strImage, LPCTSTR lpszDescr = NULL, DWORD_PTR dwData = 0);
+	CBCGPImageProp(const CString& strName, const CString& strImage, LPCTSTR lpszDescr = NULL, DWORD_PTR dwData = 0);
 
 public:
 	virtual void OnClickButton(CPoint point);
@@ -36,7 +36,7 @@ public:
 //////////////////////////////////////////////////////////////////////////
 //CMFCPropertyGridCustomFontsProperty
 
-class CMFCPropertyGridCustomFontsProperty : public CMFCPropertyGridProperty
+class CMFCPropertyGridCustomFontsProperty : public CBCGPProp
 {
 	DECLARE_DYNAMIC(CMFCPropertyGridCustomFontsProperty)
 
@@ -50,7 +50,7 @@ public:
 //////////////////////////////////////////////////////////////////////////
 //CMFCPropertyGridDefaultAttribListProperty
 
-class CMFCPropertyGridDefaultAttribListProperty : public CMFCPropertyGridProperty
+class CMFCPropertyGridDefaultAttribListProperty : public CBCGPProp
 {
 	DECLARE_DYNAMIC(CMFCPropertyGridDefaultAttribListProperty)
 
@@ -64,12 +64,12 @@ public:
 //////////////////////////////////////////////////////////////////////////
 //CPropertiesToolBar
 
-class CPropertiesToolBar : public CMFCToolBar
+class CPropertiesToolBar : public CBCGPToolBar
 {
 public:
 	virtual void OnUpdateCmdUI(CFrameWnd* /*pTarget*/, BOOL bDisableIfNoHndler)
 	{
-		CMFCToolBar::OnUpdateCmdUI((CFrameWnd*) GetOwner(), bDisableIfNoHndler);
+		CBCGPToolBar::OnUpdateCmdUI((CFrameWnd*) GetOwner(), bDisableIfNoHndler);
 	}
 
 	virtual BOOL AllowShowOnList() const { return FALSE; }
@@ -304,8 +304,8 @@ public:
 	void ShowProperty(CControlUI* pControl);
 	CControlUI* GetCurUI() const { return m_pControl; }
 
-	CMFCPropertyGridProperty* FindPropByData(DWORD_PTR dwData, BOOL bSearchSubProps = TRUE) const;
-	static CString FormatOrigProperty(CMFCPropertyGridProperty* pProp);
+	CBCGPProp* FindPropByData(DWORD_PTR dwData, BOOL bSearchSubProps = TRUE) const;
+	static CString FormatOrigProperty(CBCGPProp* pProp);
 
 protected:
 	void InitPropList();
@@ -339,7 +339,7 @@ protected:
 	void ShowTileLayoutProperty(CControlUI* pControl);
 
 protected:
-	CMFCPropertyGridCtrl m_wndPropList;
+	CBCGPPropList m_wndPropList;
 	CPropertiesToolBar m_wndToolBar;
 	CFont m_fntPropList;
 

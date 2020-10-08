@@ -101,7 +101,9 @@ namespace DuiLib
         const CDuiString& operator=(const TCHAR ch);
         const CDuiString& operator=(LPCTSTR pstr);
 #ifdef _UNICODE
+#if _MSC_VER > 1200
         const CDuiString& operator=(LPCSTR lpStr);
+#endif //_MSC_VER
         const CDuiString& operator+=(LPCSTR lpStr);
 #else
         const CDuiString& operator=(LPCWSTR lpwStr);
@@ -110,7 +112,9 @@ namespace DuiLib
         CDuiString operator+(const CDuiString& src) const;
         CDuiString operator+(LPCTSTR pstr) const;
         const CDuiString& operator+=(const CDuiString& src);
+#if _MSC_VER > 1200
         const CDuiString& operator+=(LPCTSTR pstr);
+#endif //_MSC_VER
         const CDuiString& operator+=(const TCHAR ch);
 
         bool operator == (LPCTSTR str) const;

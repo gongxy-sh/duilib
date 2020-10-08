@@ -162,7 +162,7 @@ public:
 	CTrackerElement* FindTracker(CControlUI* pControl) const;
 	CControlUI* GetFocused() const;
 	BOOL GetSelected(CArray<CControlUI*,CControlUI*>& arrSelected);
-	BOOL IsEmpty() const { return m_arrTracker.IsEmpty(); }
+	BOOL IsEmpty() const { return 0 == m_arrTracker.GetSize(); }
 	int  GetSize() const { return m_arrTracker.GetSize(); }
 
 	SIZE GetFormSize() const { return m_szForm; }

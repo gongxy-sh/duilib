@@ -12,39 +12,39 @@
 
 // CMainFrame
 
-IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWndEx)
+IMPLEMENT_DYNAMIC(CMainFrame, CBCGPMDIFrameWnd)
 
 const int  iMaxUserToolbars = 10;
 const UINT uiFirstUserToolBarId = AFX_IDW_CONTROLBAR_FIRST + 40;
 const UINT uiLastUserToolBarId = uiFirstUserToolBarId + iMaxUserToolbars - 1;
 
-BEGIN_MESSAGE_MAP(CMainFrame, CMDIFrameWndEx)
+BEGIN_MESSAGE_MAP(CMainFrame, CBCGPMDIFrameWnd)
 	ON_WM_CREATE()
 	ON_WM_DROPFILES()
-	ON_COMMAND(ID_WINDOW_MANAGER, &CMainFrame::OnWindowManager)
-	ON_COMMAND(ID_VIEW_CUSTOMIZE, &CMainFrame::OnViewCustomize)
-	ON_REGISTERED_MESSAGE(AFX_WM_CREATETOOLBAR, &CMainFrame::OnToolbarCreateNew)
-	ON_COMMAND_RANGE(ID_VIEW_APPLOOK_WIN_2000, ID_VIEW_APPLOOK_OFF_2007_AQUA, &CMainFrame::OnApplicationLook)
-	ON_UPDATE_COMMAND_UI_RANGE(ID_VIEW_APPLOOK_WIN_2000, ID_VIEW_APPLOOK_OFF_2007_AQUA, &CMainFrame::OnUpdateApplicationLook)
-	ON_REGISTERED_MESSAGE(AFX_WM_ON_GET_TAB_TOOLTIP, OnGetTabToolTip)
-	ON_REGISTERED_MESSAGE(AFX_WM_CHANGE_ACTIVE_TAB, OnChangeActiveTab)
-	ON_COMMAND(ID_PROJECT_NEW, &CMainFrame::OnProjectNew)
-	ON_COMMAND(ID_PROJECT_OPEN, &CMainFrame::OnProjectOpen)
-	ON_COMMAND(ID_PROJECT_CLOSE, &CMainFrame::OnProjectClose)
-	ON_COMMAND(ID_TEMPLATE_OPEN, &CMainFrame::OnTemplateOpen)
-	ON_COMMAND(ID_FILE_CLOSE_ALL, &CMainFrame::OnFileCloseAll)
-	ON_COMMAND(ID_FILE_SAVE_ALL, &CMainFrame::OnFileSaveAll)
-	ON_UPDATE_COMMAND_UI(ID_PROJECT_CLOSE, &CMainFrame::OnUpdateProjectExist)
-	ON_UPDATE_COMMAND_UI(ID_FILE_CLOSE_ALL, &CMainFrame::OnUpdateFileCloseAll)
+	ON_COMMAND(ID_WINDOW_MANAGER, CMainFrame::OnWindowManager)
+	ON_COMMAND(ID_VIEW_CUSTOMIZE, CMainFrame::OnViewCustomize)
+	ON_REGISTERED_MESSAGE(BCGM_CREATETOOLBAR, CMainFrame::OnToolbarCreateNew)
+	ON_COMMAND_RANGE(ID_VIEW_APPLOOK_WIN_2000, ID_VIEW_APPLOOK_OFF_2007_AQUA, CMainFrame::OnApplicationLook)
+	ON_UPDATE_COMMAND_UI_RANGE(ID_VIEW_APPLOOK_WIN_2000, ID_VIEW_APPLOOK_OFF_2007_AQUA, CMainFrame::OnUpdateApplicationLook)
+	ON_REGISTERED_MESSAGE(BCGM_ON_GET_TAB_TOOLTIP, OnGetTabToolTip)
+	ON_REGISTERED_MESSAGE(BCGM_CHANGE_ACTIVE_TAB, OnChangeActiveTab)
+	ON_COMMAND(ID_PROJECT_NEW, CMainFrame::OnProjectNew)
+	ON_COMMAND(ID_PROJECT_OPEN, CMainFrame::OnProjectOpen)
+	ON_COMMAND(ID_PROJECT_CLOSE, CMainFrame::OnProjectClose)
+	ON_COMMAND(ID_TEMPLATE_OPEN, CMainFrame::OnTemplateOpen)
+	ON_COMMAND(ID_FILE_CLOSE_ALL, CMainFrame::OnFileCloseAll)
+	ON_COMMAND(ID_FILE_SAVE_ALL, CMainFrame::OnFileSaveAll)
+	ON_UPDATE_COMMAND_UI(ID_PROJECT_CLOSE, CMainFrame::OnUpdateProjectExist)
+	ON_UPDATE_COMMAND_UI(ID_FILE_CLOSE_ALL, CMainFrame::OnUpdateFileCloseAll)
 	ON_COMMAND(ID_MDITABS_MOVE_TO_NEXT_GROUP, OnMdiMoveToNextGroup)
 	ON_COMMAND(ID_MDITABS_MOVE_TO_PREV_GROUP, OnMdiMoveToPrevGroup)
 	ON_COMMAND(ID_MDITABS_NEW_HORZ_TAB_GROUP, OnMdiNewHorzTabGroup)
 	ON_COMMAND(ID_MDITABS_NEW_VERT_TAB_GROUP, OnMdiNewVertTabGroup)
-	ON_COMMAND(ID_View_Controls, &CMainFrame::OnViewControls)
-	ON_COMMAND(ID_View_Project, &CMainFrame::OnViewProject)
-	ON_COMMAND(ID_View_Resources, &CMainFrame::OnViewResource)
-	ON_COMMAND(ID_View_ToolsBox, &CMainFrame::OnViewToolsBox)
-	ON_COMMAND(ID_View_Property, &CMainFrame::OnViewProperty)
+	ON_COMMAND(ID_View_Controls, CMainFrame::OnViewControls)
+	ON_COMMAND(ID_View_Project, CMainFrame::OnViewProject)
+	ON_COMMAND(ID_View_Resources, CMainFrame::OnViewResource)
+	ON_COMMAND(ID_View_ToolsBox, CMainFrame::OnViewToolsBox)
+	ON_COMMAND(ID_View_Property, CMainFrame::OnViewProperty)
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -71,15 +71,15 @@ CMainFrame::~CMainFrame()
 
 int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
-	if (CMDIFrameWndEx::OnCreate(lpCreateStruct) == -1)
+	if (CBCGPMDIFrameWnd::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
 	BOOL bNameValid;
 	// 基于持久值设置视觉管理器和样式
 	OnApplicationLook(theApp.m_nAppLook);
 
-	CMDITabInfo mdiTabParams;
-	mdiTabParams.m_style = CMFCTabCtrl::STYLE_3D_VS2005; // 其他可用样式...
+	CBCGPMDITabParams mdiTabParams;
+	mdiTabParams.m_style = CBCGPTabWnd::STYLE_3D_VS2005; // 其他可用样式...
 	mdiTabParams.m_bActiveTabCloseButton = TRUE;      // 设置为 FALSE 会将关闭按钮放置在选项卡区域的右侧
 	mdiTabParams.m_bTabIcons = FALSE;    // 设置为 TRUE 将在 MDI 选项卡上启用文档图标
 	mdiTabParams.m_bAutoColor = FALSE;    // 设置为 FALSE 将禁用 MDI 选项卡的自动着色
@@ -93,13 +93,14 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		TRACE0("未能创建菜单栏\n");
 		return -1;      // 未能创建
 	}
-
+#if _MSC_VER > 1200
 	m_wndMenuBar.SetPaneStyle(m_wndMenuBar.GetPaneStyle() | CBRS_SIZE_DYNAMIC | CBRS_TOOLTIPS | CBRS_FLYBY);
+#endif //_MSC_VER
 
 	//取消首先显示最近使用的命令
-	CMFCMenuBar::SetRecentlyUsedMenus(FALSE);
+	CBCGPMenuBar::SetRecentlyUsedMenus(FALSE);
 	// 防止菜单栏在激活时获得焦点
-	CMFCPopupMenu::SetForceMenuFocus(FALSE);
+	CBCGPPopupMenu::SetForceMenuFocus(FALSE);
 
 	if (!m_wndToolBar.CreateEx(this, TBSTYLE_FLAT, WS_CHILD | WS_VISIBLE | CBRS_TOP | CBRS_GRIPPER | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC) ||
 		!m_wndToolBar.LoadToolBar(theApp.m_bHiColorIcons ? IDR_MAINFRAME_HC : IDR_MAINFRAME))
@@ -146,19 +147,19 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_wndToolBar.EnableDocking(CBRS_ALIGN_ANY);
 	m_wndToolbarFormEdit.EnableDocking(CBRS_ALIGN_ANY);
 	EnableDocking(CBRS_ALIGN_ANY);
-	DockPane(&m_wndMenuBar);
-	DockPane(&m_wndToolBar);
-	DockPane(&m_wndToolbarFormEdit);
-	DockPaneLeftOf(&m_wndToolBar, &m_wndToolbarFormEdit);
+	DockControlBar(&m_wndMenuBar);
+	DockControlBar(&m_wndToolBar);
+	DockControlBar(&m_wndToolbarFormEdit);
+	DockControlBarLeftOf(&m_wndToolBar, &m_wndToolbarFormEdit);
 
 	// 启用 Visual Studio 2005 样式停靠窗口行为
-	CDockingManager::SetDockingMode(DT_SMART);
+	CBCGPDockManager::SetDockMode(BCGP_DT_SMART);
 	// 启用 Visual Studio 2005 样式停靠窗口自动隐藏行为
-	EnableAutoHidePanes(CBRS_ALIGN_ANY);
+	EnableAutoHideBars(CBRS_ALIGN_ANY);
 
 	// 加载菜单项图像(不在任何标准工具栏上):
-	CMFCToolBar::AddToolBarForImageCollection(IDR_MENU_IMAGES, theApp.m_bHiColorIcons ? IDB_MENU_IMAGES_24 : 0);
-	CMFCToolBar::AddToolBarForImageCollection(IDR_MENU_UI);
+	CBCGPToolBar::AddToolBarForImageCollection(IDR_MENU_IMAGES, theApp.m_bHiColorIcons ? IDB_MENU_IMAGES_24 : 0);
+	CBCGPToolBar::AddToolBarForImageCollection(IDR_MENU_UI);
 
 	// 创建停靠窗口
 	if (!CreateDockingWindows())
@@ -170,31 +171,31 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_wndFileView.EnableDocking(CBRS_ALIGN_ANY);
 	m_wndClassView.EnableDocking(CBRS_ALIGN_ANY);
 	m_wndResourceView.EnableDocking(CBRS_ALIGN_ANY);
-	DockPane(&m_wndFileView);
-	CDockablePane* pTabbedBar = NULL;
-	m_wndClassView.AttachToTabWnd(&m_wndFileView, DM_SHOW, FALSE, &pTabbedBar);
-	m_wndResourceView.AttachToTabWnd(pTabbedBar, DM_SHOW, FALSE, &pTabbedBar);
+	DockControlBar(&m_wndFileView);
+	CBCGPDockingControlBar* pTabbedBar = NULL;
+	m_wndClassView.AttachToTabWnd(&m_wndFileView, BCGP_DM_SHOW, FALSE, &pTabbedBar);
+	m_wndResourceView.AttachToTabWnd(pTabbedBar, BCGP_DM_SHOW, FALSE, &pTabbedBar);
 	m_wndProperties.EnableDocking(CBRS_ALIGN_ANY);
 	m_wndToolBox.EnableDocking(CBRS_ALIGN_ANY);
-	DockPane(&m_wndProperties);
-	DockPane(&m_wndToolBox);
+	DockControlBar(&m_wndProperties);
+	DockControlBar(&m_wndToolBox);
 
 	// 启用增强的窗口管理对话框
 	EnableWindowsDialog(ID_WINDOW_MANAGER, IDS_WINDOWS_MANAGER, TRUE);
 
 	// 启用工具栏和停靠窗口菜单替换
-	EnablePaneMenu(TRUE, ID_VIEW_CUSTOMIZE, strCustomize, ID_VIEW_TOOLBAR, FALSE, TRUE);
+	//EnablePaneMenu(TRUE, ID_VIEW_CUSTOMIZE, strCustomize, ID_VIEW_TOOLBAR, FALSE, TRUE);
 
 	// 启用快速(按住 Alt 拖动)工具栏自定义
-	CMFCToolBar::EnableQuickCustomization();
+	CBCGPToolBar::EnableQuickCustomization();
 
-// 	if (CMFCToolBar::GetUserImages() == NULL)
+// 	if (CBCGPToolBar::GetUserImages() == NULL)
 // 	{
 // 		// 加载用户定义的工具栏图像
 // 		if (m_UserImages.Load(_T(".\\UserImages.bmp")))
 // 		{
 // 			m_UserImages.SetImageSize(CSize(16, 16), FALSE);
-// 			CMFCToolBar::SetUserImages(&m_UserImages);
+// 			CBCGPToolBar::SetUserImages(&m_UserImages);
 // 		}
 // 	}
 
@@ -224,14 +225,14 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	lstBasicCommands.AddTail(ID_SORTING_SORTBYACCESS);
 	lstBasicCommands.AddTail(ID_SORTING_GROUPBYTYPE);
 
-	CMFCToolBar::SetBasicCommands(lstBasicCommands);
+	CBCGPToolBar::SetBasicCommands(lstBasicCommands);
 
 	return 0;
 }
 
 BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 {
-	if( !CMDIFrameWndEx::PreCreateWindow(cs) )
+	if( !CBCGPMDIFrameWnd::PreCreateWindow(cs) )
 		return FALSE;
 	// TODO: 在此处通过修改
 	//  CREATESTRUCT cs 来修改窗口类或样式
@@ -324,12 +325,12 @@ void CMainFrame::SetDockingWindowIcons(BOOL bHiColorIcons)
 #ifdef _DEBUG
 void CMainFrame::AssertValid() const
 {
-	CMDIFrameWndEx::AssertValid();
+	CBCGPMDIFrameWnd::AssertValid();
 }
 
 void CMainFrame::Dump(CDumpContext& dc) const
 {
-	CMDIFrameWndEx::Dump(dc);
+	CBCGPMDIFrameWnd::Dump(dc);
 }
 #endif //_DEBUG
 
@@ -343,20 +344,20 @@ void CMainFrame::OnWindowManager()
 
 void CMainFrame::OnViewCustomize()
 {
-	CMFCToolBarsCustomizeDialog* pDlgCust = new CMFCToolBarsCustomizeDialog(this, TRUE /* 扫描菜单*/);
+	CBCGPToolbarCustomize* pDlgCust = new CBCGPToolbarCustomize(this, TRUE /* 扫描菜单*/);
 	pDlgCust->EnableUserDefinedToolbars();
 	pDlgCust->Create();
 }
 
 LRESULT CMainFrame::OnToolbarCreateNew(WPARAM wp,LPARAM lp)
 {
-	LRESULT lres = CMDIFrameWndEx::OnToolbarCreateNew(wp,lp);
+	LRESULT lres = CBCGPMDIFrameWnd::OnToolbarCreateNew(wp,lp);
 	if (lres == 0)
 	{
 		return 0;
 	}
 
-	CMFCToolBar* pUserToolbar = (CMFCToolBar*)lres;
+	CBCGPToolBar* pUserToolbar = (CBCGPToolBar*)lres;
 	ASSERT_VALID(pUserToolbar);
 
 	BOOL bNameValid;
@@ -377,50 +378,50 @@ void CMainFrame::OnApplicationLook(UINT id)
 	switch (theApp.m_nAppLook)
 	{
 	case ID_VIEW_APPLOOK_WIN_2000:
-		CMFCVisualManager::SetDefaultManager(RUNTIME_CLASS(CMFCVisualManager));
+		CBCGPVisualManager::SetDefaultManager(RUNTIME_CLASS(CBCGPVisualManager));
 		break;
 
 	case ID_VIEW_APPLOOK_OFF_XP:
-		CMFCVisualManager::SetDefaultManager(RUNTIME_CLASS(CMFCVisualManagerOfficeXP));
+		CBCGPVisualManager::SetDefaultManager(RUNTIME_CLASS(CBCGPVisualManagerXP));
 		break;
 
 	case ID_VIEW_APPLOOK_WIN_XP:
-		CMFCVisualManagerWindows::m_b3DTabsXPTheme = TRUE;
-		CMFCVisualManager::SetDefaultManager(RUNTIME_CLASS(CMFCVisualManagerWindows));
+		CBCGPWinXPVisualManager::m_b3DTabsXPTheme = TRUE;
+		CBCGPVisualManager::SetDefaultManager(RUNTIME_CLASS(CBCGPWinXPVisualManager));
 		break;
 
 	case ID_VIEW_APPLOOK_OFF_2003:
-		CMFCVisualManager::SetDefaultManager(RUNTIME_CLASS(CMFCVisualManagerOffice2003));
-		CDockingManager::SetDockingMode(DT_SMART);
+		CBCGPVisualManager::SetDefaultManager(RUNTIME_CLASS(CBCGPVisualManager2003));
+		CBCGPDockManager::SetDockMode(BCGP_DT_SMART);
 		break;
 
 	case ID_VIEW_APPLOOK_VS_2005:
-		CMFCVisualManager::SetDefaultManager(RUNTIME_CLASS(CMFCVisualManagerVS2005));
-		CDockingManager::SetDockingMode(DT_SMART);
+		CBCGPVisualManager::SetDefaultManager(RUNTIME_CLASS(CBCGPVisualManagerVS2005));
+		CBCGPDockManager::SetDockMode(BCGP_DT_SMART);
 		break;
 
 	default:
 		switch (theApp.m_nAppLook)
 		{
 		case ID_VIEW_APPLOOK_OFF_2007_BLUE:
-			CMFCVisualManagerOffice2007::SetStyle(CMFCVisualManagerOffice2007::Office2007_LunaBlue);
+			CBCGPVisualManager2007::SetStyle(CBCGPVisualManager2007::VS2007_LunaBlue);
 			break;
 
 		case ID_VIEW_APPLOOK_OFF_2007_BLACK:
-			CMFCVisualManagerOffice2007::SetStyle(CMFCVisualManagerOffice2007::Office2007_ObsidianBlack);
+			CBCGPVisualManager2007::SetStyle(CBCGPVisualManager2007::VS2007_ObsidianBlack);
 			break;
 
 		case ID_VIEW_APPLOOK_OFF_2007_SILVER:
-			CMFCVisualManagerOffice2007::SetStyle(CMFCVisualManagerOffice2007::Office2007_Silver);
+			CBCGPVisualManager2007::SetStyle(CBCGPVisualManager2007::VS2007_Silver);
 			break;
 
 		case ID_VIEW_APPLOOK_OFF_2007_AQUA:
-			CMFCVisualManagerOffice2007::SetStyle(CMFCVisualManagerOffice2007::Office2007_Aqua);
+			CBCGPVisualManager2007::SetStyle(CBCGPVisualManager2007::VS2007_Aqua);
 			break;
 		}
 
-		CMFCVisualManager::SetDefaultManager(RUNTIME_CLASS(CMFCVisualManagerOffice2007));
-		CDockingManager::SetDockingMode(DT_SMART);
+		CBCGPVisualManager::SetDefaultManager(RUNTIME_CLASS(CBCGPVisualManager2007));
+		CBCGPDockManager::SetDockMode(BCGP_DT_SMART);
 	}
 
 	RedrawWindow(NULL, NULL, RDW_ALLCHILDREN | RDW_INVALIDATE | RDW_UPDATENOW | RDW_FRAME | RDW_ERASE);
@@ -437,7 +438,7 @@ BOOL CMainFrame::LoadFrame(UINT nIDResource, DWORD dwDefaultStyle, CWnd* pParent
 {
 	// 基类将执行真正的工作
 
-	if (!CMDIFrameWndEx::LoadFrame(nIDResource, dwDefaultStyle, pParentWnd, pContext))
+	if (!CBCGPMDIFrameWnd::LoadFrame(nIDResource, dwDefaultStyle, pParentWnd, pContext))
 	{
 		return FALSE;
 	}
@@ -451,7 +452,7 @@ BOOL CMainFrame::LoadFrame(UINT nIDResource, DWORD dwDefaultStyle, CWnd* pParent
 
 	for (int i = 0; i < iMaxUserToolbars; i ++)
 	{
-		CMFCToolBar* pUserToolbar = GetUserToolBarByIndex(i);
+		CBCGPToolBar* pUserToolbar = GetUserBarByIndex(i);
 		if (pUserToolbar != NULL)
 		{
 			pUserToolbar->EnableCustomizeButton(TRUE, ID_VIEW_CUSTOMIZE, strCustomize);
@@ -467,7 +468,7 @@ void CMainFrame::OnUpdateFrameTitle(BOOL bAddToTitle)
 	// TODO: 在此添加专用代码和/或调用基类
 
 	//禁止更新标题
-// 	CMDIFrameWndEx::OnUpdateFrameTitle(bAddToTitle);
+// 	CBCGPMDIFrameWnd::OnUpdateFrameTitle(bAddToTitle);
 }
 
 CUIDesignerView* CMainFrame::GetActiveUIView() const
@@ -481,7 +482,7 @@ CUIDesignerView* CMainFrame::GetActiveUIView() const
 
 LRESULT CMainFrame::OnGetTabToolTip(WPARAM /*wp*/, LPARAM lp)
 {
-	CMFCTabToolTipInfo* pInfo = (CMFCTabToolTipInfo*) lp;
+	CBCGPTabToolTipInfo* pInfo = (CBCGPTabToolTipInfo*) lp;
 	ASSERT(pInfo != NULL);
 	if (!pInfo)
 	{
@@ -517,7 +518,7 @@ LRESULT CMainFrame::OnGetTabToolTip(WPARAM /*wp*/, LPARAM lp)
 LRESULT CMainFrame::OnChangeActiveTab(WPARAM wp,LPARAM lp)
 {
 	int nTabIndex=wp;
-	CMFCBaseTabCtrl* pTabWnd=(CMFCBaseTabCtrl*)lp;
+	CBCGPBaseTabWnd* pTabWnd=(CBCGPBaseTabWnd*)lp;
 	CFrameWnd* pFrame=DYNAMIC_DOWNCAST(CFrameWnd,pTabWnd->GetTabWnd(nTabIndex));
 	if(pFrame==NULL)
 		return FALSE;
@@ -589,27 +590,27 @@ BOOL CMainFrame::OnShowMDITabContextMenu(CPoint point, DWORD dwAllowedItems, BOO
 
 	if (pPopup)
 	{
-		if ((dwAllowedItems & AFX_MDI_CREATE_HORZ_GROUP) == 0)
+		if ((dwAllowedItems & BCGP_MDI_CREATE_HORZ_GROUP) == 0)
 		{
 			pPopup->DeleteMenu(ID_MDITABS_NEW_HORZ_TAB_GROUP, MF_BYCOMMAND);
 		}
 
-		if ((dwAllowedItems & AFX_MDI_CREATE_VERT_GROUP) == 0)
+		if ((dwAllowedItems & BCGP_MDI_CREATE_VERT_GROUP) == 0)
 		{
 			pPopup->DeleteMenu(ID_MDITABS_NEW_VERT_TAB_GROUP, MF_BYCOMMAND);
 		}
 
-		if ((dwAllowedItems & AFX_MDI_CAN_MOVE_NEXT) == 0)
+		if ((dwAllowedItems & BCGP_MDI_CAN_MOVE_NEXT) == 0)
 		{
 			pPopup->DeleteMenu(ID_MDITABS_MOVE_TO_NEXT_GROUP, MF_BYCOMMAND);
 		}
 
-		if ((dwAllowedItems & AFX_MDI_CAN_MOVE_PREV) == 0)
+		if ((dwAllowedItems & BCGP_MDI_CAN_MOVE_PREV) == 0)
 		{
 			pPopup->DeleteMenu(ID_MDITABS_MOVE_TO_PREV_GROUP, MF_BYCOMMAND);
 		}
 
-		CMFCPopupMenu* pPopupMenu = new CMFCPopupMenu;
+		CBCGPPopupMenu* pPopupMenu = new CBCGPPopupMenu;
 		if (pPopupMenu)
 		{
 			pPopupMenu->SetAutoDestroy(FALSE);
@@ -642,27 +643,27 @@ void CMainFrame::OnMdiNewVertTabGroup()
 
 void CMainFrame::OnViewProperty()
 {
-	ShowPane(&m_wndProperties, TRUE, TRUE, TRUE);
+	ShowControlBar(&m_wndProperties, TRUE, TRUE, TRUE);
 }
 
 void CMainFrame::OnViewProject()
 {
-	ShowPane(&m_wndFileView, TRUE, TRUE, TRUE);
+	ShowControlBar(&m_wndFileView, TRUE, TRUE, TRUE);
 }
 
 void CMainFrame::OnViewResource()
 {
-	ShowPane(&m_wndResourceView, TRUE, TRUE, TRUE);
+	ShowControlBar(&m_wndResourceView, TRUE, TRUE, TRUE);
 }
 
 void CMainFrame::OnViewToolsBox()
 {
-	ShowPane(&m_wndToolBox, TRUE, TRUE, TRUE);
+	ShowControlBar(&m_wndToolBox, TRUE, TRUE, TRUE);
 }
 
 void CMainFrame::OnViewControls()
 {
-	ShowPane(&m_wndClassView,TRUE,TRUE,TRUE);
+	ShowControlBar(&m_wndClassView,TRUE,TRUE,TRUE);
 }
 
 void CMainFrame::OnDropFiles( HDROP hDropInfo )

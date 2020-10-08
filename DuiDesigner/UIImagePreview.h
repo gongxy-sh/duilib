@@ -1,5 +1,7 @@
 #pragma once
+#if _MSC_VER > 1200
 #include <atlimage.h>
+#endif //_MSC_VER
 
 // CUIImagePreview
 
@@ -12,7 +14,7 @@ public:
 	virtual ~CUIImagePreview();
 
 private:
-	CImage m_imgPreview;
+	CBCGPImage m_imgPreview;
 
 public:
 	void SetPreviewImage(LPCTSTR pstrImage);
