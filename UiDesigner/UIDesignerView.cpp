@@ -242,7 +242,7 @@ void CUIDesignerView::OnInitialUpdate()
 	m_bInit=true;
 
 	m_MultiTracker.SetHandleSize(TRACKER_HANDLE_SIZE);
-	m_MultiTracker.SetStyle(dottedLine|resizeOutside);
+  m_MultiTracker.SetStyle(CRectTracker::dottedLine|CRectTracker::resizeOutside);
 	m_MultiTracker.SetFormSize(pForm->GetInitSize());
 	m_MultiTracker.Add(CreateTracker(pForm));
 
@@ -266,9 +266,9 @@ void CUIDesignerView::OnLButtonDown(UINT nFlags, CPoint point)
 
 	int nHit=m_MultiTracker.HitTest(ptLogical);
 	int nType=GetControlType(pControl);
-	if((nFlags&MK_CONTROL)==0&&nHit==hitNothing)
+  if((nFlags&MK_CONTROL)==0&&nHit==CRectTracker::hitNothing)
 		m_MultiTracker.RemoveAll();
-	if(nHit==hitNothing)
+	if(nHit==CRectTracker::hitNothing)
 		m_MultiTracker.Add(CreateTracker(pControl));
 	else
 		m_MultiTracker.SetFocus(ptLogical);
@@ -332,7 +332,7 @@ BOOL CUIDesignerView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 	point-=m_ptDPtoLP;
 	point.Offset(-FORM_OFFSET_X,-FORM_OFFSET_Y);
 
-	if (pWnd==this&&m_MultiTracker.SetCursor(point,nHitTest))
+	if (pWnd==this&&m_MultiTracker.SetCursor(pWnd,point,nHitTest))
 		return TRUE;
 
 	return CScrollView::OnSetCursor(pWnd, nHitTest, message);

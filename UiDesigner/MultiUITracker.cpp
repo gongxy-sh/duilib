@@ -3,52 +3,20 @@
 
 /////////////////////////////////////////////////////////////////////////////
 // CUITracker
-// CUITracker global state
-
-// this array describes all 8 handles (clock-wise)
-const HandleInfo g_HandleInfo[] =
-{
-	// corner handles (top-left, top-right, bottom-right, bottom-left
-	{ offsetof(RECT, left), offsetof(RECT, top),        0, 0,  0,  0, 1, 3 },
-	{ offsetof(RECT, right), offsetof(RECT, top),       0, 0, -1,  0, 0, 2 },
-	{ offsetof(RECT, right), offsetof(RECT, bottom),    0, 0, -1, -1, 3, 1 },
-	{ offsetof(RECT, left), offsetof(RECT, bottom),     0, 0,  0, -1, 2, 0 },
-
-	// side handles (top, right, bottom, left)
-	{ offsetof(RECT, left), offsetof(RECT, top),        1, 0,  0,  0, 4, 6 },
-	{ offsetof(RECT, right), offsetof(RECT, top),       0, 1, -1,  0, 7, 5 },
-	{ offsetof(RECT, left), offsetof(RECT, bottom),     1, 0,  0, -1, 6, 4 },
-	{ offsetof(RECT, left), offsetof(RECT, top),        0, 1,  0,  0, 5, 7 }
-};
-
-// this array is indexed by the offset of the RECT member / sizeof(int)
-const RectInfo g_RectInfo[] =
-{
-	{ offsetof(RECT, right), +1 },
-	{ offsetof(RECT, bottom), +1 },
-	{ offsetof(RECT, left), -1 },
-	{ offsetof(RECT, top), -1 },
-};
 
 /////////////////////////////////////////////////////////////////////////////
 // CUITracker intitialization
 
-HCURSOR CUITracker::m_hCursors[10];
-HBRUSH CUITracker::m_hHatchBrush=NULL;
-
 CUITracker::CUITracker()
+   : CRectTracker()
 {
 	Init();
 }
 
 CUITracker::CUITracker(LPCRECT lpSrcRect, UINT nStyle)
+   : CRectTracker(lpSrcRect, nStyle)
 {
-	ASSERT(AfxIsValidAddress(lpSrcRect, sizeof(RECT), FALSE));
-
 	Init();
-
-	m_rect.CopyRect(lpSrcRect);
-	m_nStyle = nStyle;
 }
 
 void CUITracker::Init()
@@ -67,175 +35,16 @@ void CUITracker::Init()
 	m_nMask=0xFF;
 	m_nControlType=typeControl;
 	m_nMoveHandleSize=bm.bmWidth;
-
-	Construct();
 }
-
-void CUITracker::Construct()
-{
-	// do one-time initialization if necessary
-	static BOOL bInitialized;
-	if (!bInitialized)
-	{
-		// sanity checks for assumptions we make in the code
-		ASSERT(sizeof(((RECT*)NULL)->left) == sizeof(int));
-		ASSERT(offsetof(RECT, top) > offsetof(RECT, left));
-		ASSERT(offsetof(RECT, right) > offsetof(RECT, top));
-		ASSERT(offsetof(RECT, bottom) > offsetof(RECT, right));
-
-		if (m_hHatchBrush == NULL)
-		{
-			// create the hatch pattern + bitmap
-			WORD hatchPattern[8];
-			WORD wPattern = 0x1111;
-			for (int i = 0; i < 4; i++)
-			{
-				hatchPattern[i] = wPattern;
-				hatchPattern[i+4] = wPattern;
-				wPattern <<= 1;
-			}
-			HBITMAP hatchBitmap = CreateBitmap(8, 8, 1, 1, hatchPattern);
-			if (hatchBitmap == NULL)
-			{
-				AfxThrowResourceException();
-			}
-
-			// create black hatched brush
-			m_hHatchBrush = CreatePatternBrush(hatchBitmap);
-			DeleteObject(hatchBitmap);
-			if (m_hHatchBrush == NULL)
-			{
-				AfxThrowResourceException();
-			}
-		}
-
-		// Note: all track cursors must live in same module
-		HINSTANCE hInst = AfxFindResourceHandle(
-			MAKEINTRESOURCE(AFX_IDC_TRACK4WAY), RT_CURSOR);
-
-		// initialize the cursor array
-		m_hCursors[0] = ::LoadCursor(hInst, MAKEINTRESOURCE(AFX_IDC_TRACKNWSE));
-		m_hCursors[1] = ::LoadCursor(hInst, MAKEINTRESOURCE(AFX_IDC_TRACKNESW));
-		m_hCursors[2] = m_hCursors[0];
-		m_hCursors[3] = m_hCursors[1];
-		m_hCursors[4] = ::LoadCursor(hInst, MAKEINTRESOURCE(AFX_IDC_TRACKNS));
-		m_hCursors[5] = ::LoadCursor(hInst, MAKEINTRESOURCE(AFX_IDC_TRACKWE));
-		m_hCursors[6] = m_hCursors[4];
-		m_hCursors[7] = m_hCursors[5];
-		m_hCursors[8] = ::LoadCursor(hInst, MAKEINTRESOURCE(AFX_IDC_TRACK4WAY));
-		m_hCursors[9] = ::LoadCursor(hInst, MAKEINTRESOURCE(AFX_IDC_MOVE4WAY));
-
-		// get default handle size from Windows profile setting
-		static const TCHAR szWindows[] = _T("windows");
-		static const TCHAR szInplaceBorderWidth[] =
-			_T("oleinplaceborderwidth");
-		bInitialized = TRUE;
-	}
-
-	m_nStyle = 0;
-	m_nHandleSize = 4;
-	m_sizeMin.cy = m_sizeMin.cx = m_nHandleSize*2;
-
-	m_rectLast.SetRectEmpty();
-	m_sizeLast.cx = m_sizeLast.cy = 0;
-	m_bErase = FALSE;
-	m_bFinalErase =  FALSE;
-}
-
-CUITracker::~CUITracker()
-{
-}
-
-/////////////////////////////////////////////////////////////////////////////
-// CUITracker operations
 
 void CUITracker::Draw(CDC* pDC) const
 {
-	// set initial DC state
-	VERIFY(pDC->SaveDC() != 0);
-
-	// get normalized rectangle
-	CRect rect = m_rect;
-	rect.NormalizeRect();
-
-	CPen* pOldPen = NULL;
-	CBrush* pOldBrush = NULL;
-	CGdiObject* pTemp;
-	int nOldROP;
-
-	pDC->SetBkMode(TRANSPARENT);
-	// draw lines
-	if ((m_nStyle & (dottedLine|solidLine)) != 0)
-	{
-		if (m_nStyle & dottedLine)
-			pOldPen = pDC->SelectObject(CPen::FromHandle(m_hDottedLinePen));
-		else
-			pOldPen = (CPen*)pDC->SelectStockObject(BLACK_PEN);
-		pOldBrush = (CBrush*)pDC->SelectStockObject(NULL_BRUSH);
-		nOldROP = pDC->SetROP2(R2_COPYPEN);
-		int offset=GetHandleSize(rect)/2;
-		rect.InflateRect(offset, offset);   // borders are one pixel outside
-		pDC->Rectangle(rect.left, rect.top, rect.right, rect.bottom);
-		pDC->SetROP2(nOldROP);
-	}
-
-	// if hatchBrush is going to be used, need to unrealize it
-	if ((m_nStyle & (hatchInside|hatchedBorder)) != 0)
-		UnrealizeObject(m_hHatchBrush);
-
-	// hatch inside
-	if ((m_nStyle & hatchInside) != 0)
-	{
-		pTemp = pDC->SelectStockObject(NULL_PEN);
-		if (pOldPen == NULL)
-			pOldPen = (CPen*)pTemp;
-		pTemp = pDC->SelectObject(CBrush::FromHandle(m_hHatchBrush));
-		if (pOldBrush == NULL)
-			pOldBrush = (CBrush*)pTemp;
-		pDC->SetBkMode(TRANSPARENT);
-		nOldROP = pDC->SetROP2(R2_MASKNOTPEN);
-		pDC->Rectangle(rect.left+1, rect.top+1, rect.right, rect.bottom);
-		pDC->SetROP2(nOldROP);
-	}
-
-	// draw hatched border
-	if ((m_nStyle & hatchedBorder) != 0)
-	{
-		pTemp = pDC->SelectObject(CBrush::FromHandle(m_hHatchBrush));
-		if (pOldBrush == NULL)
-			pOldBrush = (CBrush*)pTemp;
-		pDC->SetBkMode(OPAQUE);
-		CRect rectTrue;
-		GetTrueRect(&rectTrue);
-		pDC->PatBlt(rectTrue.left, rectTrue.top, rectTrue.Width(),
-			rect.top-rectTrue.top, 0x000F0001 /* Pn */);
-		pDC->PatBlt(rectTrue.left, rect.bottom,
-			rectTrue.Width(), rectTrue.bottom-rect.bottom, 0x000F0001 /* Pn */);
-		pDC->PatBlt(rectTrue.left, rect.top, rect.left-rectTrue.left,
-			rect.Height(), 0x000F0001 /* Pn */);
-		pDC->PatBlt(rect.right, rect.top, rectTrue.right-rect.right,
-			rect.Height(), 0x000F0001 /* Pn */);
-	}
-
-	// draw resize handles
-	pDC->SelectObject(m_hHandlePen);
-	pDC->SelectObject(m_hHandleBrush);
-	if ((m_nStyle & (resizeInside|resizeOutside)) != 0)
-	{
-		UINT mask = GetHandleMask();
-		for (int i = 0; i < 8; ++i)
-		{
-			if (mask & (1<<i))
-			{
-				GetHandleRect((TrackerHit)i, &rect);
-				pDC->Rectangle(&rect);
-			}
-		}
-	}
+  CRectTracker::Draw(pDC);
 
 	//draw move handle
 	if(m_nControlType==typeContainer)
 	{
+    CRect rect;
 		GetMoveHandleRect(&rect);
 		CDC hCloneDC;
 		hCloneDC.CreateCompatibleDC(pDC);
@@ -244,234 +53,6 @@ void CUITracker::Draw(CDC* pDC) const
 		hCloneDC.SelectObject(hOldBitmap);
 		::DeleteDC(hCloneDC);
 	}
-
-	// cleanup pDC state
-	if (pOldPen != NULL)
-		pDC->SelectObject(pOldPen);
-	if (pOldBrush != NULL)
-		pDC->SelectObject(pOldBrush);
-	VERIFY(pDC->RestoreDC(-1));
-}
-
-BOOL CUITracker::SetCursor(CPoint point, UINT nHitTest) const
-{
-	// trackers should only be in client area
-	if (nHitTest != HTCLIENT)
-		return FALSE;
-
-	// do hittest and normalize hit
-	int nHandle = HitTestHandles(point);
-	if (nHandle < 0)
-		return FALSE;
-
-	// need to normalize the hittest such that we get proper cursors
-	nHandle = NormalizeHit(nHandle);
-
-	// handle special case of hitting area between handles
-	//  (logically the same -- handled as a move -- but different cursor)
-	if (nHandle == hitMiddle && !m_rect.PtInRect(point))
-	{
-		// only for trackers with hatchedBorder (ie. in-place resizing)
-		if (m_nStyle & hatchedBorder)
-			nHandle = (TrackerHit)10;
-	}
-
-	ENSURE(nHandle < _countof(m_hCursors));
- 	::SetCursor(m_hCursors[nHandle]);
-	return TRUE;
-}
-
-int CUITracker::HitTest(CPoint point) const
-{
-	TrackerHit hitResult = hitNothing;
-
-	CRect rectTrue;
-	GetTrueRect(&rectTrue);
-	ASSERT(rectTrue.left <= rectTrue.right);
-	ASSERT(rectTrue.top <= rectTrue.bottom);
-	if (rectTrue.PtInRect(point))
-	{
-		if ((m_nStyle & (resizeInside|resizeOutside)) != 0)
-			hitResult = (TrackerHit)HitTestHandles(point);
-		else
-			hitResult = hitMiddle;
-	}
-	return hitResult;
-}
-
-int CUITracker::NormalizeHit(int nHandle) const
-{
-	ENSURE(nHandle <= 8 && nHandle >= -1);
-	if (nHandle == hitMiddle || nHandle == hitNothing)
-		return nHandle;
-	ENSURE(0 <= nHandle && nHandle < _countof(g_HandleInfo));
-	const HandleInfo* pHandleInfo = &g_HandleInfo[nHandle];
-	if (m_rect.Width() < 0)
-	{
-		nHandle = (TrackerHit)pHandleInfo->nInvertX;
-		ENSURE(0 <= nHandle && nHandle < _countof(g_HandleInfo));
-		pHandleInfo = &g_HandleInfo[nHandle];
-	}
-	if (m_rect.Height() < 0)
-		nHandle = (TrackerHit)pHandleInfo->nInvertY;
-	return nHandle;
-}
-
-BOOL CUITracker::Track(CWnd* pWnd, CPoint point, BOOL bAllowInvert,
-						 CDC* pDCClipTo)
-{
-	// perform hit testing on the handles
-	int nHandle = HitTestHandles(point);
-	if (nHandle < 0)
-	{
-		// didn't hit a handle, so just return FALSE
-		return FALSE;
-	}
-
-	// otherwise, call helper function to do the tracking
-	m_bAllowInvert = bAllowInvert;
-	return TrackHandle(nHandle, pWnd, pDCClipTo);
-}
-
-BOOL CUITracker::TrackRubberBand(CWnd* pWnd, CPoint point, BOOL bAllowInvert)
-{
-	// simply call helper function to track from bottom right handle
-	m_bAllowInvert = bAllowInvert;
-	m_rect.SetRect(point.x, point.y, point.x, point.y);
-	return TrackHandle(hitBottomRight, pWnd, NULL);
-}
-
-void CUITracker::DrawTrackerRect(LPCRECT lpRect, CDC* pDC)
-{
-	// first, normalize the rectangle for drawing
-	CRect rect = *lpRect;
-	rect.NormalizeRect();
-
-	CSize size(0, 0);
-	if (!m_bFinalErase)
-	{
-		// otherwise, size depends on the style
-		if (m_nStyle & hatchedBorder)
-		{
-			size.cx = size.cy = max(1, GetHandleSize(rect)-1);
-			rect.InflateRect(size);
-		}
-		else
-		{
-			size.cx = CX_BORDER;
-			size.cy = CY_BORDER;
-		}
-
-		if(m_nStyle & (dottedLine|solidLine))
-		{
-			int offset=GetHandleSize(rect)/2;
-			rect.InflateRect(offset,offset);
-		}
-	}
-
-	pDC->LPtoDP(&rect);
-	// and draw it
-	if (m_bFinalErase || !m_bErase)
-		pDC->DrawDragRect(rect, size, m_rectLast, m_sizeLast);
-
-	// remember last rectangles
-	m_rectLast = rect;
-	m_sizeLast = size;
-}
-
-void CUITracker::AdjustRect(int nHandle, LPRECT)
-{
-	if (nHandle == hitMiddle)
-		return;
-
-	// convert the handle into locations within m_rect
-	int *px, *py;
-	GetModifyPointers(nHandle, &px, &py, NULL, NULL);
-
-	// enforce minimum width
-	int nNewWidth = m_rect.Width();
-	int nAbsWidth = m_bAllowInvert ? abs(nNewWidth) : nNewWidth;
-	if (px != NULL && nAbsWidth < m_sizeMin.cx)
-	{
-		nNewWidth = nAbsWidth != 0 ? nNewWidth / nAbsWidth : 1;
-		ptrdiff_t iRectInfo = (int*)px - (int*)&m_rect;
-		ENSURE(0 <= iRectInfo && iRectInfo < _countof(g_RectInfo));
-		const RectInfo* pRectInfo = &g_RectInfo[iRectInfo];
-		*px = *(int*)((BYTE*)&m_rect + pRectInfo->nOffsetAcross) +
-			nNewWidth * m_sizeMin.cx * -pRectInfo->nSignAcross;
-	}
-
-	// enforce minimum height
-	int nNewHeight = m_rect.Height();
-	int nAbsHeight = m_bAllowInvert ? abs(nNewHeight) : nNewHeight;
-	if (py != NULL && nAbsHeight < m_sizeMin.cy)
-	{
-		nNewHeight = nAbsHeight != 0 ? nNewHeight / nAbsHeight : 1;
-		ptrdiff_t iRectInfo = (int*)py - (int*)&m_rect;
-		ENSURE(0 <= iRectInfo && iRectInfo < _countof(g_RectInfo));
-		const RectInfo* pRectInfo = &g_RectInfo[iRectInfo];
-		*py = *(int*)((BYTE*)&m_rect + pRectInfo->nOffsetAcross) +
-			nNewHeight * m_sizeMin.cy * -pRectInfo->nSignAcross;
-	}
-}
-
-void CUITracker::GetTrueRect(LPRECT lpTrueRect) const
-{
-	ASSERT(AfxIsValidAddress(lpTrueRect, sizeof(RECT)));
-
-	CRect rect = m_rect;
-	rect.NormalizeRect();
-	int nInflateBy = 0;
-	if ((m_nStyle & (resizeOutside|hatchedBorder)) != 0)
-		nInflateBy += GetHandleSize() - 1;
-	if ((m_nStyle & (solidLine|dottedLine)) != 0)
-		++nInflateBy;
-	rect.InflateRect(nInflateBy, nInflateBy);
-	*lpTrueRect = rect;
-}
-
-void CUITracker::OnChangedRect(const CRect& /*rectOld*/)
-{
-	// no default implementation, useful for derived classes
-}
-
-/////////////////////////////////////////////////////////////////////////////
-// CUITracker implementation helpers
-
-void CUITracker::GetHandleRect(int nHandle, CRect* pHandleRect) const
-{
-	ASSERT(nHandle < 8);
-
-	// get normalized rectangle of the tracker
-	CRect rectT = m_rect;
-	rectT.NormalizeRect();
-	if ((m_nStyle & (solidLine|dottedLine)) != 0)
-		rectT.InflateRect(+1, +1);
-
-	// since the rectangle itself was normalized, we also have to invert the
-	//  resize handles.
-	nHandle = NormalizeHit(nHandle);
-
-	// handle case of resize handles outside the tracker
-	int size = GetHandleSize();
-	if (m_nStyle & resizeOutside)
-		rectT.InflateRect(size-1, size-1);
-
-	// calculate position of the resize handle
-	int nWidth = rectT.Width();
-	int nHeight = rectT.Height();
-	CRect rect;
-	const HandleInfo* pHandleInfo = &g_HandleInfo[nHandle];
-	rect.left = *(int*)((BYTE*)&rectT + pHandleInfo->nOffsetX);
-	rect.top = *(int*)((BYTE*)&rectT + pHandleInfo->nOffsetY);
-	rect.left += size * pHandleInfo->nHandleX;
-	rect.top += size * pHandleInfo->nHandleY;
-	rect.left += pHandleInfo->nCenterX * (nWidth - size) / 2;
-	rect.top += pHandleInfo->nCenterY * (nHeight - size) / 2;
-	rect.right = rect.left + size;
-	rect.bottom = rect.top + size;
-
-	*pHandleRect = rect;
 }
 
 void CUITracker::GetMoveHandleRect(CRect* pHandleRect) const
@@ -493,23 +74,6 @@ void CUITracker::GetMoveHandleRect(CRect* pHandleRect) const
 	*pHandleRect=rect;
 }
 
-int CUITracker::GetHandleSize(LPCRECT lpRect) const
-{
-	if (lpRect == NULL)
-		lpRect = &m_rect;
-
-	int size = m_nHandleSize;
-	if (!(m_nStyle & resizeOutside))
-	{
-		// make sure size is small enough for the size of the rect
-		int sizeMax = min(abs(lpRect->right - lpRect->left),
-			abs(lpRect->bottom - lpRect->top));
-		if (size * 2 > sizeMax)
-			size = sizeMax / 2;
-	}
-	return size;
-}
-
 void CUITracker::SetControlType(int nType)
 {
 	m_nControlType=nType;
@@ -520,6 +84,7 @@ void CUITracker::SetControlType(int nType)
 		m_nMask=0xFF;
 }
 
+/*
 int CUITracker::HitTestHandles(CPoint point) const
 {
 	CRect rect;
@@ -561,202 +126,7 @@ int CUITracker::HitTestHandles(CPoint point) const
 	}
 	return m_nControlType==typeControl?hitMiddle:hitNothing;   // no handle hit, but hit object (or object border)
 }
-
-BOOL CUITracker::TrackHandle(int nHandle, CWnd* pWnd, CDC* pDCClipTo)
-{
-	ASSERT(nHandle >= 0);
-	ASSERT(nHandle <= 8);   // handle 8 is inside the rect
-
-	// don't handle if capture already set
-	if (::GetCapture() != NULL)
-		return FALSE;
-
-	AfxLockTempMaps();  // protect maps while looping
-
-	ASSERT(!m_bFinalErase);
-
-	// save original width & height in pixels
-	int nWidth = m_rect.Width();
-	int nHeight = m_rect.Height();
-
-	// set capture to the window which received this message
-	pWnd->SetCapture();
-	ASSERT(pWnd == CWnd::GetCapture());
-	pWnd->UpdateWindow();
-	CRect rectSave = m_rect;
-
-	// convert cursor position to client co-ordinates
-	CPoint point;
-	GetCursorPos(&point);
-	pWnd->ScreenToClient(&point);
-
-	// find out what x/y coords we are supposed to modify
-	int *px, *py;
-	int xDiff, yDiff;
-	GetModifyPointers(nHandle, &px, &py, &xDiff, &yDiff);
-	xDiff = point.x - xDiff;
-	yDiff = point.y - yDiff;
-
-	// get DC for drawing
-	CDC* pDrawDC;
-	if (pDCClipTo != NULL)
-	{
-		pDrawDC = pDCClipTo;
-	}
-	else
-	{
-		// otherwise, just use normal DC
-		pDrawDC = pWnd->GetDC();
-	}
-	ENSURE_VALID(pDrawDC);
-
-	CRect rectOld;
-	BOOL bMoved = FALSE;
-
-	// get messages until capture lost or cancelled/accepted
-	for (;;)
-	{
-		MSG msg;
-		VERIFY(::GetMessage(&msg, NULL, 0, 0));
-
-		if (CWnd::GetCapture() != pWnd)
-			break;
-
-		switch (msg.message)
-		{
-			// handle movement/accept messages
-		case WM_LBUTTONUP:
-		case WM_MOUSEMOVE:
-			rectOld = m_rect;
-			// handle resize cases (and part of move)
-			if (px != NULL)
-				*px = GET_X_LPARAM(msg.lParam) - xDiff;
-			if (py != NULL)
-				*py = GET_Y_LPARAM(msg.lParam) - yDiff;
-
-			// handle move case
-			if (nHandle == hitMiddle)
-			{
-				m_rect.right = m_rect.left + nWidth;
-				m_rect.bottom = m_rect.top + nHeight;
-			}
-			// allow caller to adjust the rectangle if necessary
-			AdjustRect(nHandle, &m_rect);
-
-			// only redraw and callback if the rect actually changed!
-			m_bFinalErase = (msg.message == WM_LBUTTONUP);
-			if (!rectOld.EqualRect(&m_rect) || m_bFinalErase)
-			{
-				if (bMoved)
-				{
-					m_bErase = TRUE;
-					DrawTrackerRect(&rectOld, pDrawDC);
-				}
-				OnChangedRect(rectOld);
-				if (msg.message != WM_LBUTTONUP)
-					bMoved = TRUE;
-			}
-			if (m_bFinalErase)
-				goto ExitLoop;
-
-			if (!rectOld.EqualRect(&m_rect))
-			{
-				m_bErase = FALSE;
-				DrawTrackerRect(&m_rect, pDrawDC);
-			}
-			break;
-
-			// handle cancel messages
-		case WM_KEYDOWN:
-			if (msg.wParam != VK_ESCAPE)
-				break;
-		case WM_RBUTTONDOWN:
-			if (bMoved)
-			{
-				m_bErase = m_bFinalErase = TRUE;
-				DrawTrackerRect(&m_rect, pDrawDC);
-			}
-			m_rect = rectSave;
-			goto ExitLoop;
-
-			// just dispatch rest of the messages
-		default:
-			DispatchMessage(&msg);
-			break;
-		}
-	}
-
-ExitLoop:
-	if(pDCClipTo==NULL)
-		pWnd->ReleaseDC(pDrawDC);
-	ReleaseCapture();
-
-	AfxUnlockTempMaps(FALSE);
-
-	// restore rect in case bMoved is still FALSE
-	if (!bMoved)
-		m_rect = rectSave;
-	m_bFinalErase = FALSE;
-	m_bErase = FALSE;
-
-	// return TRUE only if rect has changed
-	return !rectSave.EqualRect(&m_rect);
-}
-
-void CUITracker::GetModifyPointers(
-									 int nHandle, int** ppx, int** ppy, int* px, int* py)
-{
-	ENSURE(nHandle >= 0);
-	ENSURE(nHandle <= 8);
-
-	if (nHandle == hitMiddle)
-		nHandle = hitTopLeft;   // same as hitting top-left
-
-	*ppx = NULL;
-	*ppy = NULL;
-
-	// fill in the part of the rect that this handle modifies
-	//  (Note: handles that map to themselves along a given axis when that
-	//   axis is inverted don't modify the value on that axis)
-
-	const HandleInfo* pHandleInfo = &g_HandleInfo[nHandle];
-	if (pHandleInfo->nInvertX != nHandle)
-	{
-		*ppx = (int*)((BYTE*)&m_rect + pHandleInfo->nOffsetX);
-		if (px != NULL)
-			*px = **ppx;
-	}
-	else
-	{
-		// middle handle on X axis
-		if (px != NULL)
-			*px = m_rect.left + abs(m_rect.Width()) / 2;
-	}
-	if (pHandleInfo->nInvertY != nHandle)
-	{
-		*ppy = (int*)((BYTE*)&m_rect + pHandleInfo->nOffsetY);
-		if (py != NULL)
-			*py = **ppy;
-	}
-	else
-	{
-		// middle handle on Y axis
-		if (py != NULL)
-			*py = m_rect.top + abs(m_rect.Height()) / 2;
-	}
-}
-
-UINT CUITracker::GetHandleMask() const
-{
-	UINT mask = m_nMask;   // always have 4 corner handles
-	int size = m_nHandleSize*3;
-	if (abs(m_rect.Width()) - size < 4)
-		mask &= (~0x50);
-	if (abs(m_rect.Height()) - size < 4)
-		mask &= (~0xA0);
-	return mask;
-}
-
+*/
 
 /////////////////////////////////////////////////////////////////////////////
 // CMultiUITracker
@@ -810,8 +180,7 @@ CMultiUITracker::CMultiUITracker(void):m_pFocused(NULL)
 	m_szForm.cx=0;
 	m_szForm.cy=0;
 
-	HINSTANCE hInst = AfxFindResourceHandle(
-		MAKEINTRESOURCE(AFX_IDC_TRACK4WAY), RT_CURSOR);
+	HINSTANCE hInst = AfxFindResourceHandle(MAKEINTRESOURCE(AFX_IDC_TRACK4WAY), RT_GROUP_CURSOR);
 	m_hNoDropCursor=::LoadCursor(hInst, MAKEINTRESOURCE(AFX_IDC_NODROPCRSR));
 }
 
@@ -915,7 +284,7 @@ BOOL CMultiUITracker::Track( CWnd* pWnd, CPoint point,BOOL bAllowInvert/*=FALSE*
 	return bRet;
 }
 
-BOOL CMultiUITracker::SetCursor(CPoint point, UINT nHitTest)
+BOOL CMultiUITracker::SetCursor(CWnd* pWnd,CPoint point, UINT nHitTest)
 {
 	CRect rectSave = m_rect;
 	for (int i=0;i<m_arrTracker.GetSize();i++)
@@ -924,7 +293,7 @@ BOOL CMultiUITracker::SetCursor(CPoint point, UINT nHitTest)
 
 		m_rect=pArrTracker->GetPos();
 		SetControlType(pArrTracker->m_nType);
-		if (CUITracker::SetCursor(point, nHitTest))
+		if (CUITracker::SetCursor(pWnd, nHitTest))
 		{
 			m_rect = rectSave;
 			return TRUE;
@@ -1033,7 +402,7 @@ BOOL CMultiUITracker::MultiTrackHandle(CWnd* pWnd,CDC* pDCClipTo)
 					if (bMoved)
 					{
 						m_bErase = TRUE;
-						DrawTrackerRect(&rectOld, pDrawDC);
+						DrawTrackerRect(&rectOld,pWnd, pDrawDC,pWnd);
 					}
 					if (!m_bFinalErase)
 						bMoved = TRUE;
@@ -1041,7 +410,7 @@ BOOL CMultiUITracker::MultiTrackHandle(CWnd* pWnd,CDC* pDCClipTo)
 				if (!rectOld.EqualRect(&m_rect) && !m_bFinalErase)
 				{
 					m_bErase = FALSE;
-					DrawTrackerRect(&m_rect, pDrawDC);
+					DrawTrackerRect(&m_rect,pWnd, pDrawDC,pWnd);
 				}
 				m_arrCloneRect.SetAt(i,m_rect);
 			}
@@ -1091,7 +460,10 @@ BOOL CMultiUITracker::OneTrackHandle(int nHandle, CWnd* pWnd, BOOL bAllowInvert,
 	CControlUI* pControl = m_pFocused->m_pControl;
 	m_rect = m_pFocused->GetPos();
 	m_bAllowInvert = bAllowInvert;
-	BOOL bRet = TrackHandle(nHandle, pWnd, pDCClipTo);
+  CPoint point;
+	GetCursorPos(&point);
+	pWnd->ScreenToClient(&point);
+	BOOL bRet = TrackHandle(nHandle, pWnd,point, pWnd);
 	if(bRet)
 	{
 		CString strVal;
