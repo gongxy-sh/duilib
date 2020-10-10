@@ -1,34 +1,65 @@
 #include "StdAfx.h"
 #include "MultiUITracker.h"
 
-/////////////////////////////////////////////////////////////////////////////
-// CUITracker
+HBRUSH   CUITracker::m_hHatchBrush;
 
 /////////////////////////////////////////////////////////////////////////////
 // CUITracker intitialization
-
 CUITracker::CUITracker()
-   : CRectTracker()
+: CRectTracker()
 {
 	Init();
 }
 
 CUITracker::CUITracker(LPCRECT lpSrcRect, UINT nStyle)
-   : CRectTracker(lpSrcRect, nStyle)
+: CRectTracker(lpSrcRect,nStyle)
 {
 	Init();
 }
 
 void CUITracker::Init()
 {
-	m_clrDottedLine=RGB(0,0,0);
-	m_hDottedLinePen=CreatePen(PS_DOT,0,m_clrDottedLine);
-	m_clrHandleBorder=RGB(0,0,0);
-	m_hHandlePen=CreatePen(PS_SOLID,1,m_clrHandleBorder);
-	m_clrHandleBackground=RGB(255,255,255);
-	m_hHandleBrush=CreateSolidBrush(m_clrHandleBackground);
-	m_hMoveHandleBitmap=(HBITMAP)::LoadImage(::AfxGetResourceHandle(),MAKEINTRESOURCE(IDB_BITMAP_MOVEHANDLE),
-		IMAGE_BITMAP,0,0,0);
+// do one-time initialization if necessary
+	static BOOL bInitialized;
+	if (!bInitialized)
+	{
+		// sanity checks for assumptions we make in the code
+		ASSERT(sizeof(((RECT*)NULL)->left) == sizeof(int));
+		ASSERT(offsetof(RECT, top) > offsetof(RECT, left));
+		ASSERT(offsetof(RECT, right) > offsetof(RECT, top));
+		ASSERT(offsetof(RECT, bottom) > offsetof(RECT, right));
+
+		if (m_hHatchBrush == NULL)
+		{
+			// create the hatch pattern + bitmap
+			WORD hatchPattern[8];
+			WORD wPattern = 0x1111;
+			for (int i = 0; i < 4; i++)
+			{
+				hatchPattern[i] = wPattern;
+				hatchPattern[i+4] = wPattern;
+				wPattern <<= 1;
+			}
+			HBITMAP hatchBitmap = CreateBitmap(8, 8, 1, 1, hatchPattern);
+			if (hatchBitmap == NULL)
+			{
+				AfxThrowResourceException();
+			}
+
+			// create black hatched brush
+			m_hHatchBrush = CreatePatternBrush(hatchBitmap);
+			DeleteObject(hatchBitmap);
+			if (m_hHatchBrush == NULL)
+			{
+				AfxThrowResourceException();
+			}
+		}
+	}
+
+	m_hDottedLinePen=CreatePen(PS_DOT,0,RGB(0,0,0));
+	m_hHandlePen=CreatePen(PS_SOLID,1,RGB(0,0,0));
+	m_hHandleBrush=CreateSolidBrush(RGB(255,255,255));
+	m_hMoveHandleBitmap=(HBITMAP)::LoadImage(::AfxGetResourceHandle(),MAKEINTRESOURCE(IDB_BITMAP_MOVEHANDLE),IMAGE_BITMAP,0,0,0);
 	BITMAP bm; 
 	GetObject(m_hMoveHandleBitmap,sizeof(BITMAP),(LPBYTE)&bm);
 
@@ -37,14 +68,98 @@ void CUITracker::Init()
 	m_nMoveHandleSize=bm.bmWidth;
 }
 
+/////////////////////////////////////////////////////////////////////////////
+// CUITracker operations
+
 void CUITracker::Draw(CDC* pDC) const
 {
-  CRectTracker::Draw(pDC);
+	// set initial DC state
+	VERIFY(pDC->SaveDC() != 0);
+
+	// get normalized rectangle
+	CRect rect = m_rect;
+	rect.NormalizeRect();
+
+	CPen* pOldPen = NULL;
+	CBrush* pOldBrush = NULL;
+	CGdiObject* pTemp;
+	int nOldROP;
+
+	pDC->SetBkMode(TRANSPARENT);
+	// draw lines
+	if ((m_nStyle & (dottedLine|solidLine)) != 0)
+	{
+		if (m_nStyle & dottedLine)
+			pOldPen = pDC->SelectObject(CPen::FromHandle(m_hDottedLinePen));
+		else
+			pOldPen = (CPen*)pDC->SelectStockObject(BLACK_PEN);
+		pOldBrush = (CBrush*)pDC->SelectStockObject(NULL_BRUSH);
+		nOldROP = pDC->SetROP2(R2_COPYPEN);
+		int offset=GetHandleSize(rect)/2;
+		rect.InflateRect(offset, offset);   // borders are one pixel outside
+		pDC->Rectangle(rect.left, rect.top, rect.right, rect.bottom);
+		pDC->SetROP2(nOldROP);
+	}
+
+	// if hatchBrush is going to be used, need to unrealize it
+	if ((m_nStyle & (hatchInside|hatchedBorder)) != 0)
+		UnrealizeObject(m_hHatchBrush);
+
+	// hatch inside
+	if ((m_nStyle & hatchInside) != 0)
+	{
+		pTemp = pDC->SelectStockObject(NULL_PEN);
+		if (pOldPen == NULL)
+			pOldPen = (CPen*)pTemp;
+		pTemp = pDC->SelectObject(CBrush::FromHandle(m_hHatchBrush));
+		if (pOldBrush == NULL)
+			pOldBrush = (CBrush*)pTemp;
+		pDC->SetBkMode(TRANSPARENT);
+		nOldROP = pDC->SetROP2(R2_MASKNOTPEN);
+		pDC->Rectangle(rect.left+1, rect.top+1, rect.right, rect.bottom);
+		pDC->SetROP2(nOldROP);
+	}
+
+	// draw hatched border
+	if ((m_nStyle & hatchedBorder) != 0)
+	{
+		pTemp = pDC->SelectObject(CBrush::FromHandle(m_hHatchBrush));
+		if (pOldBrush == NULL)
+			pOldBrush = (CBrush*)pTemp;
+		pDC->SetBkMode(OPAQUE);
+		CRect rectTrue;
+		GetTrueRect(&rectTrue);
+		pDC->PatBlt(rectTrue.left, rectTrue.top, rectTrue.Width(),
+			rect.top-rectTrue.top, 0x000F0001 /* Pn */);
+		pDC->PatBlt(rectTrue.left, rect.bottom,
+			rectTrue.Width(), rectTrue.bottom-rect.bottom, 0x000F0001 /* Pn */);
+		pDC->PatBlt(rectTrue.left, rect.top, rect.left-rectTrue.left,
+			rect.Height(), 0x000F0001 /* Pn */);
+		pDC->PatBlt(rect.right, rect.top, rectTrue.right-rect.right,
+			rect.Height(), 0x000F0001 /* Pn */);
+	}
+
+	// draw resize handles
+	pDC->SelectObject(m_hHandlePen);
+	pDC->SelectObject(m_hHandleBrush);
+	if ((m_nStyle & (resizeInside|resizeOutside)) != 0)
+	{
+		UINT mask = GetHandleMask();
+		for (int i = 0; i < 8; ++i)
+		{
+			if (mask & (1<<i))
+			{
+				GetHandleRect((TrackerHit)i, &rect);
+				pDC->Rectangle(&rect);
+			}
+		}
+	}
 
 	//draw move handle
 	if(m_nControlType==typeContainer)
 	{
     CRect rect;
+
 		GetMoveHandleRect(&rect);
 		CDC hCloneDC;
 		hCloneDC.CreateCompatibleDC(pDC);
@@ -53,8 +168,17 @@ void CUITracker::Draw(CDC* pDC) const
 		hCloneDC.SelectObject(hOldBitmap);
 		::DeleteDC(hCloneDC);
 	}
+
+	// cleanup pDC state
+	if (pOldPen != NULL)
+		pDC->SelectObject(pOldPen);
+	if (pOldBrush != NULL)
+		pDC->SelectObject(pOldBrush);
+	VERIFY(pDC->RestoreDC(-1));
 }
 
+/////////////////////////////////////////////////////////////////////////////
+// CUITracker implementation helpers
 void CUITracker::GetMoveHandleRect(CRect* pHandleRect) const
 {
 	CRect rcTopLeft;
@@ -84,7 +208,6 @@ void CUITracker::SetControlType(int nType)
 		m_nMask=0xFF;
 }
 
-/*
 int CUITracker::HitTestHandles(CPoint point) const
 {
 	CRect rect;
@@ -126,7 +249,18 @@ int CUITracker::HitTestHandles(CPoint point) const
 	}
 	return m_nControlType==typeControl?hitMiddle:hitNothing;   // no handle hit, but hit object (or object border)
 }
-*/
+
+UINT CUITracker::GetHandleMask() const
+{
+	UINT mask = m_nMask;   // always have 4 corner handles
+	int size = m_nHandleSize*3;
+	if (abs(m_rect.Width()) - size < 4)
+		mask &= (~0x50);
+	if (abs(m_rect.Height()) - size < 4)
+		mask &= (~0xA0);
+	return mask;
+}
+
 
 /////////////////////////////////////////////////////////////////////////////
 // CMultiUITracker
@@ -179,9 +313,8 @@ CMultiUITracker::CMultiUITracker(void):m_pFocused(NULL)
 {
 	m_szForm.cx=0;
 	m_szForm.cy=0;
-
 	HINSTANCE hInst = AfxFindResourceHandle(MAKEINTRESOURCE(AFX_IDC_TRACK4WAY), RT_GROUP_CURSOR);
-	m_hNoDropCursor=::LoadCursor(hInst, MAKEINTRESOURCE(AFX_IDC_NODROPCRSR));
+	m_hNoDropCursor = ::LoadCursor(hInst, MAKEINTRESOURCE(AFX_IDC_NODROPCRSR));
 }
 
 CMultiUITracker::~CMultiUITracker(void)
@@ -262,7 +395,7 @@ int CMultiUITracker::HitTestHandles(CPoint point)
 	return hitNothing;
 }
 
-BOOL CMultiUITracker::Track( CWnd* pWnd, CPoint point,BOOL bAllowInvert/*=FALSE*/,CDC* pDCClipTo/*=NULL*/)
+BOOL CMultiUITracker::Track( CWnd* pWnd, CPoint point,BOOL bAllowInvert/*=FALSE*/,CWnd* pWndClipTo/*=NULL*/)
 {
 	if (IsEmpty())
 		return FALSE;
@@ -274,17 +407,17 @@ BOOL CMultiUITracker::Track( CWnd* pWnd, CPoint point,BOOL bAllowInvert/*=FALSE*
 	case hitNothing:
 		break;
 	case hitMiddle:
-		bRet = MultiTrackHandle(pWnd, pDCClipTo);
+		bRet = MultiTrackHandle(pWnd, pWndClipTo);
 		break;
 	default:
-		bRet = OneTrackHandle(nHandle, pWnd, bAllowInvert, pDCClipTo);
+		bRet = OneTrackHandle(nHandle, pWnd, point,bAllowInvert, pWndClipTo);
 		break;
 	}
 
 	return bRet;
 }
 
-BOOL CMultiUITracker::SetCursor(CWnd* pWnd,CPoint point, UINT nHitTest)
+BOOL CMultiUITracker::SetCursor(CWnd* pWnd, UINT nHitTest)
 {
 	CRect rectSave = m_rect;
 	for (int i=0;i<m_arrTracker.GetSize();i++)
@@ -303,7 +436,7 @@ BOOL CMultiUITracker::SetCursor(CWnd* pWnd,CPoint point, UINT nHitTest)
 	return FALSE;
 }
 
-BOOL CMultiUITracker::MultiTrackHandle(CWnd* pWnd,CDC* pDCClipTo)
+BOOL CMultiUITracker::MultiTrackHandle(CWnd* pWnd,CWnd* pWndClipTo)
 {
 	if (::GetCapture() != NULL)
 		return FALSE;
@@ -327,9 +460,9 @@ BOOL CMultiUITracker::MultiTrackHandle(CWnd* pWnd,CDC* pDCClipTo)
 
 	// get DC for drawing
 	CDC* pDrawDC;
-	if (pDCClipTo != NULL)
+	if (pWndClipTo != NULL)
 	{
-		pDrawDC = pDCClipTo;
+		pDrawDC = pWndClipTo->GetDC();
 	}
 	else
 	{
@@ -402,7 +535,7 @@ BOOL CMultiUITracker::MultiTrackHandle(CWnd* pWnd,CDC* pDCClipTo)
 					if (bMoved)
 					{
 						m_bErase = TRUE;
-						DrawTrackerRect(&rectOld,pWnd, pDrawDC,pWnd);
+						DrawTrackerRect(&rectOld, NULL,pDrawDC,pWnd);
 					}
 					if (!m_bFinalErase)
 						bMoved = TRUE;
@@ -410,7 +543,7 @@ BOOL CMultiUITracker::MultiTrackHandle(CWnd* pWnd,CDC* pDCClipTo)
 				if (!rectOld.EqualRect(&m_rect) && !m_bFinalErase)
 				{
 					m_bErase = FALSE;
-					DrawTrackerRect(&m_rect,pWnd, pDrawDC,pWnd);
+					DrawTrackerRect(&m_rect, NULL,pDrawDC,pWnd);
 				}
 				m_arrCloneRect.SetAt(i,m_rect);
 			}
@@ -434,7 +567,9 @@ BOOL CMultiUITracker::MultiTrackHandle(CWnd* pWnd,CDC* pDCClipTo)
 	}
 
 ExitLoop:
-	if(pDCClipTo==NULL)
+	if(pWndClipTo==NULL)
+		pWndClipTo->ReleaseDC(pDrawDC);
+	else
 		pWnd->ReleaseDC(pDrawDC);
 	ReleaseCapture();
 
@@ -452,7 +587,7 @@ ExitLoop:
 	return bMoved;
 }
 
-BOOL CMultiUITracker::OneTrackHandle(int nHandle, CWnd* pWnd, BOOL bAllowInvert, CDC* pDCClipTo)
+BOOL CMultiUITracker::OneTrackHandle(int nHandle, CWnd* pWnd,CPoint point, BOOL bAllowInvert, CWnd* pWndClipTo)
 {
 	if(m_arrTracker.GetSize()>1)
 		return FALSE;
@@ -460,10 +595,7 @@ BOOL CMultiUITracker::OneTrackHandle(int nHandle, CWnd* pWnd, BOOL bAllowInvert,
 	CControlUI* pControl = m_pFocused->m_pControl;
 	m_rect = m_pFocused->GetPos();
 	m_bAllowInvert = bAllowInvert;
-  CPoint point;
-	GetCursorPos(&point);
-	pWnd->ScreenToClient(&point);
-	BOOL bRet = TrackHandle(nHandle, pWnd,point, pWnd);
+	BOOL bRet = TrackHandle(nHandle, pWnd,point, pWndClipTo);
 	if(bRet)
 	{
 		CString strVal;

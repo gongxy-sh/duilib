@@ -60,7 +60,6 @@ public:
 	void SetModifiedFlag(BOOL bModified = TRUE);
 
 protected:
-	void UpDateDPtoLPOffset();
 	CTrackerElement* CreateTracker(CControlUI* pControl);
 	int GetControlType(CControlUI* pControl);
 
@@ -82,7 +81,6 @@ private:
 	CMultiUITracker m_MultiTracker;
 	CUICommandHistory m_UICommandHistory;
 
-	CPoint m_ptDPtoLP;//Device coordinates to Logical coordinates
 	bool m_bInit;
 
 	static CLIPFORMAT m_cfUI;//custom clipboard format

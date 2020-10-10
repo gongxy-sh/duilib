@@ -153,6 +153,26 @@ LINK32=link.exe
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
+# Begin Group "tinyxml"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=.\third_party\tinyxml\tinystr.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\third_party\tinyxml\tinyxml.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\third_party\tinyxml\tinyxmlerror.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\third_party\tinyxml\tinyxmlparser.cpp
+# End Source File
+# End Group
 # Begin Source File
 
 SOURCE=.\ChildFrm.cpp
@@ -188,16 +208,6 @@ SOURCE=.\DialogTemplateOpen.cpp
 # Begin Source File
 
 SOURCE=.\DialogUIAttribEdit.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\UiDesigner.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\UiDesigner.rc
-# ADD BASE RSC /l 0x804
-# ADD RSC /l 0x804 /i "..\..\BCGControlBarPro" /i "..\..\BCGControlBarPro\Styles"
 # End Source File
 # Begin Source File
 
@@ -249,22 +259,6 @@ SOURCE=.\stdafx.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\third_party\tinyxml\tinystr.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\third_party\tinyxml\tinyxml.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\third_party\tinyxml\tinyxmlerror.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\third_party\tinyxml\tinyxmlparser.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\ToolBoxCtrl.cpp
 # End Source File
 # Begin Source File
@@ -274,6 +268,16 @@ SOURCE=.\ToolBoxWnd.cpp
 # Begin Source File
 
 SOURCE=.\UICommandHistory.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\UiDesigner.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\UiDesigner.rc
+# ADD BASE RSC /l 0x804
+# ADD RSC /l 0x804 /i "..\..\BCGControlBarPro" /i "..\..\BCGControlBarPro\Styles"
 # End Source File
 # Begin Source File
 
@@ -338,10 +342,6 @@ SOURCE=.\DialogTemplateOpen.h
 # Begin Source File
 
 SOURCE=.\DialogUIAttribEdit.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\UiDesigner.h
 # End Source File
 # Begin Source File
 
@@ -410,6 +410,10 @@ SOURCE=.\ToolBoxWnd.h
 # Begin Source File
 
 SOURCE=.\UICommandHistory.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\UiDesigner.h
 # End Source File
 # Begin Source File
 

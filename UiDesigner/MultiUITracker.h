@@ -6,11 +6,13 @@ using DuiLib::INotifyUI;
 
 /////////////////////////////////////////////////////////////////////////////
 // CUITracker - Modified according to CRectTracker
+
 class CUITracker : public CRectTracker
 {
 public:
-  CUITracker();
-  CUITracker(LPCRECT lpSrcRect, UINT nStyle);
+	// Constructors
+	CUITracker();
+	CUITracker(LPCRECT lpSrcRect, UINT nStyle);
 
 	// Operations
 	RECT GetRect() const { return m_rect; }
@@ -19,26 +21,27 @@ public:
 	void SetStyle(UINT style) { m_nStyle=style; }
 
 	// Overridables
-	void Draw(CDC* pDC) const;
-	void SetControlType(int nType);
+	virtual void Draw(CDC* pDC) const;
+	virtual UINT GetHandleMask() const;
+	virtual void SetControlType(int nType);
 
 protected:
-	// implementation helpers
-	void GetMoveHandleRect(CRect* pHandleRect) const;
-	void Init();
-
-protected:
+	// Attributes
 	int m_nMoveHandleSize;//size of move handle
 	UINT m_nMask;
 	UINT m_nControlType;
 
-	COLORREF m_clrDottedLine;
 	HPEN     m_hDottedLinePen;
-	COLORREF m_clrHandleBorder;
 	HPEN     m_hHandlePen;
-	COLORREF m_clrHandleBackground;
 	HBRUSH   m_hHandleBrush;
 	HBITMAP  m_hMoveHandleBitmap;
+
+	static HBRUSH   m_hHatchBrush;
+
+	// implementation helpers
+	int HitTestHandles(CPoint point) const;
+	void GetMoveHandleRect(CRect* pHandleRect) const;
+	void Init();
 };
 
 ////////////////////////////////////////////////////////////
@@ -80,8 +83,8 @@ public:
 
 	int HitTest(CPoint point);
 	int HitTestHandles(CPoint point);
-	BOOL Track(CWnd* pWnd, CPoint point,BOOL bAllowInvert=FALSE,CDC* pDCClipTo=NULL);
-	BOOL SetCursor(CWnd* pWnd,CPoint point, UINT nHitTest);
+	BOOL Track(CWnd* pWnd, CPoint point,BOOL bAllowInvert=FALSE,CWnd* pWndClipTo=NULL);
+	BOOL SetCursor(CWnd* pWnd, UINT nHitTest);
 
 	BOOL Add(CTrackerElement * pTracker);
 	BOOL Remove(CTrackerElement * pTracker);
@@ -98,8 +101,8 @@ public:
 	void SetFormSize(SIZE size) { m_szForm=size; }
 
 protected:
-	BOOL MultiTrackHandle(CWnd* pWnd,CDC* pDCClipTo);
-	BOOL OneTrackHandle(int nHandle, CWnd* pWnd, BOOL bAllowInvert, CDC* pDCClipTo);
+	BOOL MultiTrackHandle(CWnd* pWnd,CWnd* pWndClipTo);
+	BOOL OneTrackHandle(int nHandle, CWnd* pWnd, CPoint point,BOOL bAllowInvert, CWnd* pWndClipTo);
 	void CopyUIRect();
 	void ClearUIRect();
 	void UpdateUIRect();

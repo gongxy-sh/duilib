@@ -62,9 +62,6 @@
 #define FORM_INIT_WIDTH  400
 #define FORM_INIT_HEIGHT 400
 
-#define FORM_OFFSET_X 20
-#define FORM_OFFSET_Y 20
-
 #define COPY_OFFSET_XY 10
 
 #define UI_DEFAULT_WIDTH  60

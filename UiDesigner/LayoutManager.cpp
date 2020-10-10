@@ -925,8 +925,6 @@ void CLayoutManager::TestForm(LPCTSTR pstrFile)
 	if( pFrame == NULL )
 		return;
 
-	g_HookAPI.EnableInvalidate(false);
-
 	pFrame->SetManager(pManager);
 	HWND h_wnd =pFrame->Create(m_Manager.GetPaintWindow(),_T("FormTest"),UI_WNDSTYLE_FRAME,0,0,0,size.cx,size.cy);
 
@@ -941,7 +939,6 @@ void CLayoutManager::TestForm(LPCTSTR pstrFile)
 	//pRoot->SetManager(NULL,NULL);
 	pFrame->SetRoot(pRoot);
 	pFrame->Init();
-
 
 	pFrame->CenterWindow();
 
@@ -963,9 +960,6 @@ void CLayoutManager::TestForm(LPCTSTR pstrFile)
 		if( msg.message == WM_QUIT ) break;
 	}
 	if( msg.message == WM_QUIT ) ::PostQuitMessage(msg.wParam);
-
-	g_HookAPI.EnableInvalidate(true);
-
 	DeleteFile(pstrFile);
 }
 

@@ -7,33 +7,16 @@ bool CHookAPI::m_bCreateFileEnabled=false;
 TCHAR CHookAPI::m_sSkinDir[MAX_PATH]={0};
 pfnCreateFile CHookAPI::CreateFileAPI=NULL;
 
-bool CHookAPI::m_bInvalidateEnabled=false;
-HOOKSTRUCT CHookAPI::m_InvalidateHookInfo={0};
-
 bool CHookAPI::m_bGetImageExEnabled=false;
 HOOKSTRUCT CHookAPI::m_GetImageExHookInfo={0};
 
 CHookAPI::CHookAPI(void)
 {
-#ifdef _DEBUG
 	CreateFileAPI=(pfnCreateFile)HookAPI(_T("KERNEL32.dll"),LPCSTR("CreateFileW"),(FARPROC)Hook_CreateFile,GetModuleHandle(_T("DuilibUD.dll")));
 	EnableCreateFile(true);
 
-	HookAPI(_T("DuilibUD.dll"),LPCSTR("?Invalidate@CPaintManagerUI@DuiLib@@QAEXAAUtagRECT@@@Z"),(FARPROC)Hook_Invalidate,m_InvalidateHookInfo);
-	EnableInvalidate(true);
-
 	HookAPI(_T("DuilibUD.dll"),LPCSTR("?GetImageEx@CPaintManagerUI@DuiLib@@QAEPAUtagTImageInfo@2@PB_W0K@Z"),(FARPROC)Hook_GetImageEx,m_GetImageExHookInfo);
 	EnableGetImageEx(true);
-#else
-	CreateFileAPI=(pfnCreateFile)HookAPI(_T("KERNEL32.dll"),LPCSTR("CreateFileW"),(FARPROC)Hook_CreateFile,GetModuleHandle(_T("DuilibU.dll")));
-	EnableCreateFile(true);
-
-	HookAPI(_T("DuilibU.dll"),LPCSTR("?Invalidate@CPaintManagerUI@DuiLib@@QAEXAAUtagRECT@@@Z"),(FARPROC)Hook_Invalidate,m_InvalidateHookInfo);
-	EnableInvalidate(true);
-
-	HookAPI(_T("DuilibU.dll"),LPCSTR("?GetImageEx@CPaintManagerUI@DuiLib@@QAEPAUtagTImageInfo@2@PB_W0K@Z"),(FARPROC)Hook_GetImageEx,m_GetImageExHookInfo);
-	EnableGetImageEx(true);
-#endif
 }
 
 CHookAPI::~CHookAPI(void)
@@ -136,35 +119,6 @@ HANDLE WINAPI CHookAPI::Hook_CreateFile(
 	return CreateFileAPI(lpFileName,dwDesiredAccess,dwShareMode,lpSecurityAttributes,dwCreationDisposition
 		,dwFlagsAndAttributes,hTemplateFile);
 }
-
-__declspec(naked) void WINAPI CHookAPI::Hook_Invalidate(RECT& rcItem)
-{
-	_asm
-	{
-		push ebp;
-		mov ebp,esp;
-		pushad;
-		push ecx;//push this pointer
-	}
-	EnableHook(m_InvalidateHookInfo,FALSE);
-
-	if(m_bInvalidateEnabled)
-	{
-	::OffsetRect(&rcItem,FORM_OFFSET_X,FORM_OFFSET_Y);
-	::InflateRect(&rcItem,TRACKER_HANDLE_SIZE,TRACKER_HANDLE_SIZE);
-	}
-	_asm pop ecx;//pop this pointer
-	((pfnInvalidate)m_InvalidateHookInfo.pfnFuncAddr)(rcItem);
-
-	EnableHook(m_InvalidateHookInfo,TRUE);
-	_asm
-	{
-		popad;
-		pop ebp;
-		retn 0x04;
-	}
-}
-
 __declspec(naked) TImageInfo* WINAPI CHookAPI::Hook_GetImageEx(LPCTSTR pstrBitmap, LPCTSTR pstrType, DWORD mask)
 {
 	_asm

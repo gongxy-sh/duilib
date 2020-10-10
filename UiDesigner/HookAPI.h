@@ -20,7 +20,6 @@ typedef HANDLE (WINAPI *pfnCreateFile)(
 									 DWORD dwFlagsAndAttributes, 
 									 HANDLE hTemplateFile
 							   );
-typedef void (WINAPI *pfnInvalidate)(RECT& rcItem);
 typedef TImageInfo* (WINAPI *pfnGetImageEx)(LPCTSTR pstrBitmap, LPCTSTR pstrType, DWORD mask);
 
 class CHookAPI
@@ -47,9 +46,6 @@ public:
 	static void EnableCreateFile(bool bEnable=true) { m_bCreateFileEnabled=bEnable; }
 	static void SetSkinDir(LPCTSTR pstrDir) { _tcscpy_s(m_sSkinDir,pstrDir); }
 
-	static void WINAPI Hook_Invalidate(RECT& rcItem);
-	static void EnableInvalidate(bool bEnable=true) { m_bInvalidateEnabled=bEnable; }
-
 	static TImageInfo* WINAPI Hook_GetImageEx(LPCTSTR pstrBitmap, LPCTSTR pstrType, DWORD mask);
 	static void EnableGetImageEx(bool bEnable=true) { m_bGetImageExEnabled=bEnable; }
 
@@ -57,9 +53,6 @@ private:
 	static bool m_bCreateFileEnabled;
 	static TCHAR m_sSkinDir[MAX_PATH];
 	static pfnCreateFile CreateFileAPI;
-
-	static bool m_bInvalidateEnabled;
-	static HOOKSTRUCT m_InvalidateHookInfo;
 
 	static bool m_bGetImageExEnabled;
 	static HOOKSTRUCT m_GetImageExHookInfo;
