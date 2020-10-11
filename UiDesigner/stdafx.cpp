@@ -10,7 +10,6 @@ CPropertiesWnd* g_pPropertiesWnd = NULL;
 CFileView* g_pFileView = NULL;
 CClassView* g_pClassView = NULL;
 CResourceViewBar* g_pResourceView = NULL;
-CHookAPI g_pHookAPI;
 
 int gGetUIClass(LPCTSTR pstrClass)
 {

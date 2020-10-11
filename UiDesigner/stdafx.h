@@ -139,7 +139,6 @@ typedef struct tagUIAttribute
 #include "FileView.h"
 #include "ClassView.h"
 #include "ResourceView.h"
-#include "HookAPI.h"
 #include "GlobalVariable.h"
 
 #define DUI_MSGTYPE_SETPOS               DUI_MSGTYPE_USER
@@ -157,7 +156,6 @@ extern CPropertiesWnd* g_pPropertiesWnd;
 extern CFileView* g_pFileView;
 extern CClassView* g_pClassView;
 extern CResourceViewBar* g_pResourceView;
-extern CHookAPI g_HookAPI;
 
 //////////////////////////////////////////////////////////////////////////
 //Global functions

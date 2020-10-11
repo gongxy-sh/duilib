@@ -587,9 +587,6 @@ void CLayoutManager::Init(HWND hWnd,LPCTSTR pstrLoad)
 		if(nPos != -1)
 			m_strSkinDir = m_strSkinDir.Left(nPos + 1);
 
-		g_HookAPI.SetSkinDir(m_strSkinDir);
-		g_HookAPI.EnableCreateFile(true);
-
 		CDialogBuilder builder;
 		CControlUI* pRoot=builder.Create(pstrLoad,NULL,this,&m_Manager);
 		if(pRoot)
@@ -928,15 +925,12 @@ void CLayoutManager::TestForm(LPCTSTR pstrFile)
 	pFrame->SetManager(pManager);
 	HWND h_wnd =pFrame->Create(m_Manager.GetPaintWindow(),_T("FormTest"),UI_WNDSTYLE_FRAME,0,0,0,size.cx,size.cy);
 
-	// CControlUI* pRoot=CloneControls(GetForm()->GetItemAt(0));
-	// 使用新建的XML树来预览，不会挂掉
 	pManager->Init(h_wnd);
 	CDialogBuilder builder;
 	CContainerUI* pRoot=static_cast<CContainerUI*>(builder.Create(pstrFile,NULL,NULL,pManager));
 	if(pRoot==NULL)
 		return;
 
-	//pRoot->SetManager(NULL,NULL);
 	pFrame->SetRoot(pRoot);
 	pFrame->Init();
 

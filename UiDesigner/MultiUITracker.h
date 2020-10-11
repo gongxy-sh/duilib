@@ -20,10 +20,12 @@ public:
 	void SetHandleSize(int nHandleSize) { m_nHandleSize=nHandleSize; }
 	void SetStyle(UINT style) { m_nStyle=style; }
 
+  void Draw(CDC* pDC) const;
+
+  void SetControlType(int nType);
+
 	// Overridables
-	virtual void Draw(CDC* pDC) const;
 	virtual UINT GetHandleMask() const;
-	virtual void SetControlType(int nType);
 
 protected:
 	// Attributes
@@ -79,7 +81,7 @@ public:
 	virtual ~CMultiUITracker(void);
 
 public:
-	void Draw(CDC* pDC,LPSIZE pOffset=NULL);
+	void Draw(CDC* pDC);
 
 	int HitTest(CPoint point);
 	int HitTestHandles(CPoint point);

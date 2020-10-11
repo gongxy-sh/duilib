@@ -107,7 +107,7 @@ BOOL CUIDesignerView::PreCreateWindow(CREATESTRUCT& cs)
 
 // CUIDesignerView 绘制
 
-void CUIDesignerView::OnDraw(CDC* pDrawDC)
+void CUIDesignerView::OnDraw(CDC* pDC)
 {
   CUIDesignerDoc* pDoc = GetDocument();
   ASSERT_VALID(pDoc);
@@ -117,8 +117,10 @@ void CUIDesignerView::OnDraw(CDC* pDrawDC)
   }
 
   // TODO: 在此处为本机数据添加绘制代码
-  CBCGPMemDC memDC(*pDrawDC, this);
-  CDC* pDC = &memDC.GetDC();
+#ifndef _DEBUG
+  CBCGPMemDC memDC(*pDC, this);
+  pDC = &memDC.GetDC();
+#endif //_DEBUG
 
   CRect rectClient;
   GetClientRect(rectClient);
@@ -126,40 +128,24 @@ void CUIDesignerView::OnDraw(CDC* pDrawDC)
   rectClient.OffsetRect(point);
   pDC->FillSolidRect(rectClient,RGB(255, 255, 255));
 
-  CSize szForm=m_LayoutManager.GetForm()->GetInitSize();
-  CSize szFormOffset(0,0);
-  CDC hCloneDC;
-  HBITMAP hNewBitmap;
-  hCloneDC.CreateCompatibleDC(pDC);
-  hNewBitmap=::CreateCompatibleBitmap(pDC->GetSafeHdc(),szForm.cx,szForm.cy);
-  HBITMAP hOldBitmap=(HBITMAP)hCloneDC.SelectObject(hNewBitmap);
-
   if (m_brHatch.m_hObject)
   {
-    CDC cloneDC;
-    cloneDC.Attach(hCloneDC);
-    CRect rcTemp = rectClient;
-    rcTemp.top= rcTemp.top>=20 ? rcTemp.top-20 : 0;
-    rcTemp.left= rcTemp.left>=20 ? rcTemp.left-20 : 0;
-    //rcTemp.right  = max(rcTemp.right , m_pScrollHelper->GetDisplaySize().cx);
-    //rcTemp.bottom = max(rcTemp.bottom, m_pScrollHelper->GetDisplaySize().cy);
+    CSize szForm = m_LayoutManager.GetForm()->GetInitSize();
+    CRect rcTemp;
+    rcTemp.left   = rectClient.left>=20 ? rectClient.left-20 : 0;
+    rcTemp.top    = rectClient.top>=20 ? rectClient.top-20 : 0;
+    rcTemp.right  = rcTemp.left + szForm.cx;
+    rcTemp.bottom = rcTemp.top + szForm.cy;
     m_brHatch.UnrealizeObject();
     CPoint pt(0, 0);
-    cloneDC.LPtoDP(&pt);
-    pt = cloneDC.SetBrushOrg(pt.x % 8, pt.y % 8);
-    CBrush* old = cloneDC.SelectObject(&m_brHatch);
-    cloneDC.FillRect(&rcTemp, &m_brHatch);
-    cloneDC.SelectObject(old);
-    cloneDC.Detach();
+    pDC->LPtoDP(&pt);
+    pt = pDC->SetBrushOrg(pt.x % 8, pt.y % 8);
+    CBrush* old = pDC->SelectObject(&m_brHatch);
+    pDC->FillRect(&rcTemp, &m_brHatch);
+    pDC->SelectObject(old);
   }
-
-  m_LayoutManager.Draw(&hCloneDC);
-  pDC->BitBlt(szFormOffset.cx,szFormOffset.cy,szForm.cx,szForm.cy,&hCloneDC,0,0,SRCCOPY);
-  hCloneDC.SelectObject(hOldBitmap);
-  ::DeleteDC(hCloneDC);
-  ::DeleteObject(hNewBitmap);
-
-  m_MultiTracker.Draw(pDC,&szFormOffset);
+  m_LayoutManager.Draw(pDC);
+  m_MultiTracker.Draw(pDC);
 }
 
 
@@ -597,7 +583,6 @@ void CUIDesignerView::SelectUI(CControlUI* pControl)
 void CUIDesignerView::OnActivated()
 {
   g_pPropertiesWnd->ShowProperty(m_MultiTracker.GetFocused());
-  g_HookAPI.SetSkinDir(m_LayoutManager.GetSkinDir());
 }
 
 void CUIDesignerView::InitUI(CControlUI* pControl, int depth)

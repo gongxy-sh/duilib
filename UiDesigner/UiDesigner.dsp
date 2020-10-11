@@ -219,10 +219,6 @@ SOURCE=.\GlobalVariable.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\HookAPI.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=.\ImageDialog.cpp
 # End Source File
 # Begin Source File

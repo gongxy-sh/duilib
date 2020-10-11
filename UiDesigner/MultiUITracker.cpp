@@ -323,7 +323,7 @@ CMultiUITracker::~CMultiUITracker(void)
 	ClearUIRect();
 }
 
-void CMultiUITracker::Draw(CDC* pDC,LPSIZE pOffset/*=NULL*/)
+void CMultiUITracker::Draw(CDC* pDC)
 {
 	HPEN hOldPen=m_hHandlePen;
 	HPEN hWhitePen=CreatePen(PS_SOLID,1,RGB(255,255,255));
@@ -335,8 +335,6 @@ void CMultiUITracker::Draw(CDC* pDC,LPSIZE pOffset/*=NULL*/)
 		CTrackerElement* pArrTracker = m_arrTracker.GetAt(i);
 
 		m_rect=pArrTracker->GetPos();
-		if(pOffset)
-			m_rect.OffsetRect(*pOffset);
 		SetControlType(pArrTracker->m_nType);
 		if(pArrTracker==m_pFocused)
 		{

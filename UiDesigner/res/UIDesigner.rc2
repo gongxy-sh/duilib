@@ -5,14 +5,16 @@
 #ifdef APSTUDIO_INVOKED
 #endif //APSTUDIO_INVOKED
 
-//#ifdef _BCGCBPRO_STATIC_
-#include "../../BCGControlBarPro/BCGCBPro.rc"
-#include "../../BCGControlBarPro/Styles/BCGPStyle2007Luna.rc"
-#include "../../BCGControlBarPro/Styles/BCGPStyle2007Obsidian.rc"
-#include "../../BCGControlBarPro/Styles/BCGPStyle2007Silver.rc"
-#include "../../BCGControlBarPro/Styles/BCGPStyle2007Aqua.rc"
-#include "../../BCGControlBarPro/Styles/BCGPStyleCarbon.rc"
-//#endif //_BCGCBPRO_STATIC_
+#include "BCGCBPro.rc"
+#include "BCGPStyle2007Aqua.rc2"
+#include "BCGPStyle2007Luna.rc2"
+#include "BCGPStyle2007Obsidian.rc2"
+#include "BCGPStyle2007Silver.rc2"
+#include "BCGPStyle2010Black.rc2"
+#include "BCGPStyle2010Blue.rc2"
+#include "BCGPStyle2010White.rc2"
+#include "BCGPStyleCarbon.rc2"
+#include "BCGPStyleScenic.rc2"
 
 /////////////////////////////////////////////////////////////////////////////
 
